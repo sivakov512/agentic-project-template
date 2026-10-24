@@ -43,6 +43,5 @@ records the stop and its reason in `docs/now.md`. Work resumes only on the owner
 ## The process itself
 
 When the process gets in the way or misses something, the coordinator proposes a change to the
-template ([updates.md](updates.md#changing-the-process)). When a process update pull request opens, the
-coordinator does what its changelog asks of the project and brings it to the owner
-([updates.md](updates.md#getting-a-newer-process)).
+template ([updates.md](updates.md#changing-the-process)). When `doctor.py` reports a newer process, the
+coordinator brings the update as [updates.md](updates.md#getting-a-newer-process) says.

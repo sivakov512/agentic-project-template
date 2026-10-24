@@ -10,10 +10,11 @@ Python's standard library.
     "set_up": true,
     "owner_language": "English",
     "tracker": "Linear, project EXA",
+    "releases": "release-please, versions vX.Y.Z, built and published on release",
     "agents_account": "own",
     "merged_by": "coordinator"
   },
-  "commits": {"one_line": true, "no_co_authors": false},
+  "commits": {"one_line": true, "no_co_authors": false, "conventional": true},
   "checks": ["npm test", "npm run lint"],
   "ids_ignore": ["docs/audit/*.md"],
   "ids": [
@@ -39,21 +40,38 @@ Python's standard library.
 - `tracker`: the tracker that mirrors the project for the owner, and the project in it, in a few words;
   or `none`. `doctor.py` shows it at the start of every coordinator session
   ([coordinator.md](coordinator.md#the-tracker)).
+- `releases`: how the project ships, in a few words; `not yet: <where it is decided>` for a project
+  that will ship but hasn't chosen how; or `none`. The full description is in the Releases section of
+  `docs/plan.md` ([releases](#releases)).
 - `agents_account`: `own` (the agents have a GitHub account of their own) or `owner` (they work under
   the owner's); `merged_by`: `coordinator` or `owner`. What each means:
   [workflow.md](workflow.md#the-owners-ok-and-the-merge).
 
-`owner_language`, `tracker`, `agents_account` and `merged_by` must be set once `set_up` is `true`, so
-these choices are always made and written down.
+`owner_language`, `tracker`, `releases`, `agents_account` and `merged_by` must be set once `set_up` is
+`true`, so these choices are always made and written down.
 
 ## commits
 
 Every commit subject is at most 72 characters. Stricter rules the project may ask for:
 
 - `one_line`: a commit message is its subject line only, with no body;
-- `no_co_authors`: no `Co-authored-by` lines.
+- `no_co_authors`: no `Co-authored-by` lines;
+- `conventional`: every subject follows Conventional Commits, as release tools that read the history
+  need: one of the types `feat`, `fix`, `perf`, `revert`, `refactor`, `chore`, `docs`, `style`, `test`,
+  `build`, `ci`, in lower case, an optional lower-case scope, an optional `!` (`fix(parser): …`,
+  `docs!: …`). A revert is written `revert: …`, not git's default `Revert "…"`.
 
-Both default to `false`. Rules beyond these (Conventional Commits, say) go in the project's own check.
+All default to `false`. Rules beyond these go in the project's own check.
+
+## releases
+
+The process doesn't choose a release tool; it makes the project choose one and write it down. For a
+project that ships, a good default is release-please: it opens release pull requests from the
+Conventional Commits history (set `commits.conventional`), keeps the changelog and tags versions,
+and the project's own workflows build and publish on the release. Run it with a GitHub App's token,
+not the agents' or the owner's: its pull requests are then recognised as a bot's
+([pull-requests.md](pull-requests.md#the-checks-ci-runs)), and the release it creates starts the
+publishing workflows. Its configuration is the project's: it differs with what the project ships.
 
 ## checks
 

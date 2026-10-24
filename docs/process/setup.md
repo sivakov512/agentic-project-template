@@ -23,11 +23,13 @@ Always ask, whatever the brief says:
 - **which tracker mirrors the project for the owner,** or that there is none; whether the project is in
   it yet; and how agents reach it (a connector, a skill, a token), which the owner grants. If the
   project isn't in it yet, `tracker` names the tracker and says "project to be created";
+- **how the project ships** (what is released, versions, how it is built and published, who starts
+  it), or that it isn't released ([config.md](config.md#releases));
 - the owner's language, and the commit rules, if any ([config.md](config.md#commits)).
 
 ## Steps
 
-1. **Branch** `setup` from `main`, start it with `git commit --allow-empty -m "Start the setup"`, and
+1. **Branch** `setup` from `main`, start it with `git commit --allow-empty -m "chore: start the setup"`, and
    open a draft pull request titled `Plan: set up the project`, "Backlog item: Setup", with the steps
    below as a checklist in its description. Tick each step there when it is done.
 2. **`CLAUDE.md`:** replace the placeholder text with what the project is, in two or three lines, and
@@ -35,8 +37,9 @@ Always ask, whatever the brief says:
    session must know). Keep the line `@docs/process/rules.md`.
 3. **`docs/plan.md`:** fill in every section the placeholder lists. The first stage is usually
    requirements or research; keep the document chain as short as the project allows.
-4. **`docs/process.json`:** the owner's language, the tracker, the agents' account and who merges, the
-   commit rules, the kinds of ID and coverage rules ([config.md](config.md)). `checks` stays empty until
+4. **`docs/process.json`:** the owner's language, the tracker, how the project ships, the agents'
+   account and who merges, the commit rules, the kinds of ID and coverage rules
+   ([config.md](config.md)). `checks` stays empty until
    the project has code; the item that adds the first check also adds
    `.github/workflows/project-checks.yml` that runs it in CI. Leave `set_up` false until step 9.
 5. **`docs/backlog.md`:** the first stage's items ([changes.md](changes.md#the-backlog)).
@@ -52,8 +55,6 @@ Always ask, whatever the brief says:
      approve their own pull request, so nothing would merge) and no bypassing ("Do not allow bypassing
      the above settings", or no bypass list in a ruleset), because the owner's account is an admin and
      the protection wouldn't bind it otherwise.
-   - Settings → Secrets and variables → Actions → Secrets: `PROCESS_UPDATE_TOKEN`
-     ([updates.md](updates.md#getting-a-newer-process)).
    - Settings → Secrets and variables → Actions → Variables: `CI_RUNNER`, if the checks should run on a
      self-hosted runner.
    - The secrets the project itself needs, if any are known yet.

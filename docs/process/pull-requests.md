@@ -54,8 +54,8 @@ clash with the project's own.
 Pull requests opened by a GitHub App (a release bot, a dependency bot) skip `process-pr`: they don't
 follow the template. Their other checks run, and they go through the owner's OK and the merge like any
 other. So automation whose pull requests don't follow the template (a release tool run in CI, say)
-opens them with a GitHub App's token, not with the agents' or the owner's; the template's own process
-update follows it and uses the agents' token. One that changes the template's files (a dependency bot
+opens them with a GitHub App's token, not with the agents' or the owner's; a process update follows the
+template, and the coordinator opens it under the agents' account. One that changes the template's files (a dependency bot
 bumping an action in `process-*.yml`) is closed: such changes come from the template.
 
 These checks catch mistakes, not a determined agent: a pull request runs its own copy of the workflow

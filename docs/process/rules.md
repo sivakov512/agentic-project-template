@@ -43,8 +43,8 @@ Whatever your role: a question from the owner is a question. Answer it and propo
 - Work on your own branch, named `b-###-short-name`. Never commit to `main`.
 - **Questions first.** Before any work, open a draft pull request with a short plan (what you will
   change and how you will check it) and your questions about the item, or "no questions". GitHub needs a
-  commit to open one: start the branch with an empty commit (`git commit --allow-empty -m "Start
-  B-###"`, or in the form the project's commit rules ask for). With questions, end your turn and say
+  commit to open one: start the branch with an empty commit (`git commit --allow-empty -m "chore: start
+  B-###"`, which passes the commit check with or without Conventional Commits). With questions, end your turn and say
   in your last message that you wait for answers in the pull request; the coordinator answers there and
   tells you to go on (a message to your session). With no questions, go on at once.
 - **Do only that item, and no more than it needs.** Its "Done when" is the bar. Tools for our own use get

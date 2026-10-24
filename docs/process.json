@@ -3,11 +3,12 @@
     "set_up": false,
     "owner_language": "",
     "tracker": "",
+    "releases": "",
     "agents_account": "",
     "merged_by": ""
   },
   "checks": [],
-  "commits": {"one_line": false, "no_co_authors": false},
+  "commits": {"one_line": false, "no_co_authors": false, "conventional": false},
   "ids_ignore": [],
   "ids": [],
   "coverage": []

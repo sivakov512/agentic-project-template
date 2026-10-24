@@ -38,8 +38,8 @@ BACKLOG = """\
 
 # A project's kinds of ID and coverage, as docs/process.json gives them: cases to requirements.
 CONFIG = {
-    "project": {"set_up": True, "owner_language": "English", "tracker": "none", "agents_account": "own",
-                "merged_by": "coordinator"},
+    "project": {"set_up": True, "owner_language": "English", "tracker": "none", "releases": "none",
+                "agents_account": "own", "merged_by": "coordinator"},
     "ids": [
         {"kind": "case", "prefix": "C", "file": "docs/cases.md", "defined_by": "heading"},
         {"kind": "scenario", "prefix": "S", "file": "docs/scenarios.md", "defined_by": "heading"},
@@ -302,11 +302,12 @@ class DocsCheck(unittest.TestCase):
             ({"project": None}, "project must be an object"),
             ({"project": {**CONFIG["project"], "owner_language": ""}}, "owner_language must be set"),
             ({"project": {**CONFIG["project"], "tracker": ""}}, "tracker must be set"),
+            ({"project": {**CONFIG["project"], "releases": ""}}, "releases must be set"),
             ({"project": {**CONFIG["project"], "merged_by": ""}}, "merged_by must be set"),
             ({"project": {**CONFIG["project"], "agents_account": "bot"}}, "agents_account must be own or owner"),
             ({"ids_ignore": "docs/a.md"}, "ids_ignore must be a list"),
             ({"commits": {"one_line": "yes"}}, "commits must be an object of true or false"),
-            ({"commits": {"signed": True}}, "knows only one_line and no_co_authors"),
+            ({"commits": {"signed": True}}, "knows only one_line, no_co_authors and conventional"),
             ({"ids": [{"kind": "x", "prefix": "X", "file": "a.md", "defined_by": "heading"},
                       {"kind": "x", "prefix": "Y", "file": "b.md", "defined_by": "heading"}]}, "named twice"),
         ]:
@@ -442,6 +443,18 @@ class CommitsCheck(unittest.TestCase):
         errors = check_commits.check([("a" * 40, "Subject\n\nCo-authored-by: Someone <a@b.c>\n")], self.STRICT)
         self.assertTrue(any("Co-authored-by" in error for error in errors))
 
+    def test_conventional_subjects(self):
+        rules = {"conventional": True}
+        for subject in ("feat: export to CSV", "fix(parser): keep empty lines", "docs!: drop the old guide",
+                        "chore(main): release 1.2.0"):
+            with self.subTest(subject=subject):
+                self.assertEqual(check_commits.check([("a" * 40, subject)], rules), [])
+        for subject in ("Add export", "feat:no space", "Feat: capital", "feat (x): space before scope",
+                        "fx: typo in the type", 'Revert "feat: export"'):
+            with self.subTest(subject=subject):
+                self.assertTrue(check_commits.check([("a" * 40, subject)], rules))
+        self.assertEqual(check_commits.check([("a" * 40, "Add export")], {}), [])
+
     def test_unknown_commits_give_a_message(self):
         script = Path(__file__).resolve().parent / "check_commits.py"
         result = subprocess.run([sys.executable, str(script), "0" * 40, "1" * 40], capture_output=True, text=True)
@@ -547,6 +560,23 @@ class LockAgainstMain(unittest.TestCase):
         self.change_and_relock("0.3.0")
         errors = check_lock.check(self.root, self.base, ["plan", "ok-without-reading"])
         self.assertTrue(any("owner-review" in e for e in errors), errors)
+
+
+class DoctorRulesets(unittest.TestCase):
+    def test_approvals_come_from_the_pull_request_rule(self):
+        rules = [{"type": "deletion"}, {"type": "pull_request", "parameters": {
+            "required_approving_review_count": 1, "dismiss_stale_reviews_on_push": True}}]
+        self.assertEqual(doctor.approvals(rules), (1, True))
+
+    def test_the_strictest_of_several_rulesets_counts(self):
+        rules = [{"type": "pull_request", "parameters": {"required_approving_review_count": 0}},
+                 {"type": "pull_request", "parameters": {"required_approving_review_count": 2,
+                                                         "dismiss_stale_reviews_on_push": True}}]
+        self.assertEqual(doctor.approvals(rules), (2, True))
+
+    def test_no_pull_request_rule_means_unknown(self):
+        self.assertIsNone(doctor.approvals([{"type": "deletion"}]))
+        self.assertIsNone(doctor.approvals([]))
 
 
 class Sync(unittest.TestCase):

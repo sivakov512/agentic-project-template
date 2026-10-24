@@ -1,18 +1,23 @@
 #!/usr/bin/env python3
 """Checks the commit messages of a pull request. Standard library and git only.
 
-Every subject is at most 72 characters and not empty. docs/process.json may also ask for one-line messages
-and no "Co-authored-by" (docs/process/config.md, "commits").
+Every subject is at most 72 characters and not empty. docs/process.json may also ask for one-line messages,
+no "Co-authored-by" and Conventional Commits subjects (docs/process/config.md, "commits").
 
     python3 tools/process/check_commits.py <base sha> <head sha>
 """
 
 import json
+import re
 import subprocess
 import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
+# A Conventional Commits subject: one of the usual types (the ones release tools read), an optional scope,
+# an optional "!", then ": " and a description.
+TYPES = ("feat", "fix", "perf", "revert", "refactor", "chore", "docs", "style", "test", "build", "ci")
+CONVENTIONAL = re.compile(r"^(" + "|".join(TYPES) + r")(\([a-z0-9][a-z0-9._/-]*\))?!?: \S")
 
 
 def rules(root):
@@ -38,6 +43,9 @@ def check(messages, rules):
             errors.append(f"{short}: has a body; a commit message is one subject line here")
         if rules.get("no_co_authors") and "co-authored-by" in message.lower():
             errors.append(f"{short}: has a Co-authored-by line")
+        if rules.get("conventional") and subject.strip() and not CONVENTIONAL.match(subject):
+            errors.append(f"{short}: subject is not Conventional Commits (\"type(scope): description\", type one"
+                          f" of {', '.join(TYPES)})")
     return errors
 
 

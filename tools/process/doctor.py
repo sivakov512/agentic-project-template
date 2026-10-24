@@ -54,6 +54,17 @@ def this_repo():
     return out.strip() if code == 0 else None
 
 
+def approvals(rules):
+    """(required approvals, dismissed by new commits) as GitHub applies them, the strictest of the
+    rulesets' pull request rules; None when no ruleset has one (classic protection, which only an admin
+    can read)."""
+    found = [rule.get("parameters") or {} for rule in rules if rule.get("type") == "pull_request"]
+    if not found:
+        return None
+    return (max(int(p.get("required_approving_review_count", 0)) for p in found),
+            any(bool(p.get("dismiss_stale_reviews_on_push")) for p in found))
+
+
 def check_files(report):
     try:
         lock = owned.read_lock(ROOT) or {}
@@ -125,8 +136,8 @@ def check_github(report, lock, set_up, fix_labels, agents_account):
             report.line(not missing, "labels for kinds and review",
                         "missing: " + ", ".join(missing) + " (run with --fix-labels)")
 
-    # Readable with read access: the branch (classic protection) and the rules on it (rulesets). How
-    # many approvals and whether a new commit dismisses one only an admin can read.
+    # Readable with read access: the branch (classic protection) and the rules on it (rulesets). Approval
+    # settings come from the rulesets; under classic protection only an admin can read them.
     code, out = gh("api", f"repos/{repo}/branches/main")
     branch = json.loads(out) if code == 0 else {}
     code, out = gh("api", f"repos/{repo}/rules/branches/main")
@@ -145,22 +156,25 @@ def check_github(report, lock, set_up, fix_labels, agents_account):
         missing_checks = [name for name in REQUIRED_CHECKS if name not in contexts]
         report.line(protected and not missing_checks, "the process checks are required for main",
                     "the owner requires them: " + ", ".join(missing_checks))
-        if agents_account == "own":
+        reviews = approvals(rules)
+        if agents_account == "own" and reviews is None:
             report.line(None, "approvals for main",
                         "the owner checks: one approval, dismissed by new commits (docs/process/setup.md, step 8)")
-        elif agents_account == "owner":
+        elif agents_account == "own":
+            count, dismissed = reviews
+            report.line(count >= 1 and dismissed, "one approval for main, dismissed by new commits",
+                        f"the ruleset asks {count} approval(s), dismissed by new commits: {dismissed}"
+                        " (docs/process/setup.md, step 8)")
+        elif agents_account == "owner" and reviews is None:
+            report.line(None, "no required approvals for main",
+                        "the owner checks: nobody can approve their own pull request (docs/process/setup.md, step 8)")
+        elif agents_account == "owner" and reviews[0] > 0:
+            report.line(False, "no required approvals for main",
+                        "nobody can approve their own pull request, so nothing would merge (docs/process/setup.md, step 8)")
+        if agents_account == "owner":
             report.line(None, "no bypassing for main",
                         "the owner checks it is on, or the protection doesn't bind the owner's account"
                         " (docs/process/setup.md, step 8)")
-
-    if not is_template:
-        code, out = gh("secret", "list", "--json", "name", "--jq", ".[].name")
-        if code == 0:
-            report.line("PROCESS_UPDATE_TOKEN" in out.split("\n"), "the PROCESS_UPDATE_TOKEN secret",
-                        "the owner adds it (docs/process/updates.md)")
-        else:
-            report.line(None, "the PROCESS_UPDATE_TOKEN secret",
-                        "can't list secrets with this account: the owner checks Settings → Secrets and variables → Actions")
 
     template = lock.get("template")
     if template:
@@ -170,7 +184,7 @@ def check_github(report, lock, set_up, fix_labels, agents_account):
             current = lock.get("version", "0.0.0")
             report.line(owned.version_tuple(latest) <= owned.version_tuple(current),
                         f"the process is the newest ({current})",
-                        f"{latest} is out: merge the open process update, or run the process-update workflow"
+                        f"{latest} is out: run python3 tools/process/update.py, or merge the open process update"
                         " (docs/process/updates.md)")
         else:
             report.line(None, "the newest process", f"can't read releases of {template}")

@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
-"""The weekly process update (docs/process/updates.md, "Getting a newer process"): when the template has
-a newer release, brings its files in and opens a pull request. Runs in GitHub Actions, with GH_TOKEN and
-GITHUB_REPOSITORY set; standard library, git and gh only.
+"""The process update (docs/process/updates.md, "Getting a newer process"): when the template has a newer
+release, brings its files in on a branch made from main as it is on GitHub, and opens a pull request.
+The coordinator runs it with a clean working tree, git and gh signed in as the agents' account; it leaves
+the checkout on the update's branch. Standard library, git and gh only.
 
     python3 tools/process/update.py
 """
 
 import json
-import os
 import subprocess
 import sys
 import tempfile
@@ -41,7 +41,7 @@ The process lives in the template; projects take its releases (docs/process/upda
 
 ## How it was checked
 
-Opened by the process-update workflow; the checks of this pull request are the evidence.
+Opened by tools/process/update.py; the checks of this pull request are the evidence.
 
 ## Docs updated
 
@@ -66,7 +66,7 @@ class Failed(Exception):
 def run(*args, cwd=ROOT):
     done = subprocess.run(args, cwd=cwd, capture_output=True, text=True)
     if done.returncode != 0:
-        command = " ".join(arg if "x-access-token" not in arg else "<url>" for arg in args[:3])
+        command = " ".join(args[:3])
         raise Failed(f"{command}: {done.stderr.strip() or done.stdout.strip()}")
     return done.stdout.strip()
 
@@ -76,17 +76,18 @@ def gh_json(*args):
 
 
 def main():
-    repo = os.environ["GITHUB_REPOSITORY"]
-    lock = owned.read_lock(ROOT)
-    if lock is None:
-        print(f"No {owned.LOCK}: nothing to update from")
+    repo = run("gh", "repo", "view", "--json", "nameWithOwner", "--jq", ".nameWithOwner")
+    if run("git", "status", "--porcelain"):
+        raise Failed("the working tree has changes: commit or stash them first")
+    run("git", "fetch", "--quiet", "origin", "main")
+    try:
+        lock = json.loads(run("git", "show", f"origin/main:{owned.LOCK}"))
+    except (Failed, ValueError):
+        print(f"main has no readable {owned.LOCK}: nothing to update from")
         return 1
     template = lock["template"]
     if repo == template:
         print("This is the template itself: nothing to update")
-        return 0
-    if not os.environ.get("GH_TOKEN"):
-        print("::warning::No PROCESS_UPDATE_TOKEN secret, so no process update (docs/process/updates.md)")
         return 0
 
     try:
@@ -107,10 +108,12 @@ def main():
         print(f"A process update is already open: {open_updates[0]['html_url']}. Merge or close it first")
         return 0
 
+    # The update starts from main as it is on GitHub, whatever was checked out.
+    run("git", "checkout", "--quiet", "-B", branch, "origin/main")
     with tempfile.TemporaryDirectory() as folder:
         checkout = Path(folder) / "template"
-        url = f"https://x-access-token:{os.environ['GH_TOKEN']}@github.com/{template}.git"
-        run("git", "clone", "--quiet", "--depth", "1", "--branch", tag, url, str(checkout))
+        run("git", "clone", "--quiet", "--depth", "1", "--branch", tag, f"https://github.com/{template}.git",
+            str(checkout))
         released = owned.read_lock(checkout) or {}
         if released.get("version") != new:
             raise Failed(f"release {tag} of {template} carries a lock for version {released.get('version')}")
@@ -120,13 +123,9 @@ def main():
     if changelog.startswith("## "):
         changelog = "#" + changelog
 
-    user = gh_json("api", "user")
-    name, email = user["login"], f"{user['id']}+{user['login']}@users.noreply.github.com"
-    run("git", "checkout", "-b", branch)
     run("git", "add", "-A")
-    run("git", "-c", f"user.name={name}", "-c", f"user.email={email}",
-        "commit", "--quiet", "-m", f"chore: update the process to {new}")
-    # The branch is this workflow's own: one left from a run that couldn't open its pull request is replaced.
+    run("git", "commit", "--quiet", "-m", f"chore: update the process to {new}")
+    # The branch is this script's own: one left from a run that couldn't open its pull request is replaced.
     run("git", "push", "--quiet", "--force", "origin", branch)
 
     body = BODY.format(old=old, new=new, template=template, tag=tag, changelog=changelog or "(none)")
@@ -134,7 +133,7 @@ def main():
                    "-f", f"head={branch}", "-f", "base=main", "-f", f"body={body}")
     run("gh", "api", f"repos/{repo}/issues/{pull['number']}/labels",
         "-f", "labels[]=plan", "-f", "labels[]=owner-review")
-    print(f"Opened {pull['html_url']}")
+    print(f"Opened {pull['html_url']}. The checkout is on {branch}: do there what the changelog asks.")
     return 0
 
 

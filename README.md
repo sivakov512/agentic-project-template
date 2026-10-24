@@ -24,14 +24,14 @@ files alone, and it is checked in CI.
   reviewer), how one piece of work goes from a backlog item to a merged pull request, what the owner
   reviews and what only needs an OK, decision records, IDs and coverage.
 - `tools/process/`: checks of the documents, pull requests and commits; `doctor.py`, which says what
-  the setup is missing; the weekly update of the process.
+  the setup is missing; `update.py`, which brings a newer process into a project.
 - Placeholders for the project's own files: `CLAUDE.md`, `docs/plan.md`, `docs/now.md`,
   `docs/backlog.md`, `docs/decisions/`, `docs/process.json`.
 
 ## Updates
 
-Projects keep the template's files as a released version, locked by hash. A workflow checks every week
-for a newer release and opens a pull request with it; changes to the process are made here, never in a
-project ([docs/process/updates.md](docs/process/updates.md)).
+Projects keep the template's files as a released version, locked by hash. When a newer release is out,
+the project's coordinator brings it as a pull request; changes to the process are made here, never in
+a project ([docs/process/updates.md](docs/process/updates.md)).
 
 This file is the project's: setting up replaces it.

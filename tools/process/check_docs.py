@@ -362,8 +362,8 @@ def project_errors(config):
     if not isinstance(project, dict):
         return [f"{CONFIG}: project must be an object"]
     errors = []
-    for key, kind in (("set_up", bool), ("owner_language", str), ("tracker", str), ("agents_account", str),
-                      ("merged_by", str)):
+    for key, kind in (("set_up", bool), ("owner_language", str), ("tracker", str), ("releases", str),
+                      ("agents_account", str), ("merged_by", str)):
         if key in project and not isinstance(project[key], kind):
             errors.append(f"{CONFIG}: project.{key} must be a {kind.__name__}")
     for key, allowed in (("agents_account", ("own", "owner")), ("merged_by", ("coordinator", "owner"))):
@@ -372,6 +372,7 @@ def project_errors(config):
     if project.get("set_up") is True:
         for key, what in (("owner_language", "the owner's language"),
                           ("tracker", "the tracker and the project in it, or \"none\""),
+                          ("releases", "how the project ships, \"not yet: ...\" or \"none\""),
                           ("agents_account", "own or owner"), ("merged_by", "coordinator or owner")):
             if not str(project.get(key, "")).strip():
                 errors.append(f"{CONFIG}: project.{key} must be set once the project is set up: {what}")
@@ -382,8 +383,8 @@ def project_errors(config):
     commits = config.get("commits", {})
     if not isinstance(commits, dict) or not all(isinstance(value, bool) for value in commits.values()):
         errors.append(f"{CONFIG}: commits must be an object of true or false settings")
-    elif set(commits) - {"one_line", "no_co_authors"}:
-        errors.append(f"{CONFIG}: commits knows only one_line and no_co_authors")
+    elif set(commits) - {"one_line", "no_co_authors", "conventional"}:
+        errors.append(f"{CONFIG}: commits knows only one_line, no_co_authors and conventional")
     return errors
 
 

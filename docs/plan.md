@@ -36,6 +36,13 @@ How the tracker named in `docs/process.json` is kept: how
 [the process's rules](process/coordinator.md#the-tracker) map onto its own items (milestones, tasks,
 problems or whatever it calls them), and how agents reach it. Or "none".
 
+## Releases
+
+How the project ships, strictly enough that every session does it the same way: what is released
+(an app, a package, a deployed service, documents), how versions are numbered, what builds and
+publishes a release and where, and who or what starts it. Or "not yet", with where it will be
+decided; or "none", with the reason. The short form is `releases` in `docs/process.json`.
+
 ## Defences
 
 What could go wrong in this project, beyond [the process's list](process/defences.md), and what stops
