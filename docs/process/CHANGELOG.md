@@ -3,6 +3,14 @@
 The newest version first. Each entry says what changed and what projects must do, if anything
 ([updates.md](updates.md#changing-the-process)).
 
+## 0.1.1 — 2026-10-24
+
+- Every comment and review on pull requests is in the owner's language, agents' to each other
+  included: the owner reads them. The repository itself stays in English.
+- In the template itself, the coordinator merges after the owner's Approve.
+
+Projects: nothing to do.
+
 ## 0.1.0 — 2026-10-24
 
 The process of a running agent-driven project, split into the template's part and the project's.

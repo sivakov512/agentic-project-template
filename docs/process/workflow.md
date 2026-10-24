@@ -81,6 +81,7 @@ Each project chooses, in `docs/process.json`, how this works for it; the choice 
 
 Either way agents never merge without the owner's OK, and a commit pushed after the OK needs the OK
 again (with the agents' own account GitHub sees to that). Before merging, the coordinator checks the OK
-itself, not from a retelling: the Approve on the pull request, or the owner's own words in the chat. The setting-up session counts as the
-coordinator for the setup pull request. In the template itself, its owner merges. When the coordinator
-quotes the owner's OK in a comment, the quote keeps the owner's words as said.
+itself, not from a retelling: the Approve on the pull request, or the owner's own words in the chat.
+When the coordinator quotes the owner's OK in a comment, the quote keeps the owner's words as said. The
+setting-up session counts as the coordinator for the setup pull request. In the template itself, the
+coordinator merges after the owner's Approve, as in a project with the agents' own account.

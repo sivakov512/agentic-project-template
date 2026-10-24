@@ -102,10 +102,11 @@ Whatever your role: a question from the owner is a question. Answer it and propo
 - Write for the next reader, briefly: say each thing once, and link to the document that says it rather
   than restating it.
 - Everything in the repository is in English: docs, code, comments, commits, pull request titles and
-  descriptions, and what agents write to each other in pull requests. Docs in plain words.
-- Talk with the owner is in the owner's language (`owner_language` in `docs/process.json`; before it is
-  set, the language the owner writes in): the chat, questions to the owner, and comments on pull
-  requests addressed to the owner. Text proposed for the repository is quoted in English.
+  descriptions. Docs in plain words.
+- Talk is in the owner's language (`owner_language` in `docs/process.json`; before it is set, the
+  language the owner writes in): the chat, and every comment and review on pull requests, agents' to
+  each other included, since the owner reads them. Text proposed for the repository is quoted in
+  English.
 - A commit subject is at most 72 characters; `docs/process.json` may ask for more
   ([config.md](config.md#commits)).
 
