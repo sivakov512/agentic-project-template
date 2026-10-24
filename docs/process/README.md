@@ -4,6 +4,11 @@ How work goes in a repository where agents do the work and the owner decides. Th
 the template and is the same in every project made from it. A change to the process goes to the
 template ([updates.md](updates.md)); in a project, these files are locked.
 
+The process files (this folder, `tools/process/`, `.github/pull_request_template.md` and
+`.github/workflows/process-*.yml`) are from
+[agentic-project-template](https://github.com/sivakov512/agentic-project-template), copyright (c) 2026
+Nikita Sivakov, under the MIT License.
+
 ## What lives where
 
 | What | Where | Whose |
@@ -17,6 +22,7 @@ template ([updates.md](updates.md)); in a project, these files are locked.
 | Decisions | `docs/decisions/` and its `README.md` | the project |
 | Settings the process reads | `docs/process.json` ([config.md](config.md)) | the project |
 | A visitor's introduction | `README.md` | the project |
+| The project's license | `LICENSE` | the project |
 | What git ignores | `.gitignore` | the project |
 | The project's own CI | `.github/workflows/project-*.yml` | the project |
 

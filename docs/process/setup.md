@@ -44,7 +44,9 @@ Always ask, whatever the brief says:
    `.github/workflows/project-checks.yml` that runs it in CI. Leave `set_up` false until step 9.
 5. **`docs/backlog.md`:** the first stage's items ([changes.md](changes.md#the-backlog)).
 6. **`docs/now.md`:** where the work stands: stage 1, nothing in work, the first items next.
-7. **`README.md`:** what the project is, for a visitor; one paragraph is enough.
+7. **`README.md`:** what the project is, for a visitor; one paragraph is enough. **`LICENSE`** is the
+   template's: replace it with the project's license, or remove it if the owner wants none. The
+   process files keep their own notice in `docs/process/README.md`.
 8. **GitHub:** `python3 tools/process/doctor.py --fix-labels` creates the labels. The repository's
    settings are the owner's: list them in the pull request as paths of clicks.
    - Settings → General: allow only "Rebase merging".

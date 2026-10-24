@@ -3,6 +3,13 @@
 The newest version first. Each entry says what changed and what projects must do, if anything
 ([updates.md](updates.md#changing-the-process)).
 
+## 0.2.1 — 2026-10-25
+
+- The template is under the MIT License. The process files carry the notice in
+  `docs/process/README.md`; setting up replaces the template's `LICENSE` with the project's own.
+
+Projects: nothing to do.
+
 ## 0.2.0 — 2026-10-25
 
 - Every project decides how it ships and writes it down: `releases` in `docs/process.json` (required
