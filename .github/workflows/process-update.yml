@@ -1,0 +1,23 @@
+name: process-update
+
+# Brings a newer release of the process from the template as a pull request (docs/process/updates.md).
+on:
+  schedule:
+    - cron: "0 6 * * 1"
+  workflow_dispatch:
+
+# Every write goes through PROCESS_UPDATE_TOKEN; GitHub's own token only reads.
+permissions:
+  contents: read
+
+jobs:
+  update:
+    # It holds a write token, so it runs on GitHub's runners, never on a self-hosted one.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.PROCESS_UPDATE_TOKEN || github.token }}
+      - run: python3 tools/process/update.py
+        env:
+          GH_TOKEN: ${{ secrets.PROCESS_UPDATE_TOKEN }}

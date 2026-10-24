@@ -1,0 +1,53 @@
+name: process-checks
+
+on:
+  pull_request:
+    types: [opened, edited, synchronize, reopened, labeled, unlabeled, ready_for_review]
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+# A new event on a pull request cancels the run it makes stale.
+concurrency:
+  group: process-checks-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+# These checks come from the template (docs/process/pull-requests.md). They need only git and python3
+# (3.9 or newer, standard library). They run on GitHub's runners, or on a self-hosted runner when the
+# repository variable CI_RUNNER names its label. If checks then wait in "queued" and no runner takes
+# them, the owner deletes the variable (Settings → Secrets and variables → Actions → Variables),
+# reruns them, and sets it back once the runner is up. The project's own checks are in .github/workflows/project-*.yml.
+jobs:
+  process-docs:
+    runs-on: ${{ vars.CI_RUNNER || 'ubuntu-latest' }}
+    steps:
+      - uses: actions/checkout@v4
+      - run: python3 tools/process/check.py --process-only
+
+  process-pr:
+    if: github.event_name == 'pull_request'
+    runs-on: ${{ vars.CI_RUNNER || 'ubuntu-latest' }}
+    steps:
+      - uses: actions/checkout@v4
+      - run: python3 tools/process/check_pr.py "$GITHUB_EVENT_PATH"
+
+  process-lock:
+    if: github.event_name == 'pull_request'
+    runs-on: ${{ vars.CI_RUNNER || 'ubuntu-latest' }}
+    steps:
+      - uses: actions/checkout@v4
+      - run: |
+          git fetch --depth=1 origin "$GITHUB_BASE_REF"
+          git show FETCH_HEAD:.process-lock.json > "$RUNNER_TEMP/base-lock.json" 2>/dev/null || rm -f "$RUNNER_TEMP/base-lock.json"
+          python3 tools/process/check_lock.py --base-lock "$RUNNER_TEMP/base-lock.json" "$GITHUB_EVENT_PATH"
+
+  process-commits:
+    if: github.event_name == 'pull_request'
+    runs-on: ${{ vars.CI_RUNNER || 'ubuntu-latest' }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - run: python3 tools/process/check_commits.py "${{ github.event.pull_request.base.sha }}" "${{ github.event.pull_request.head.sha }}"

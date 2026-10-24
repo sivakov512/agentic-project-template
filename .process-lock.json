@@ -1,0 +1,33 @@
+{
+  "template": "sivakov512/agentic-project-template",
+  "version": "0.1.0",
+  "files": {
+    ".github/pull_request_template.md": "bb3c085621399e8dbb70671bdcde473577349ce9fdc4908107f1718ded484c58",
+    ".github/workflows/process-checks.yml": "0bea1e764a475f49c201c97a97610a1db5b36c0f6ccec4a1ccf36dc76816ecb1",
+    ".github/workflows/process-update.yml": "897423229f64293f027de8fb85fc7d1ba0c0cda6f8ed35e51c1d947c9d79e264",
+    "docs/process/CHANGELOG.md": "e36a0bb1f43f3dcb38785bb6b1eeb08f68d876bf792f9e90ac946b586167af40",
+    "docs/process/README.md": "3f46ad267382dcc4c6fa16da569785eeb5e07148d03c5911341c81beba478ad4",
+    "docs/process/changes.md": "95aea340ea6d0dbcd1bb3a9ff40b5f249012071958cb704f2a28d10c3c442c9f",
+    "docs/process/config.md": "3d968d3aebb123dfe6770a8b1d0a45e2e13e06048e8df212b67862b6af3e8726",
+    "docs/process/coordinator.md": "fc07ee34f49eef8b306fb21a409dae8e99ce0ac9578fe51ebab905bc3127101f",
+    "docs/process/defences.md": "c63775a66a5137346ee8eaaf99ecc91efe1547b0ace120b33bb04ee5d4cca086",
+    "docs/process/pull-requests.md": "635d52e7d7fbc19ccde52a89f4535b8410b455da781cf427911206af065285dc",
+    "docs/process/reports.md": "76da83c4cafd8c6aa9a833c866d9d584b0560aa0f931018079dece1ac6a869bb",
+    "docs/process/roles.md": "8c28d0451b8ac0eee009e16918176eaf9eb7533b4bc1a95dc4db666ffa2c991d",
+    "docs/process/rules.md": "9c5c60d824130cd4a94d8ef4f2efd1729cec4a2b3c9c1b801f93104e22c276b4",
+    "docs/process/setup.md": "719b853aa675e85e1f483f9739e8badce9f7b1237500ec38e4bccca0690f26c9",
+    "docs/process/updates.md": "3991eda46afeb5b76a56be7d6a6148d610308e930e46ecf4f9c95ad90b332150",
+    "docs/process/workflow.md": "2c0fbdd39e1d5ded3d521bf33c28e0cb9b53f9fe0d108177fcd731819fca49b2",
+    "tools/process/check.py": "1e9abc69a1da209ea309f545eaebf64c9db6ab8b09d6d41d4483b758b82204e7",
+    "tools/process/check_commits.py": "7d83f131dd181d7022ab0815fc29e02be9685cf4d4da0e3ed031fc865eac73e2",
+    "tools/process/check_docs.py": "ccea067480d3855233d62701c5a9c558d5e8fee8ae6009ec03748669f73f4105",
+    "tools/process/check_lock.py": "c09b1af6672e0639f651282be0c8cd00f402b64bba6455ae8e9762119b7234da",
+    "tools/process/check_pr.py": "b3e459c77e8200e4c9317ef7738510e8b5c73cc04eee422c79a30fae8faa112a",
+    "tools/process/doctor.py": "c02baf5a5838016d3984682306f638e052a8ccfa67ae5c36128c70a2098fc09f",
+    "tools/process/lock.py": "9471e9d741b07bc4f5434e8b36f5d2aca93601a5b184985e2aa9fa3a3d7fb283",
+    "tools/process/owned.py": "0c027c431de12c419e495643cf1fab43c1442b9a946b374659ae686eee8d5f95",
+    "tools/process/sync.py": "86dcce97e07a06915e5de6b7376f85ea86df0882ca63952d3f754664960123ef",
+    "tools/process/test_checks.py": "2e32ba5d13dcc031214f306f46bcedde204dcdb0e18be64479f5095049f534a1",
+    "tools/process/update.py": "e16360692a5c9ce7ae13dc81f65f752a1530174d81de0f42bf896a6e7b753268"
+  }
+}

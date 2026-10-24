@@ -1,0 +1,14 @@
+{
+  "project": {
+    "set_up": false,
+    "owner_language": "",
+    "tracker": "",
+    "agents_account": "",
+    "merged_by": ""
+  },
+  "checks": [],
+  "commits": {"one_line": false, "no_co_authors": false},
+  "ids_ignore": [],
+  "ids": [],
+  "coverage": []
+}
