@@ -90,4 +90,9 @@ it in as a pull request, and you approve it. A change to the process is made her
 - An agent that reads `CLAUDE.md`: the rules are written for Claude Code.
 - Python 3.9 or newer for the checks; they use only its standard library.
 
+## License
+
+[MIT](LICENSE). A project made from the template chooses its own license when it is set up; the process
+files keep their notice.
+
 This file is the project's: setting up a project replaces it with the project's own README.

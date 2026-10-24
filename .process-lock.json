@@ -1,11 +1,11 @@
 {
   "template": "sivakov512/agentic-project-template",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "files": {
     ".github/pull_request_template.md": "bb3c085621399e8dbb70671bdcde473577349ce9fdc4908107f1718ded484c58",
     ".github/workflows/process-checks.yml": "0bea1e764a475f49c201c97a97610a1db5b36c0f6ccec4a1ccf36dc76816ecb1",
-    "docs/process/CHANGELOG.md": "dd6542750b24baa235690b582b72b4f101e0196b77c406a2dafdb3309a793a5d",
-    "docs/process/README.md": "3f46ad267382dcc4c6fa16da569785eeb5e07148d03c5911341c81beba478ad4",
+    "docs/process/CHANGELOG.md": "3c15a7dc37839f590e908a6ab4ceb0d9a00b299ce7430f17683f638823569b27",
+    "docs/process/README.md": "b675ad86b470fd8f3b106af095654f154308d7227d39c686196563dad50494ce",
     "docs/process/changes.md": "95aea340ea6d0dbcd1bb3a9ff40b5f249012071958cb704f2a28d10c3c442c9f",
     "docs/process/config.md": "c0a08d6fcd3dbcb01b51f349ee7234792d7165877a2270f5cfe244ee108c7181",
     "docs/process/coordinator.md": "b7cec4ba1566a0b05df06c7d66771285449b96a902dda5f8aa5df9adfb715826",
@@ -14,7 +14,7 @@
     "docs/process/reports.md": "76da83c4cafd8c6aa9a833c866d9d584b0560aa0f931018079dece1ac6a869bb",
     "docs/process/roles.md": "8c28d0451b8ac0eee009e16918176eaf9eb7533b4bc1a95dc4db666ffa2c991d",
     "docs/process/rules.md": "2b71b8d9500e410699b2d00f99d713511e633073e8c7ed44ec8e36b47ef9e2dc",
-    "docs/process/setup.md": "4d6da46669691ee8333f1f291060db033cc5980f26f922c903c117ede75ccff6",
+    "docs/process/setup.md": "a254c6f59aa8dd9ea35ad58075de09ef733fba489db783f5366b81d6610da0c6",
     "docs/process/updates.md": "7b274c89625c3c65919aec11c993ceddf1615d575dcbe31625ea8bd28a4440d6",
     "docs/process/workflow.md": "c23e42fa4c7502d035282d0674f094cafa9fb9dae344002d1d76d928797e6f1b",
     "tools/process/check.py": "1e9abc69a1da209ea309f545eaebf64c9db6ab8b09d6d41d4483b758b82204e7",
