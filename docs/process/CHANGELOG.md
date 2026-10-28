@@ -7,16 +7,17 @@ The newest version first. Each entry says what changed and what projects must do
 
 - Each stage is written out in `docs/plan.md` at the end of the one before it, from what is known by
   then, with everything it builds on named and either in a document already or settled at its start.
-  It goes to the owner with the gate, so there is no new gate, and the stage starts once it is merged.
+  It goes to the owner in the same report as the gate or the stage's last pull requests, so there is
+  no new interruption, and the stage starts once it is merged.
 - Interfaces between parts that different items build (a data schema, an API, tool contracts, a
   protocol, a pinout) are written in a document before those items start; "settled in the code" holds
   only when one item builds both sides.
 - Setting up names in the document chain where the interfaces are written; later stages may stay
   brief.
 
-Projects: nothing to do now. At the end of the current stage, write out the next one as
-`workflow.md` says; where the current plan leaves an interface to the code, add an item that writes it
-before the items that depend on it.
+Projects: no change to files; the rules hold from the update on. An item that builds one side of an
+interface not yet written waits for an item that writes it; the coordinator adds that item when the
+current plan leaves an interface to the code. At the end of the current stage, write out the next one.
 
 ## 0.2.1 — 2026-10-25
 
