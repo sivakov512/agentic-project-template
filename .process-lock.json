@@ -4,7 +4,7 @@
   "files": {
     ".github/pull_request_template.md": "bb3c085621399e8dbb70671bdcde473577349ce9fdc4908107f1718ded484c58",
     ".github/workflows/process-checks.yml": "0bea1e764a475f49c201c97a97610a1db5b36c0f6ccec4a1ccf36dc76816ecb1",
-    "docs/process/CHANGELOG.md": "aa47c7e9ff4ea99ec1e56a3bc7f466ca6cfd275bb695499b7d3a8e8e06399876",
+    "docs/process/CHANGELOG.md": "f353343a48b0072c732042fe56747c962fee2c637cedb06d3c23f7497510c9d6",
     "docs/process/README.md": "b675ad86b470fd8f3b106af095654f154308d7227d39c686196563dad50494ce",
     "docs/process/changes.md": "95aea340ea6d0dbcd1bb3a9ff40b5f249012071958cb704f2a28d10c3c442c9f",
     "docs/process/config.md": "c0a08d6fcd3dbcb01b51f349ee7234792d7165877a2270f5cfe244ee108c7181",
@@ -16,7 +16,7 @@
     "docs/process/rules.md": "2b71b8d9500e410699b2d00f99d713511e633073e8c7ed44ec8e36b47ef9e2dc",
     "docs/process/setup.md": "302f967afeb865724343aa6c41b10d679d37b23457cccde7229ae05f4571cd77",
     "docs/process/updates.md": "7b274c89625c3c65919aec11c993ceddf1615d575dcbe31625ea8bd28a4440d6",
-    "docs/process/workflow.md": "2ee08b7ee126490d603996cc48cbcb584974f1f8758e1e8e30a50d6030a16753",
+    "docs/process/workflow.md": "490c66c1627b57272e96d4f4e5550232b0d41f7e040ad07572016f2126a691e7",
     "tools/process/check.py": "1e9abc69a1da209ea309f545eaebf64c9db6ab8b09d6d41d4483b758b82204e7",
     "tools/process/check_commits.py": "354141ed8dd24d3f7f87d4237b5b8895427277a5af2a51b4b1d3975cc6af1787",
     "tools/process/check_docs.py": "7a5432326a0e2d488325e03afc541dae805f3cfef94d0a9221a6a1bff97def10",
