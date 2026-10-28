@@ -19,7 +19,7 @@ Settings the owner must change are given as a path of clicks with links (Setting
 ## Review or OK without reading
 
 Review is needed for: what the product must do and what is in and out of it, the design the owner will
-use, stack and architecture, any decision that is hard to reverse, changes to the plan, to `CLAUDE.md`
+use, stack and architecture, the interfaces between parts, any decision that is hard to reverse, changes to the plan, to `CLAUDE.md`
 and to the process, anything risky the project's rules name, and accepting what a stage, or an
 iteration within it, delivered.
 `docs/plan.md` may name more.
