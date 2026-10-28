@@ -19,12 +19,12 @@ Settings the owner must change are given as a path of clicks with links (Setting
 ## Review or OK without reading
 
 Review is needed for: what the product must do and what is in and out of it, the design the owner will
-use, stack and architecture, the interfaces between parts, any decision that is hard to reverse, changes to the plan, to `CLAUDE.md`
-and to the process, anything risky the project's rules name, and accepting what a stage, or an
-iteration within it, delivered.
+use, stack and architecture, the interfaces between parts (in whatever form they are written), any
+decision that is hard to reverse, changes to the plan, to `CLAUDE.md` and to the process, anything
+risky the project's rules name, and accepting what a stage, or an iteration within it, delivered.
 `docs/plan.md` may name more.
 
-OK without reading is enough for: documents written for machines, studies that only collect material
+OK without reading is enough for: documents written for machines other than interfaces, studies that only collect material
 (what they find reaches the owner through the documents built on them), tests, code inside an agreed
 design, code of our own tools, the project's checks and CI (they are the coordinator's: the report says
 in one line what each change does, and what it loosens or tightens; when a change matters to the owner,
