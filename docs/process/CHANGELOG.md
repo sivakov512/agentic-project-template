@@ -6,12 +6,14 @@ The newest version first. Each entry says what changed and what projects must do
 ## 0.2.2 — 2026-10-28
 
 - Each stage is written out in `docs/plan.md` at the end of the one before it, from what is known by
-  then, with everything it builds on named and either in a document already or settled at its start.
+  then, with everything it builds on (documents, interfaces, technologies) named and either written
+  down already or settled at its start.
   It goes to the owner in the same report as the gate or the stage's last pull requests, so there is
   no new interruption, and the stage starts once it is merged.
-- Interfaces between parts that different items build (a data schema, an API, tool contracts, a
-  protocol, a pinout) are written in a document before those items start; "settled in the code" holds
-  only when one item builds both sides.
+- Interfaces between parts that different items build (a data schema, an API, a protocol, a pinout)
+  are written down before those items start, once: in a form the parts use directly when there is one
+  (a schema file, an API description), otherwise in a document. Leaving one to the code holds only when
+  one item builds both sides. The owner reviews them, as stack and architecture.
 - Setting up names in the document chain where the interfaces are written; later stages may stay
   brief.
 

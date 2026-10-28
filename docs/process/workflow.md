@@ -8,9 +8,12 @@
 - **Upstream first.** The project's documents depend on each other in the order of the document chain
   in `docs/plan.md`, ending with the backlog and the code ([changes.md](changes.md)).
 - **Interfaces before the work on either side.** Where different items build parts that meet (a data
-  schema, an API, tool contracts, a protocol, a file format, a pinout, a document's structure), the
-  meeting point is written in a document of the chain, with every name, field and limit the sides rely
-  on, before those items start. "Settled in the code" holds only when one item builds both sides.
+  schema, an API, a protocol, a file format, a pinout, a document's structure), the meeting point is
+  written down, with every name, field and limit the sides rely on, before those items start. It is
+  written once, where the document chain says: in a form the parts use directly when there is one (a
+  schema file, an API description), so the work is built from it or checked against it and can't drift
+  from it; otherwise in a document. Documents above it explain it in plain words and link to it.
+  Leaving it to the code holds only when one item builds both sides.
 - **No work without a backlog item.** Pull requests that are not product work say what they are instead
   ([pull-requests.md](pull-requests.md#the-description)).
 - **The owner's words become records the same day:** a rule in the plan, a decision record, a change to
@@ -25,7 +28,8 @@ them to these rules:
   backlog item of the stage is merged, or dropped with a reason.
 - Each stage is written out at the end of the one before it, from what is known by then: what the
   stage delivers and its exit list in `docs/plan.md`, concrete enough to write its items from. It names
-  everything the stage builds on, each either in a document already or settled at the stage's start,
+  everything the stage builds on (documents, interfaces, the technologies it uses), each either
+  decided and written down already or settled at the stage's start,
   before the work that depends on it. This change to the plan goes to the owner in the same report as
   the gate, or, at an end that needs no owner, as the stage's last pull requests.
 - An item starts only when everything it depends on is merged and its stage has started. A stage starts
