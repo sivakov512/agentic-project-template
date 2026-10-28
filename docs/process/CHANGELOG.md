@@ -3,6 +3,21 @@
 The newest version first. Each entry says what changed and what projects must do, if anything
 ([updates.md](updates.md#changing-the-process)).
 
+## 0.2.2 — 2026-10-28
+
+- Each stage is written out in `docs/plan.md` at the end of the one before it, from what is known by
+  then, with everything it builds on named and either in a document already or settled at its start.
+  It goes to the owner with the gate, so there is no new gate, and the stage starts once it is merged.
+- Interfaces between parts that different items build (a data schema, an API, tool contracts, a
+  protocol, a pinout) are written in a document before those items start; "settled in the code" holds
+  only when one item builds both sides.
+- Setting up names in the document chain where the interfaces are written; later stages may stay
+  brief.
+
+Projects: nothing to do now. At the end of the current stage, write out the next one as
+`workflow.md` says; where the current plan leaves an interface to the code, add an item that writes it
+before the items that depend on it.
+
 ## 0.2.1 — 2026-10-25
 
 - The template is under the MIT License. The process files carry the notice in

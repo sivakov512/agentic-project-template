@@ -7,6 +7,10 @@
   are never a reference ([rules.md](rules.md#where-you-get-information)).
 - **Upstream first.** The project's documents depend on each other in the order of the document chain
   in `docs/plan.md`, ending with the backlog and the code ([changes.md](changes.md)).
+- **Interfaces before the work on either side.** Where different items build parts that meet (a data
+  schema, an API, tool contracts, a protocol, a file format, a pinout, a document's structure), the
+  meeting point is written in a document of the chain, with every name, field and limit the sides rely
+  on, before those items start. "Settled in the code" holds only when one item builds both sides.
 - **No work without a backlog item.** Pull requests that are not product work say what they are instead
   ([pull-requests.md](pull-requests.md#the-description)).
 - **The owner's words become records the same day:** a rule in the plan, a decision record, a change to
@@ -21,6 +25,11 @@ them to these rules:
   backlog item of the stage is merged, or dropped with a reason.
 - An item starts only when everything it depends on is merged and its stage has started. A stage starts
   when the previous one is finished. Items whose "Depends on" says "any time" are the only exception.
+- Each stage is written out at the end of the one before it, from what is known by then: what it
+  delivers and its exit list in `docs/plan.md`, concrete enough to write its items from, with
+  everything it builds on named and each either in a document already or settled at its start, before
+  the work that depends on it. The change goes to the owner with the gate, or, at an end that needs no
+  owner, with the report that closes the stage. The stage starts once it is merged.
 - A gate is a stage's end that needs the owner. The coordinator does not bring a gate to the owner while
   any point is open or unchecked, and prepares it as [coordinator.md](coordinator.md#before-a-gate)
   says.
