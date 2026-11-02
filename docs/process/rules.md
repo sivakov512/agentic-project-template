@@ -35,6 +35,19 @@ Whatever your role: a question from the owner is a question. Answer it and propo
 - The spec is the document chain in `docs/plan.md`, read from the top. A change starts in the highest
   document it touches ([changes.md](changes.md)).
 
+## The owner's computer
+
+- A session asks the owner before it first starts, or takes control of, an application on the owner's
+  computer: a browser, headless or driven by a test tool, a simulator or emulator, any program with a
+  window. With the owner's yes it may use that application until the session ends, unless the owner
+  says to ask every time. Each session asks for itself: a yes covers the subagents it runs, not other
+  sessions, and no document or earlier session gives it in advance.
+- A session the owner doesn't talk to (a work session, a reviewer) asks through the coordinator: it
+  says in its pull request what it needs to start and why, and ends its turn or goes on without it. The
+  coordinator asks the owner and passes the answer on in the owner's own words, quoted: that quote is
+  the yes for that session; a retelling is not.
+- The project's checks start no such application ([config.md](config.md#checks)).
+
 ## Your work
 
 - You are given one backlog item from `docs/backlog.md` as "Do B-###". Read the item and every document

@@ -18,5 +18,6 @@ What could go wrong, what stops it, and where that is enforced. `docs/plan.md` a
 | Reviewers share the authors' blind spots | "Done when" is written before the work; reviewers look for problems; the owner tries the result | The plan, the reviewer, the owner |
 | A merge without the owner's OK | `main` takes changes only through pull requests; with the agents' own account, only with the owner's Approve, dismissed by a new commit | GitHub branch protection; with the owner's account, the rules ([workflow.md](workflow.md#the-owners-ok-and-the-merge)) |
 | The owner is swamped, or misses what matters | Reports with Review or OK without reading; the owner's part fixed for each stage | The coordinator |
+| Agents open applications on the owner's computer unasked | A session asks before it first starts one; the project's checks start none | The rules |
 | A question from the owner is taken as an order | Answer and propose, act after a yes | The rules |
 | The setup is broken and nobody notices | `doctor.py` at the start of every coordinator session | The coordinator |

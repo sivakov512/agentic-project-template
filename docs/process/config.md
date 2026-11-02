@@ -80,6 +80,11 @@ project's own tests and linters, so an agent runs one command before pushing. CI
 project's own workflows (`.github/workflows/project-*.yml`), not in the process workflow, because they
 need the project's toolchain.
 
+Since they run before every push, they start no browser (headless or not), simulator, emulator or other
+program with a window ([rules.md](rules.md#the-owners-computer)); servers, databases and command-line
+programs the tests need are fine. Tests that need such an application run only in the project's own
+workflows.
+
 ## ids_ignore
 
 File patterns (`fnmatch`, from the repository root) the ID check leaves alone: frozen documents where

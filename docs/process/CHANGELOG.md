@@ -3,6 +3,22 @@
 The newest version first. Each entry says what changed and what projects must do, if anything
 ([updates.md](updates.md#changing-the-process)).
 
+## 0.4.0 — 2026-11-02
+
+- A session asks the owner before it first starts, or takes control of, an application on the owner's
+  computer (a browser, headless or not, a simulator, any program with a window) and, with a yes, uses
+  it until the session ends, unless the owner says to ask every time. Nothing gives that yes in
+  advance. A session the owner doesn't talk to asks through the coordinator, who quotes the owner's
+  answer.
+- The project's `checks`, run before every push, start no such application: tests that need one run
+  only in the project's own workflows.
+
+Projects: a project whose `checks` start a browser, a simulator or another such application moves those
+tests out of `checks` into a `.github/workflows/project-*.yml` workflow in the update pull request, or,
+if that is too much for it, the coordinator makes that the next item. Open pull requests that add such
+tests to `checks` move them too before their merge ("Fix pull request #N"). A rule in the project's
+`CLAUDE.md` that only repeats this one is removed. Otherwise nothing to do.
+
 ## 0.3.0 — 2026-11-02
 
 - The reviewer gives a verdict on three points in every pull request that changes the work: understood
