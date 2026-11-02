@@ -12,8 +12,9 @@ that belongs to the template ([README.md](README.md#what-lives-where)).
   the lock, or when the lock's version isn't the newest in [CHANGELOG.md](CHANGELOG.md). So a template
   file can't be edited in a project by mistake.
 - `tools/process/check_lock.py` compares a pull request with `main`'s lock: if it changes the template's
-  files, its lock must name a newer version than `main`'s, and it must be labelled `owner-review`. So the
-  process changes only by moving to a newer version, and the owner sees it.
+  files, its lock must name a newer version than `main`'s. So the process changes only by moving to a
+  newer version, which the owner agreed in the template; `process-owner` lets the template's files in
+  without the owner only when they are exactly those of that release.
 
 ## Getting a newer process
 
@@ -22,16 +23,19 @@ the coordinator runs at the start of every session, says when a newer version is
 then runs `python3 tools/process/update.py` with a clean working tree. It makes a branch
 `process-update-X.Y.Z` from `main` as it is on GitHub, copies the template's files at the release,
 writes the new lock, and opens a pull request `Plan: update the process to X.Y.Z` with "Backlog item:
-Process update", labelled `plan` and `owner-review`, and the changelog entries since the current
+Process update", labelled `plan` and `ok-without-reading`, and the changelog entries since the current
 version; the checkout stays on that branch. While any process update pull request is open, it does
 nothing. A project nobody works on needs no update. A release may change
 `.github/workflows/process-*.yml`, so the agents' account's git credentials must be allowed to change
 workflow files (a classic token's `workflow` scope, or Workflows: write).
 
 In the same pull request the coordinator does what the entries' "Projects:" lines ask of the project
-(a new key in `docs/process.json`, say), has open work pull requests fixed if the lines say they break
-them ("Fix pull request #N"), and brings it to the owner. The owner reviewed each change in the
-template already, so the report says only what the project had to do, or that it had nothing to do.
+(a new key in `docs/process.json`, say) and has open work pull requests fixed if the lines say they
+break them ("Fix pull request #N"). If that changes nothing the owner keeps, the coordinator merges the
+update on its own once its checks pass, and the report lists it: `process-owner` lets the template's
+files in without the owner where each is exactly as in the release. If it does (the plan, the
+settings), the pull request is labelled `owner-review` and goes to the owner, whose review covers only what the
+project had to do: the owner agreed each change in the template already.
 
 ## Changing the process
 

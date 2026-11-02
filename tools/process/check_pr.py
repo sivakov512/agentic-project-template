@@ -40,7 +40,7 @@ KIND_DESCRIPTIONS = {
     "code": "The code of the tools and of the product",
 }
 REVIEW_LABELS = {"owner-review": "The owner reads it before saying yes",
-                 "ok-without-reading": "The owner says yes without reading it"}
+                 "ok-without-reading": "The coordinator merges it; the owner sees it in the report"}
 # What a pull request that is no backlog item says instead (docs/process/pull-requests.md).
 NOT_AN_ITEM = re.compile(r"^(coordinator record|setup|process update|process change)\b", re.IGNORECASE)
 

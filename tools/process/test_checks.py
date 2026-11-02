@@ -14,6 +14,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 import check_commits  # noqa: E402
 import check_docs  # noqa: E402
 import check_lock  # noqa: E402
+import check_owner  # noqa: E402
 import check_pr  # noqa: E402
 import doctor  # noqa: E402
 import owned  # noqa: E402
@@ -349,9 +350,10 @@ class PullRequestCheck(unittest.TestCase):
         self.assertEqual(len([e for e in errors if "is empty" in e]), len(check_pr.SECTIONS), errors)
 
     def test_required_checks_are_the_workflows_jobs(self):
-        workflow = (TEMPLATE.parents[1] / ".github/workflows/process-checks.yml").read_text(encoding="utf-8")
-        self.assertEqual(sorted(re.findall(r"^  (process-[a-z]+):", workflow, re.MULTILINE)),
-                         sorted(doctor.REQUIRED_CHECKS))
+        jobs = []
+        for workflow in (TEMPLATE.parents[1] / ".github/workflows").glob("process-*.yml"):
+            jobs += re.findall(r"^  (process-[a-z]+):", workflow.read_text(encoding="utf-8"), re.MULTILINE)
+        self.assertEqual(sorted(jobs), sorted(doctor.REQUIRED_CHECKS))
 
     def test_template_and_check_agree(self):
         self.assertEqual(list(check_pr.sections(TEMPLATE.read_text())), check_pr.SECTIONS)
@@ -421,6 +423,136 @@ class PullRequestEvent(unittest.TestCase):
         result = self.run_check({"draft": False}, "--body", "x.md")
         self.assertEqual(result.returncode, 2, result.stdout + result.stderr)
         self.assertNotIn("Traceback", result.stderr)
+
+
+class OwnerCheck(unittest.TestCase):
+    HEAD = "abc123"
+
+    def errors(self, labels, changed=("src/app.py",), account="own", reviews=()):
+        return check_owner.check(labels, list(changed), account, list(reviews), self.HEAD, "agents")
+
+    def review(self, state, login="owner", commit=HEAD, association="OWNER"):
+        return {"user": {"login": login}, "state": state, "commit_id": commit, "author_association": association}
+
+    def test_ok_without_reading_needs_no_approval(self):
+        self.assertEqual(self.errors(["code", "ok-without-reading"]), [])
+
+    def test_owner_review_needs_an_approval_of_the_last_commit(self):
+        self.assertEqual(len(self.errors(["code", "owner-review"])), 1)
+        self.assertEqual(self.errors(["code", "owner-review"], reviews=[self.review("APPROVED")]), [])
+        self.assertEqual(len(self.errors(["code", "owner-review"],
+                                         reviews=[self.review("APPROVED", commit="older")])), 1)
+
+    def test_no_review_label_needs_an_approval(self):
+        self.assertEqual(len(self.errors([])), 1)
+
+    def test_a_later_review_withdraws_the_approval_and_comments_dont(self):
+        approved = self.review("APPROVED")
+        self.assertEqual(len(self.errors(["owner-review"], reviews=[approved, self.review("CHANGES_REQUESTED")])), 1)
+        self.assertEqual(len(self.errors(["owner-review"], reviews=[approved, self.review("DISMISSED")])), 1)
+        self.assertEqual(self.errors(["owner-review"], reviews=[approved, self.review("COMMENTED")]), [])
+
+    def test_the_author_cant_approve(self):
+        self.assertEqual(len(self.errors(["owner-review"], reviews=[self.review("APPROVED", login="agents")])), 1)
+
+    def test_only_the_owner_can_approve(self):
+        for association in ("NONE", "COLLABORATOR", "MEMBER"):
+            with self.subTest(association=association):
+                other = self.review("APPROVED", login="someone", association=association)
+                self.assertEqual(len(self.errors(["owner-review"], reviews=[other])), 1)
+
+    def test_a_moved_file_counts_at_its_old_path(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            def git(*args):
+                return subprocess.run(["git", "-c", "user.name=t", "-c", "user.email=t@t", *args], cwd=root,
+                                      check=True, capture_output=True, text=True).stdout.strip()
+            git("init", "-q")
+            (root / "docs").mkdir()
+            (root / "docs/plan.md").write_text("# Plan\n\nThe contract, long enough to be seen as moved.\n")
+            git("add", "-A")
+            git("commit", "-qm", "base")
+            base = git("rev-parse", "HEAD")
+            git("mv", "docs/plan.md", "docs/old-plan.md")
+            git("commit", "-qm", "move")
+            original, check_owner.ROOT = check_owner.ROOT, root
+            try:
+                changed = check_owner.changed_files(base, git("rev-parse", "HEAD"))
+            finally:
+                check_owner.ROOT = original
+        self.assertEqual(sorted(changed), ["docs/old-plan.md", "docs/plan.md"])
+
+    def test_what_the_owner_keeps_needs_owner_review(self):
+        for name in ("CLAUDE.md", "docs/plan.md", "docs/process.json", ".process-lock.json",
+                     ".github/workflows/project-checks.yml",
+                     "docs/process/rules.md", "tools/process/check.py"):
+            with self.subTest(name=name):
+                errors = self.errors(["plan", "ok-without-reading"], changed=[name])
+                self.assertEqual(len(errors), 2, errors)
+                self.assertIn("owner-review", errors[0])
+        self.assertEqual(self.errors(["code", "ok-without-reading"], changed=["docs/now.md", "docs/backlog.md"]), [])
+
+    def test_released_files_need_no_approval_and_the_rest_counts_as_usual(self):
+        changed = ["docs/process/rules.md", ".process-lock.json", "docs/backlog.md"]
+        def errors(changed, released):
+            return check_owner.check(["plan", "ok-without-reading"], changed, "own", [], self.HEAD, "agents",
+                                     released=released)
+        released = {"docs/process/rules.md", ".process-lock.json"}
+        self.assertEqual(errors(changed, released), [])
+        self.assertEqual(len(errors(changed, set())), 2)
+        self.assertEqual(len(errors(changed, {"docs/process/rules.md"})), 2)
+        self.assertEqual(len(errors(changed + ["docs/plan.md"], released)), 2)
+
+    def test_release_copy_compares_with_the_templates_tag(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            def git(root, *args):
+                return subprocess.run(["git", "-c", "user.name=t", "-c", "user.email=t@t", *args], cwd=root,
+                                      check=True, capture_output=True, text=True).stdout.strip()
+            def commit(root, files, message):
+                for name, text in files.items():
+                    (root / name).parent.mkdir(parents=True, exist_ok=True)
+                    (root / name).write_text(text)
+                git(root, "add", "-A")
+                git(root, "commit", "-qm", message)
+                return git(root, "rev-parse", "HEAD")
+            template, project = Path(tmp) / "someone" / "template", Path(tmp) / "project"
+            template.mkdir(parents=True)
+            project.mkdir()
+            git(template, "init", "-q")
+            def lock(template, version):
+                return json.dumps({"template": template, "version": version})
+            commit(template, {"docs/process/rules.md": "New rules.\n",
+                              ".process-lock.json": lock("someone/template", "0.5.0")}, "release")
+            git(template, "tag", "v0.5.0")
+            fork = Path(tmp) / "agent" / "fork"
+            fork.mkdir(parents=True)
+            git(fork, "init", "-q")
+            commit(fork, {"docs/process/rules.md": "Loosened rules.\n"}, "fork")
+            git(fork, "tag", "v0.5.0")
+            git(project, "init", "-q")
+            base = commit(project, {"docs/process/rules.md": "Old rules.\n",
+                                    ".process-lock.json": lock("someone/template", "0.4.0")}, "base")
+            faithful = commit(project, {"docs/process/rules.md": "New rules.\n",
+                                        ".process-lock.json": lock("someone/template", "0.5.0")}, "update")
+            changed = ["docs/process/rules.md", ".process-lock.json"]
+            edited = commit(project, {"docs/process/rules.md": "New rules, loosened.\n"}, "edit")
+            forked = commit(project, {"docs/process/rules.md": "Loosened rules.\n",
+                                      ".process-lock.json": lock("agent/fork", "0.5.0")}, "fork")
+            saved = check_owner.ROOT, check_owner.TEMPLATE_SOURCE
+            check_owner.ROOT, check_owner.TEMPLATE_SOURCE = project, str(Path(tmp)) + "/{}"
+            try:
+                released = check_owner.released_files
+                self.assertEqual(released(changed, base, faithful, "someone/project"),
+                                 {"docs/process/rules.md", ".process-lock.json"})
+                self.assertEqual(released(changed, base, edited, "someone/project"), {".process-lock.json"})
+                self.assertEqual(released(changed, base, forked, "someone/project"), set())
+                self.assertEqual(released(changed, base, faithful, "someone/template"), set())
+            finally:
+                check_owner.ROOT, check_owner.TEMPLATE_SOURCE = saved
+
+    def test_with_the_owners_account_only_the_label_is_checked(self):
+        self.assertEqual(self.errors(["owner-review"], account="owner"), [])
+        self.assertEqual(len(self.errors(["ok-without-reading"], changed=["docs/plan.md"], account="owner")), 1)
 
 
 class CommitsCheck(unittest.TestCase):
@@ -544,22 +676,17 @@ class LockAgainstMain(unittest.TestCase):
 
     def test_projects_own_files_pass(self):
         (self.root / "docs/plan.md").write_text("Changed.\n", encoding="utf-8")
-        self.assertEqual(check_lock.check(self.root, self.base, []), [])
+        self.assertEqual(check_lock.check(self.root, self.base), [])
 
     def test_relocked_change_without_a_new_version_fails(self):
         self.change_and_relock("0.2.0")
         self.assertEqual(owned.check(self.root), [])  # the pull request's own lock agrees
-        errors = check_lock.check(self.root, self.base, ["owner-review"])
+        errors = check_lock.check(self.root, self.base)
         self.assertTrue(any("doesn't move past version 0.2.0" in e for e in errors), errors)
 
-    def test_new_version_with_owner_review_passes(self):
+    def test_new_version_passes(self):
         self.change_and_relock("0.3.0")
-        self.assertEqual(check_lock.check(self.root, self.base, ["plan", "owner-review"]), [])
-
-    def test_new_version_without_owner_review_fails(self):
-        self.change_and_relock("0.3.0")
-        errors = check_lock.check(self.root, self.base, ["plan", "ok-without-reading"])
-        self.assertTrue(any("owner-review" in e for e in errors), errors)
+        self.assertEqual(check_lock.check(self.root, self.base), [])
 
 
 class DoctorRulesets(unittest.TestCase):

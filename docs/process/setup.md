@@ -19,7 +19,8 @@ Always ask, whatever the brief says:
 
 - **whose account the agents work under, and who merges**
   ([workflow.md](workflow.md#the-owners-ok-and-the-merge)). Ask this first: step 1 already pushes, so
-  `git` and `gh` must be signed in as that account before it;
+  `git` and `gh` must be signed in as that account before it. With the agents' own account the
+  repository must belong to the owner's personal account, not an organisation;
 - **which tracker mirrors the project for the owner,** or that there is none; whether the project is in
   it yet; and how agents reach it (a connector, a skill, a token), which the owner grants. If the
   project isn't in it yet, `tracker` names the tracker and says "project to be created";
@@ -41,15 +42,14 @@ Always ask, whatever the brief says:
    where the interfaces between parts are written
    ([workflow.md](workflow.md#how-the-repository-works)) and, with code, the document of the code's
    design that lists its folders ([rules.md](rules.md#code)). The foundation is written out in full;
-   the increments after it are a line each, what the owner gets from it, and each is written out at
-   the end of the stage before it.
+   the increments after it are a line each, what the owner gets from it.
 4. **`docs/process.json`:** the owner's language, the tracker, how the project ships, the agents'
    account and who merges, the commit rules, the kinds of ID and coverage rules
    ([config.md](config.md)). `checks` stays empty until
    the project has code; the item that adds the first check also adds
    `.github/workflows/project-checks.yml` that runs it in CI. Leave `set_up` false until step 9.
 5. **`docs/backlog.md`:** the first stage's items ([changes.md](changes.md#the-backlog)).
-6. **`docs/now.md`:** where the work stands: stage 1, nothing in work, the first items next.
+6. **`docs/now.md`:** where the work stands: the foundation, nothing in work, the first items next.
 7. **`README.md`:** what the project is, for a visitor; one paragraph is enough. **`LICENSE`** is the
    template's: replace it with the project's license, or remove it if the owner wants none. The
    process files keep their own notice in `docs/process/README.md`.
@@ -57,10 +57,10 @@ Always ask, whatever the brief says:
    settings are the owner's: list them in the pull request as paths of clicks.
    - Settings → General: allow only "Rebase merging".
    - Settings → Branches (or Rules): protect `main`, with changes only through pull requests and the
-     checks `process-docs`, `process-pr`, `process-lock` and `process-commits` required (the project's
-     own jobs too, once they exist). With the agents' own account, also one approval, dismissed by new
-     commits. With the owner's account, no required approvals (untick "Require approvals": nobody can
-     approve their own pull request, so nothing would merge) and no bypassing ("Do not allow bypassing
+     checks `process-docs`, `process-pr`, `process-lock`, `process-commits` and `process-owner` required
+     (the project's own jobs too, once they exist), and no required approvals (untick "Require
+     approvals"): `process-owner` asks for the owner's approval where it is needed, and a required one
+     would hold back what the coordinator merges on its own. With the owner's account, also no bypassing ("Do not allow bypassing
      the above settings", or no bypass list in a ruleset), because the owner's account is an admin and
      the protection wouldn't bind it otherwise.
    - Settings → Secrets and variables → Actions → Variables: `CI_RUNNER`, if the checks should run on a
@@ -94,8 +94,8 @@ template's sections they lack.
    and plan; what is the project's own stays, under the sections of the `docs/plan.md` placeholder.
    The plan's stages take the shape of the foundation and increments
    ([workflow.md](workflow.md#stages-and-gates)): what is done stays as done, and what is left is
-   brought into that shape as the 0.5.0 entry of [CHANGELOG.md](CHANGELOG.md) says for a project
-   already under way.
+   brought into that shape as [workflow.md](workflow.md#stages-and-gates) says for a project already
+   under way.
    `CLAUDE.md` keeps the project's rules and imports `@docs/process/rules.md`.
 3. Move the project's documents where the process expects them, and its backlog into the `B-###` form,
    renumbered if it used another prefix; `docs/now.md` keeps a table from old numbers to new, the old
