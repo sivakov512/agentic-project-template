@@ -61,6 +61,15 @@ them to these rules:
    alone; small leftovers of the second round (wording, a link) the coordinator fixes itself, anything
    in the product goes back to a work session. If blocking problems remain after that, the coordinator
    stops, rethinks the item (its approach or its size) and tells the owner.
+   A pull request with code that `docs/plan.md` names as risky also gets a review for harm ("Review
+   pull request #N for harm"), run at the same time by another reviewer
+   ([rules.md](rules.md#if-you-are-the-reviewer)). One "Fix pull request #N" fixes the findings of both.
+   Any change to the risky code after the review for harm, from a fix of either review or later, goes
+   back to it before the merge, even when its own first round had no "fix" finding, and the coordinator
+   never makes such a change itself. A finding of the review for harm is closed only when its
+   reviewer says so: if one is still open after its second round, the coordinator neither fixes it
+   itself nor merges, but stops and tells the owner. The pull request merges only when neither review
+   has a "fix" finding left.
    The coordinator then checks the result personally: the diff against "Done when", the running result,
    and that the commits read as the steps they are ([rules.md](rules.md#git-and-github)).
 6. **The report to the owner** ([reports.md](reports.md)). The owner reviews and discusses the pull

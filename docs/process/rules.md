@@ -11,7 +11,8 @@ The first of these that fits is your role:
 1. **Your first message is "Do B-###":** you are a work session. Follow "Your work" below.
 2. **It is "Fix pull request #N":** you are a work session fixing review findings. Follow "If you fix a
    pull request".
-3. **It is "Review pull request #N":** you are a reviewer. Follow "If you are the reviewer".
+3. **It is "Review pull request #N", or "Review pull request #N for harm":** you are a reviewer. Follow
+   "If you are the reviewer".
 4. **This repository is the template** (the `owner/name` of its `origin` remote is the `template` in
    `.process-lock.json`): you are the template's coordinator. Changes to the process go as
    [updates.md](updates.md#changing-the-process) says; the rest of [coordinator.md](coordinator.md)
@@ -79,11 +80,12 @@ Whatever your role: a question from the owner is a question. Answer it and propo
 
 ## If you fix a pull request
 
-- Read the reviewer's comment on the pull request. Fix every finding marked **fix**, on the pull
-  request's branch; leave the **drop** ones.
+- Read the reviewers' comments on the pull request: the review, and the review for harm where there is
+  one. Fix every finding marked **fix** in all of them, on the pull request's branch; leave the
+  **drop** ones.
 - Fold each fix into the commit it corrects ("Git and GitHub" below), run the checks as in "Your
   work", push, and answer with one comment: the new head commit, and for each "fix" finding what you
-  changed and where, or why you couldn't. The coordinator then runs the second round.
+  changed and where, or why you couldn't. The coordinator then runs the second rounds on that new head.
 
 ## If you are the reviewer
 
@@ -104,10 +106,21 @@ Whatever your role: a question from the owner is a question. Answer it and propo
   documents that contradict each other, a gap the next item would trip on, or falling short on one of
   the three points) or **drop** (wording, taste, layout, or no effect on the result or the next steps)
   with a one-line reason. Nothing is put off for later. Don't fix things yourself.
-- A second round comes only if the first had "fix" findings: review only the fix, the change from the
+- A second round comes only if the first had "fix" findings, or, for a review for harm, if a fix
+  changed the code `docs/plan.md` names as risky: review only the fix, the change from the
   head you reviewed to the new head the fix comment names (`git range-diff --creation-factor=100
   origin/main <reviewed> <new>`; a head that is gone from the branch comes back with `git fetch origin <sha>`): whether each
   is fixed and whether the fix broke anything nearby.
+- **A review for harm** ("Review pull request #N for harm") is a second, independent review of code
+  that `docs/plan.md` names as risky ([workflow.md](workflow.md#how-a-piece-of-work-goes)). Until your
+  findings are posted, read the pull request's description, diff and commits, not its comments; in the
+  second round, only your own earlier comment and the fix reply besides. Your comment opens with
+  "Review for harm" and the head you reviewed, so it can be told from the other. Hunt for concrete ways
+  the change does harm: a secret that leaks or reaches the wrong place, damage to the owner's machine,
+  to infrastructure or to data, a state nothing can recover from, a race or an interruption that leads
+  there. Each finding says how it would happen. The three-point verdict is the other review's; your
+  comment ends by saying whether the change is safe to merge as is: yes when no "fix" finding is left,
+  otherwise no. Findings, marks and the second round are as above.
 
 ## Writing
 
