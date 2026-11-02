@@ -32,7 +32,10 @@ The newest version first. Each entry says what changed and what projects must do
   it. A new required check, `process-owner`, holds this: a pull request labelled `owner-review` or with
   no review label, or one that changes `CLAUDE.md`, `docs/plan.md`, `docs/process.json`, anything under
   `.github/` or the template's files, needs the repository owner's approval of its last commit; agents
-  never approve. A process update that is exactly the template's release is the exception, and
+  never approve. `process-owner` runs the check from `main`'s copy, and with the agents' own account
+  `.github/CODEOWNERS` gives the owner `.github/`, so a pull request can't rewrite the check that guards
+  it. A process update that is exactly the template's release is the exception (one that changes
+  `.github/` still waits for the owner), and
   `update.py` labels it `ok-without-reading`; `process-lock` no longer asks for a label. With the
   agents' own account `process-owner` takes the place of GitHub's required approval.
 - Editing a pull request's description or labels reruns only the check of the description and the labels
@@ -46,7 +49,11 @@ list for later in the plan moves to the section "Later" of `docs/backlog.md`. A 
 
 The owner, in the repository's settings (Settings → Rules → the ruleset for `main`, or Settings →
 Branches): add `process-owner` to the required checks and, where the agents have their own account, set
-required approvals to 0; until then what is OK without reading still waits for an approval. Where the
+required approvals to 0 and tick "Require review from Code Owners" and "Dismiss stale pull request
+approvals when new commits are pushed"; until then what is OK without reading still waits for an
+approval. With the agents' own account, the coordinator adds `.github/CODEOWNERS` as `setup.md`, step
+8, says, in the update pull request (which this release's `.github/` changes send to the owner
+anyway). Where the
 agents work under the owner's account there is no required approval to remove, so the coordinator
 merges what is OK without reading from the update on, and `process-owner` guards the label once it is
 required. An open pull request gets the check at its next push or label change; until then a required

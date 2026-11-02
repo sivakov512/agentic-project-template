@@ -131,7 +131,8 @@ The process holds the stages to these rules:
 **Which pull requests need the owner's OK:** those labelled `owner-review`, those with no review label
 (a bot's, until the coordinator labels it), and every one that changes what the owner keeps for themself: `CLAUDE.md`, `docs/plan.md`,
 `docs/process.json`, anything under `.github/`, and the template's files and lock, apart from those a
-process update brings exactly as in the template's release ([updates.md](updates.md#getting-a-newer-process)). One labelled
+process update brings exactly as in the template's release, `.github/` aside with the agents' own
+account ([updates.md](updates.md#getting-a-newer-process)). One labelled
 `ok-without-reading` that changes none of these the coordinator merges on its own, once its checks are
 green, its reviews have no "fix" finding left and step 5's own check is done; the next report lists it
 ([reports.md](reports.md)), and the owner can have any of them reverted. The check `process-owner`

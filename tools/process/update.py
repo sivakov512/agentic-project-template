@@ -125,6 +125,13 @@ def main():
         changelog = "#" + changelog
 
     run("git", "add", "-A")
+    # With the agents' own account GitHub keeps .github/ for the owner (docs/process/updates.md), so such an
+    # update waits for the owner.
+    config = json.loads((ROOT / "docs/process.json").read_text(encoding="utf-8"))
+    own_account = (config.get("project") or {}).get("agents_account") != "owner"
+    touches_github = any(name.startswith(".github/") for name in
+                         run("git", "diff", "--cached", "--name-only").splitlines())
+    label = "owner-review" if own_account and touches_github else "ok-without-reading"
     run("git", "commit", "--quiet", "-m", f"chore: update the process to {new}")
     # The branch is this script's own: one left from a run that couldn't open its pull request is replaced.
     run("git", "push", "--quiet", "--force", "origin", branch)
@@ -133,7 +140,7 @@ def main():
     pull = gh_json("api", f"repos/{repo}/pulls", "-f", f"title=Plan: update the process to {new}",
                    "-f", f"head={branch}", "-f", "base=main", "-f", f"body={body}")
     run("gh", "api", f"repos/{repo}/issues/{pull['number']}/labels",
-        "-f", "labels[]=plan", "-f", "labels[]=ok-without-reading")
+        "-f", "labels[]=plan", "-f", f"labels[]={label}")
     print(f"Opened {pull['html_url']}. The checkout is on {branch}: do there what the changelog asks,"
           " and label it owner-review if that changes what the owner keeps (docs/process/updates.md).")
     return 0

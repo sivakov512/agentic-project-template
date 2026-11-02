@@ -25,6 +25,7 @@ Nikita Sivakov, under the MIT License.
 | The project's license | `LICENSE` | the project |
 | What git ignores | `.gitignore` | the project |
 | The project's own CI | `.github/workflows/project-*.yml` | the project |
+| Who reviews what GitHub keeps for the owner | `.github/CODEOWNERS` ([setup.md](setup.md), step 8) | the project |
 
 The template ships a placeholder for each of the project's files. The process expects the default
 branch to be `main`.

@@ -60,8 +60,10 @@ template, and the coordinator opens it under the agents' account. One that chang
 bumping an action in `process-*.yml`) is closed: such changes come from the template.
 
 These checks catch mistakes, not a determined agent: a pull request runs its own copy of the workflow
-and the scripts, so one that also edits them could get round them; `process-owner` too, which with the
-agents' own account stands where GitHub's required approval stood. That is why every change to the
+and the scripts, so one that also edits them could get round them. `process-owner` is the exception:
+it runs the check from `main`'s copy, and with the agents' own account `.github/CODEOWNERS` gives the
+owner its workflow, so GitHub asks for the owner's review of any pull request that changes it
+([setup.md](setup.md), step 8). That is why every change to the
 process, the commands of the project's checks and CI needs the owner's OK ([reports.md](reports.md)).
 
 The project's own CI (builds, product tests, its own rules for pull requests) is in
