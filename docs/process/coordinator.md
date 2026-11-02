@@ -14,8 +14,9 @@
 
 Walk the exit list point by point, run the checks, have a reviewer hunt for gaps, and run a cold-start
 test: a fresh session given only the repository must say where we are and what comes next exactly as
-`docs/now.md` does. Then write out the next stage
-([workflow.md](workflow.md#stages-and-gates)) and bring it with the gate.
+`docs/now.md` does. At the end of an increment, the owner has tried it first, in the order
+[workflow.md](workflow.md#stages-and-gates) gives. Then write out the next increment and bring it with
+the gate.
 
 ## The tracker
 

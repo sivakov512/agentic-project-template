@@ -19,9 +19,10 @@ written, and, with code, which document describes the code's design and lists it
 
 ## Stages
 
-Each stage: what it delivers, the owner's part, and its exit list
-([the process's rules for stages](process/workflow.md#stages-and-gates)). Stages after the first may
-stay brief until the one before them ends.
+The foundation, then increments ([the process's rules for stages](process/workflow.md#stages-and-gates)).
+Each stage: what it delivers (for an increment, what the owner gets from it), the owner's part, and its
+exit list. The increments not started yet are a line each until the stage before them ends. Then the
+list for later: what is left out of the increments so far.
 
 ## Facts
 

@@ -21,23 +21,48 @@
 
 ## Stages and gates
 
-`docs/plan.md` lists the project's stages: what each delivers, and its exit list. The process holds
-them to these rules:
+The work goes in increments, each ending with something the owner uses: a build, a document, a board,
+whatever the project makes. `docs/plan.md` lists the project's stages, each with what it delivers and
+its exit list:
+
+- **The foundation,** the first stage, once and short: what the product is for and for whom, the
+  owner's main scenarios, the limits; research only where a decision can't be made without it; the
+  technologies and the frame of the design only as far as the first increment needs. For a product that
+  exists already, it also holds an inventory of what the product does and checks that it still does it
+  (tests, for code), where these don't exist yet.
+- **Increments,** one stage each, one after another. An increment says what the owner gets from it in
+  their real work: something they can do that they couldn't, or, for a step of a rebuild, a part of the
+  product they use running on the rebuilt part, checked. Everything else goes to the plan's list for
+  later. Inside it: the requirements and research for that scope only, the design and the interfaces
+  for it, and the items that build it. The first increment of a new product is its smallest version
+  the owner can use; for a product that exists, each increment changes the working product, and a
+  rebuild goes as a series of increments, each leaving it working.
+
+The process holds the stages to these rules:
 
 - A stage is finished only when every point of its exit list is true. Every exit list includes: every
-  backlog item of the stage is merged, or dropped with a reason.
+  backlog item of the stage is merged, or dropped with a reason. An increment's also includes: the
+  owner has used it in real work, and it is released as `docs/plan.md` says.
 - Each stage is written out at the end of the one before it, from what is known by then: what the
   stage delivers and its exit list in `docs/plan.md`, concrete enough to write its items from. It names
   everything the stage builds on (documents, interfaces, the technologies it uses), each either
   decided and written down already or settled at the stage's start,
   before the work that depends on it. This change to the plan goes to the owner in the same report as
-  the gate, or, at an end that needs no owner, as the stage's last pull requests.
+  the gate.
 - An item starts only when everything it depends on is merged and its stage has started. A stage starts
   when the previous one is finished and its own written-out plan is merged. Items whose "Depends on"
   says "any time" are the only exception.
-- A gate is a stage's end that needs the owner. The coordinator does not bring a gate to the owner while
-  any point is open or unchecked, and prepares it as [coordinator.md](coordinator.md#before-a-gate)
-  says.
+- An increment ends in this order: the coordinator runs the result end to end and gives it to the
+  owner ready to try, with the steps; the owner uses it in real work and says what came up; what must
+  be fixed for it to do its job is fixed in this increment, the rest goes to the next one or the list
+  for later. While the owner tries it, the coordinator writes out the next increment and adds what
+  comes up.
+- A gate is a stage's end, and every stage ends with one: the owner accepts what the stage delivered
+  and agrees the next increment. The coordinator does not bring a gate to the owner while any point is
+  open or unchecked, and prepares it as [coordinator.md](coordinator.md#before-a-gate) says.
+- The list for later in `docs/plan.md` holds what is left out of the increments so far, so nothing is
+  lost. A backlog item moved there is dropped with the reason "moved to the list for later"; an
+  increment takes its work back from there as new items.
 
 ## How a piece of work goes
 
