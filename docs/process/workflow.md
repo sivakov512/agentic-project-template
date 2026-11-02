@@ -43,7 +43,12 @@ them to these rules:
 
 1. **The item** exists in the backlog ([changes.md](changes.md#the-backlog)) and may start. If a session
    would need more than the item to do it, the coordinator fixes the item first; an item that is clearly
-   large is split before a session starts on it.
+   large is split before a session starts on it. One found too large once its pull request is open is
+   split on that pull request's branch: the coordinator commits the split to `docs/backlog.md` there,
+   the first part keeps the ID with a narrower "Done when" and goes on in the same pull request, and the
+   other parts get new IDs. The split follows from the work: it changes neither the pull request's kind
+   nor its review label ([pull-requests.md](pull-requests.md#kind-and-labels)), and the report names it
+   among the coordinator's own decisions.
 2. **The brief** is the item's ID: "Do B-###". Nothing else; everything the session needs is in the
    repository.
 3. **Questions first:** the session opens a draft pull request with its plan and questions, and the
@@ -56,7 +61,8 @@ them to these rules:
    alone; small leftovers of the second round (wording, a link) the coordinator fixes itself, anything
    in the product goes back to a work session. If blocking problems remain after that, the coordinator
    stops, rethinks the item (its approach or its size) and tells the owner.
-   The coordinator then checks the result personally: the diff against "Done when", the running result.
+   The coordinator then checks the result personally: the diff against "Done when", the running result,
+   and that the commits read as the steps they are ([rules.md](rules.md#git-and-github)).
 6. **The report to the owner** ([reports.md](reports.md)). The owner reviews and discusses the pull
    request in its comments on GitHub, or in the chat when agents work under the owner's account; the
    coordinator answers where the owner wrote.

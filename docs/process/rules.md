@@ -81,7 +81,8 @@ Whatever your role: a question from the owner is a question. Answer it and propo
 
 - Read the reviewer's comment on the pull request. Fix every finding marked **fix**, on the pull
   request's branch; leave the **drop** ones.
-- Run the checks as in "Your work", push, and answer with one comment: for each "fix" finding, what you
+- Fold each fix into the commit it corrects ("Git and GitHub" below), run the checks as in "Your
+  work", push, and answer with one comment: the new head commit, and for each "fix" finding what you
   changed and where, or why you couldn't. The coordinator then runs the second round.
 
 ## If you are the reviewer
@@ -89,18 +90,29 @@ Whatever your role: a question from the owner is a question. Answer it and propo
 - Check the pull request against its item's "Done when" and the documents it links. Look for what is
   wrong or missing, not for reasons to approve.
 - Check that the evidence in the pull request is real: repeat it where you can.
-- Post your findings as one comment on the pull request: each with the file and line, what is wrong and
-  why it matters, and marked **fix** (wrong behaviour, a risk the project's rules name, a wrong or
-  unsupported fact, a red or flaky check, documents that contradict each other, or a gap the next item
-  would trip on) or **drop** (wording, taste, layout, or no effect on the result or the next steps) with
-  a one-line reason. Nothing is put off for later. Don't fix things yourself.
-- A second round comes only if the first had "fix" findings: review only the fix, whether each is fixed
-  and whether the fix broke anything nearby.
+- In a pull request that changes the work itself (code, a design, a document of the chain), give a
+  verdict on three points, each with what you judged it on:
+  - **Understood by a person** who hasn't read the rest of the project: the work explains itself (for
+    code, "Code" below).
+  - **Fits the design:** each part sits where the design puts it (for code, in a folder the design
+    names), and the boundaries between parts hold.
+  - **Easy to change:** each piece has one job, nothing is copied where the copies will drift apart,
+    and tests, where there are any, read as a description of the behaviour.
+- Post your findings as one comment on the pull request, naming the head commit you reviewed: each
+  finding with the file and line, what is wrong and why it matters, and marked **fix** (wrong
+  behaviour, a risk the project's rules name, a wrong or unsupported fact, a red or flaky check,
+  documents that contradict each other, a gap the next item would trip on, or falling short on one of
+  the three points) or **drop** (wording, taste, layout, or no effect on the result or the next steps)
+  with a one-line reason. Nothing is put off for later. Don't fix things yourself.
+- A second round comes only if the first had "fix" findings: review only the fix, the change from the
+  head you reviewed to the new head the fix comment names (`git range-diff --creation-factor=100
+  origin/main <reviewed> <new>`; a head that is gone from the branch comes back with `git fetch origin <sha>`): whether each
+  is fixed and whether the fix broke anything nearby.
 
 ## Writing
 
 - Write for the next reader, briefly: say each thing once, and link to the document that says it rather
-  than restating it.
+  than restating it. In code, a link adds to an explanation and never replaces it ("Code" below).
 - Everything in the repository is in English: docs, code, comments, commits, pull request titles and
   descriptions. Docs in plain words.
 - Talk is in the owner's language (`owner_language` in `docs/process.json`; before it is set, the
@@ -110,10 +122,38 @@ Whatever your role: a question from the owner is a question. Answer it and propo
 - A commit subject is at most 72 characters; `docs/process.json` may ask for more
   ([config.md](config.md#commits)).
 
+## Code
+
+Where the project has code. A reader must be able to tell what a piece of code is for and how to use
+it without working through the rest; writing that down also makes the author think over what was
+written.
+
+- Every module opens with a comment in plain sentences: what it is for, which part of the design it
+  is, what it holds and who uses it. A link to a document adds to this, never replaces it.
+- Everything a module offers to others has a comment: what it does or stands for, and why; its inputs,
+  where their names and types don't say it all; what it returns, empty results and failures included;
+  the errors it raises. Something internal gets one when its purpose isn't plain from its name.
+- A comment says what and why, not how the next line works, and changes with the code it describes.
+- Where the language has a linter for such comments, the project's checks run it
+  ([config.md](config.md#checks)); whether the comments are clear and true is the reviewer's to judge.
+- The document the document chain names for the code's design lists its folders: those at the top of
+  the repository and those of each part of the code, as deep as the design describes the parts. One
+  line each: what it holds and, for a name that isn't plain, where the name comes from. A new folder is
+  a change to the design, so it goes into the list before the work that makes it, usually with the item
+  that needs it. The project's checks include one that fails on a folder missing from the list; the
+  item that adds the first code adds it.
+
 ## Git and GitHub
 
 - Commits, pushes and pull requests go out under the account the project chose for agents
   ([workflow.md](workflow.md#the-owners-ok-and-the-merge)). Call `git` and `gh` by name.
+- **A pull request's history is what lands on `main`.** Each commit is one step a reader of `main`
+  wants to see, with a subject that says that step. A fix from a review or a check, or any later change
+  to a step already committed, goes into that commit, not into a commit of its own: commit it with
+  `git commit --fixup <commit>`, take in what others pushed to the branch (`git pull --rebase origin <branch>`), run
+  `git rebase --autosquash --no-keep-empty origin/main` (with git older than 2.44,
+  `GIT_SEQUENCE_EDITOR=: git rebase -i --autosquash --no-keep-empty origin/main`), and push with
+  `git push --force-with-lease`. That also drops the empty start commit once a real one is there.
 - Open pull requests through the REST API (`gh api repos/{owner}/{repo}/pulls`), so nothing adds text
   to the description you wrote.
 - Nobody but the coordinator merges, and only after the owner's OK, by rebase; or the owner merges, as

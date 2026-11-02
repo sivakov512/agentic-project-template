@@ -3,6 +3,29 @@
 The newest version first. Each entry says what changed and what projects must do, if anything
 ([updates.md](updates.md#changing-the-process)).
 
+## 0.3.0 — 2026-11-02
+
+- The reviewer gives a verdict on three points in every pull request that changes the work: understood
+  by a person, fits the design, easy to change. Falling short on any is a "fix" finding.
+- Code: every module opens with a plain explanation of what it is for and where it sits in the design;
+  everything it offers to others says what it does, its inputs, its results and failures, and its
+  errors; a link to a document adds to the explanation, never replaces it. The design document lists
+  the code's folders, a new folder goes there before the work that makes it, and a project check fails
+  on a folder missing from it.
+- A pull request's history is what lands on `main`: fixes are folded into the commits they correct and
+  force-pushed with lease; the second round reviews the range-diff from the head the first round
+  reviewed to the new one.
+- An item found too large once its pull request is open is split on that pull request's branch; the
+  first part keeps the ID and goes on there, with the pull request's kind and label unchanged.
+- `updates.md` says plainly that in 0.x new rules raise the minor version too.
+
+Projects: a project with code, in the update pull request, names in `docs/plan.md` the document of the
+code's design, lists the code's folders there, and adds to its checks the folder check and, where the
+language has one, a linter for code comments; if that is too much for one pull request, the
+coordinator makes it the next item, before any other code. Open pull requests with code follow the new
+rules before their merge ("Fix pull request #N"). Existing modules get their comments when a pull
+request changes them. A project without code: nothing to do.
+
 ## 0.2.2 — 2026-10-28
 
 - Each stage is written out in `docs/plan.md` at the end of the one before it, from what is known by

@@ -7,6 +7,8 @@ What could go wrong, what stops it, and where that is enforced. `docs/plan.md` a
 | An agreement is lost between chats | The repository is the only source; same-day records; `docs/now.md`; sessions start from the repository | The rules, the cold-start test |
 | A stage or item starts before its inputs exist | Exit lists; items start only when their dependencies are merged and their stage has started | The coordinator, the reviewer |
 | Parts built by different items don't fit, or a stage finds what it builds on missing | Interfaces written down once, before the items on either side; each stage written out at the end of the one before, with what it builds on named | The coordinator, the reviewer, the owner at the gate |
+| Code nobody can follow or maintain | Comments on every module and on what it offers; the reviewer's verdict on understood, fits the design, easy to change | The reviewer, the project's lint |
+| `main`'s history fills with review rounds | Fixes are folded into the commits they correct before the merge | The rules, the coordinator |
 | Something is forgotten | IDs and coverage | CI (`process-docs`) |
 | A session does something other than its item, or more | The brief is the item; a reviewer compares the diff with "Done when"; a session stops when its item is unclear | The rules, the reviewer |
 | "Done" without proof | The pull request asks for evidence someone can repeat; the reviewer repeats it; the coordinator checks the result personally | The reviewer, the coordinator (CI only checks the section is there) |
