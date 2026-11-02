@@ -3,6 +3,25 @@
 The newest version first. Each entry says what changed and what projects must do, if anything
 ([updates.md](updates.md#changing-the-process)).
 
+## 0.5.0 — 2026-11-02
+
+- The work goes in increments, each ending with something the owner uses. The first stage is a short
+  foundation (for a product that exists, with an inventory and checks where they are missing); each
+  later stage is an increment: what the owner gets from it, requirements and design for that scope
+  only, the items, the owner using the result in real work, its release. A rebuild goes as a series of
+  increments, each leaving the product working. Everything else waits in the plan's list for later.
+- An increment ends with the owner trying it before its gate; the coordinator writes out the next one
+  meanwhile. Every stage ends with a gate where the owner agrees the next increment.
+- Setting up writes the foundation in full and the increments as a line each; adopting the process
+  brings the plan into this shape too.
+
+Projects: in the update pull request, or as the coordinator's next item, the coordinator brings the
+plan's stages into this shape, and the owner reviews it. Stages done stay as they are. A current stage
+that already ends with something the owner uses is an increment and stays; one that doesn't is cut to
+what the first increment needs and closes the foundation. The stages after it become increments, a
+line each, with the rest in the list for later. Backlog items left outside are dropped with the reason
+"moved to the list for later"; an open pull request left outside is the owner's to keep or close.
+
 ## 0.4.0 — 2026-11-02
 
 - A review for harm: code that `docs/plan.md` names as risky (it handles a secret, or acts on the
