@@ -35,23 +35,26 @@ at:
    such things is risky code (below), not this point.
 5. **The rules of the work:** what the owner keeps for themself
    ([workflow.md](workflow.md#the-owners-ok-and-the-merge)): `CLAUDE.md`, the plan, the settings and the
-   commands of the checks, CI and the process. The template's files a process update brings exactly as
-   in the template's release are the exception: the owner agreed them in the template.
+   commands of the checks, CI and the process, and any change that loosens the project's checks,
+   whatever file it is in (a test removed or skipped, a lint rule or a threshold eased). The template's
+   files a process update brings exactly as in the template's release are the exception: the owner
+   agreed them in the template.
 
 A pull request for 1, 2, 4 or 5 is labelled `owner-review`; it says in plain words what it decides or
 changes, and for the checks and CI what it loosens or tightens. Everything else is labelled
 `ok-without-reading` and the coordinator merges it on its own: the requirements and the documents of
 the chain inside the agreed scope, studies, code and tests, interfaces between parts that only the
 agents build, the backlog, `docs/now.md`, records of facts, and records of the owner's own decisions
-outside what the owner keeps. For code the project's checks run, the report says in one line what a
-change loosens or tightens.
+outside what the owner keeps. A bot's pull request the coordinator labels after its review: a
+dependency bump inside the plan `ok-without-reading`, a release as the plan's Releases section says.
 
 Code `docs/plan.md` names as risky goes as OK without reading only where the plan says so, once
 neither its review nor its review for harm has a "fix" finding left
 ([workflow.md](workflow.md#how-a-piece-of-work-goes)).
 
 When the coordinator isn't sure whether something stays inside the plan, it asks the owner in one line
-in the report, with its recommendation, instead of sending the whole pull request to be read. It never
+in the report, with its recommendation, instead of sending the whole pull request to be read, and holds
+that pull request until the answer; the rest goes on. It never
 moves a kind of work off the owner's list on its own; only the owner can, by a change to the plan.
 
 ## Batching

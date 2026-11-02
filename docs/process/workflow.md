@@ -29,14 +29,15 @@ its exit list:
   owner's main scenarios, the limits; research only where a decision can't be made without it; the
   technologies and the frame of the design only as far as the first increment needs. For a product that
   exists already, it also holds an inventory of what the product does and checks that it still does it
-  (tests, for code), where these don't exist yet.
+  (tests, for code), for the parts the first increments touch and where these don't exist yet; each
+  later increment adds them for the parts it touches.
 - **Increments,** one stage each, one after another. An increment says what the owner gets from it in
   their real work: something they can do that they couldn't, or, for a step of a rebuild, a part of the
-  product they use running on the rebuilt part, checked. Everything else goes to the plan's list for
-  later. Inside it: the requirements and research for that scope only, the design and the interfaces
-  for it, and the items that build it. The first increment of a new product is its smallest version
-  the owner can use; for a product that exists, each increment changes the working product, and a
-  rebuild goes as a series of increments, each leaving it working.
+  product they use running on the rebuilt part, checked. Everything else goes to the list for later.
+  Inside it: the requirements and research for that scope only, the design and the interfaces for it,
+  and the items that build it. The first increment of a new product is its smallest version the owner
+  can use; for a product that exists, each increment changes the working product, and a rebuild goes as
+  a series of increments, each leaving it working.
 
 The process holds the stages to these rules:
 
@@ -58,16 +59,20 @@ The process holds the stages to these rules:
   for later. While the owner tries it, the coordinator writes out the next increment and adds what
   comes up.
 - A gate is a stage's end, and every stage ends with one: the owner accepts what the stage delivered
-  and agrees the next increment. The coordinator does not bring a gate to the owner while any point is
-  open or unchecked, and prepares it as [coordinator.md](coordinator.md#before-a-gate) says.
+  and agrees the next increment. Agreeing it lets the coordinator start the work sessions and reviewers
+  for its items on its own, without asking again; where its tool starts a session on its own only on
+  the owner's word, the coordinator asks for that word together with the plan. The coordinator does
+  not bring a gate to the owner while any point is open or unchecked, and prepares it as [coordinator.md](coordinator.md#before-a-gate) says.
 - A project already under way (adopting the process, or taking this shape in an update) brings its plan
   into it: stages done stay as they are; a current stage that already ends with something the owner
   uses is an increment and stays; one that doesn't is cut to what the first increment needs and closes
   the foundation; the stages after it become increments, a line each, with the rest in the list for
   later. Backlog items left outside go to the list for later (below); an open pull request left outside
   is the owner's to keep or close.
-- The list for later in `docs/plan.md` holds what is left out of the increments so far, so nothing is
-  lost. A backlog item moved there is dropped with the reason "moved to the list for later"; an
+- The list for later, the section "Later" at the end of `docs/backlog.md`, holds what is left out of
+  the increments so far, a line each, so nothing is lost; the coordinator adds to it as a record of its
+  own. Moving work of the agreed increment there is a change of scope
+  ([reports.md](reports.md#when-the-owner-looks), 4). A backlog item moved there is dropped with the reason "moved to the list for later"; an
   increment takes its work back from there as new items.
 
 ## How a piece of work goes
@@ -102,15 +107,19 @@ The process holds the stages to these rules:
    itself nor merges, but stops and tells the owner; so does a change to the risky code that would need
    a third round. The pull request merges only when neither review has a "fix" finding left.
    The coordinator then checks the result personally: the diff against "Done when", the running result,
-   and that the commits read as the steps they are ([rules.md](rules.md#git-and-github)).
+   that the commits read as the steps they are ([rules.md](rules.md#git-and-github)), and that the
+   review label follows [reports.md](reports.md#when-the-owner-looks) and the decisions the increment's
+   plan gave the owner; it corrects the label if not. A reviewer is needed for every pull request but a
+   coordinator record of `docs/now.md` or the backlog (its section "Later" included) and a process
+   update that only brings the template's release; a record that changes a document of the chain or
+   adds a decision record gets one.
 6. **The report to the owner** ([reports.md](reports.md)). The owner reviews and discusses the pull
    request in its comments on GitHub, or in the chat when agents work under the owner's account; the
    coordinator answers where the owner wrote.
 7. **The merge,** by rebase: after the owner's OK where it is needed, by the coordinator on its own
-   where it isn't ("The owner's OK and the merge" below). When the merge changes where the work stands,
-   the coordinator adds the commit that brings `docs/now.md` up to date before the report that asks for
-   the OK (for a pull request merged without it, before the merge), so what is merged is exactly what
-   was agreed. If the owner says no,
+   where it isn't ("The owner's OK and the merge" below). When merges change where the work stands, the
+   coordinator brings `docs/now.md` up to date afterwards in a record of its own, several merges in
+   one, before its next report. If the owner says no,
    the pull request stays open, and the owner's remarks are handled like any other change
    ([changes.md](changes.md)).
 8. **After the merge,** whoever merged, the coordinator records it in the tracker, if the project has
@@ -120,7 +129,7 @@ The process holds the stages to these rules:
 ## The owner's OK and the merge
 
 **Which pull requests need the owner's OK:** those labelled `owner-review`, those with no review label
-(a bot's), and every one that changes what the owner keeps for themself: `CLAUDE.md`, `docs/plan.md`,
+(a bot's, until the coordinator labels it), and every one that changes what the owner keeps for themself: `CLAUDE.md`, `docs/plan.md`,
 `docs/process.json`, anything under `.github/`, and the template's files and lock, apart from those a
 process update brings exactly as in the template's release ([updates.md](updates.md#getting-a-newer-process)). One labelled
 `ok-without-reading` that changes none of these the coordinator merges on its own, once its checks are

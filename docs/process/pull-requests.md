@@ -53,7 +53,8 @@ clash with the project's own.
 | `process-owner` | `tools/process/check_owner.py` | a pull request that needs the owner's OK has the owner's approval of its last commit, and one labelled `ok-without-reading` changes nothing the owner keeps for themself, a process update that is exactly the template's release aside ([workflow.md](workflow.md#the-owners-ok-and-the-merge)); it runs again on every review |
 
 Pull requests opened by a GitHub App (a release bot, a dependency bot) skip `process-pr`: they don't
-follow the template. Their other checks run, and with no review label they need the owner's OK. So automation whose pull requests don't follow the template (a release tool run in CI, say)
+follow the template. Their other checks run; with no review label they need the owner's OK, and the coordinator labels
+them after its review ([reports.md](reports.md#when-the-owner-looks)). So automation whose pull requests don't follow the template (a release tool run in CI, say)
 opens them with a GitHub App's token, not with the agents' or the owner's; a process update follows the
 template, and the coordinator opens it under the agents' account. One that changes the template's files (a dependency bot
 bumping an action in `process-*.yml`) is closed: such changes come from the template.

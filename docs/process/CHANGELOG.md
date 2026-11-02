@@ -9,7 +9,8 @@ The newest version first. Each entry says what changed and what projects must do
   foundation (for a product that exists, with an inventory and checks where they are missing); each
   later stage is an increment: what the owner gets from it, requirements and design for that scope
   only, the items, the owner using the result in real work, its release. A rebuild goes as a series of
-  increments, each leaving the product working. Everything else waits in the plan's list for later.
+  increments, each leaving the product working. Everything else waits in the list for later, a section
+  at the end of `docs/backlog.md` the coordinator keeps without the owner.
 - An increment ends with the owner trying it before its gate; the coordinator writes out the next one
   meanwhile. Every stage ends with a gate where the owner agrees the next increment.
 - Setting up writes the foundation in full and the increments as a line each; adopting the process
@@ -19,6 +20,14 @@ The newest version first. Each entry says what changed and what projects must do
   use or work with, what shapes the whole product, what is hard to reverse); the result of each
   increment; what goes beyond the plan; and the rules of the work (`CLAUDE.md`, the plan, the settings,
   CI, the process). A doubt is a one-line question in the report, not a whole pull request to read.
+  Agreeing an increment's plan lets the coordinator start the sessions for its items on its own. A
+  question holds its pull request until the answer. A change that loosens the project's checks, in
+  whatever file, is the owner's. The coordinator checks every review label before merging, labels bots'
+  pull requests after its review, and brings `docs/now.md` up to date after merges, several at once.
+  Every pull request gets a reviewer but coordinator records of `docs/now.md` or the backlog and plain
+  process updates.
+- Code: behaviour the code adds or changes is covered by automated tests where the project can run
+  them.
 - The coordinator merges everything else on its own once checks and reviews pass, and the report lists
   it. A new required check, `process-owner`, holds this: a pull request labelled `owner-review` or with
   no review label, or one that changes `CLAUDE.md`, `docs/plan.md`, `docs/process.json`, anything under
@@ -31,7 +40,9 @@ The newest version first. Each entry says what changed and what projects must do
   names, so the required checks don't change.
 
 Projects: in the update pull request, or as the next item, the coordinator brings the plan's stages
-into this shape as `workflow.md` says for a project already under way, and the owner reviews it.
+into this shape as `workflow.md` says for a project already under way, and the owner reviews it; a
+list for later in the plan moves to the section "Later" of `docs/backlog.md`. A project that keeps
+`docs/now.md` up to date in each pull request may stop doing so.
 
 The owner, in the repository's settings (Settings → Rules → the ruleset for `main`, or Settings →
 Branches): add `process-owner` to the required checks and, where the agents have their own account, set

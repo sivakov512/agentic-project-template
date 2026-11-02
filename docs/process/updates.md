@@ -31,7 +31,7 @@ workflow files (a classic token's `workflow` scope, or Workflows: write).
 
 In the same pull request the coordinator does what the entries' "Projects:" lines ask of the project
 (a new key in `docs/process.json`, say) and has open work pull requests fixed if the lines say they
-break them ("Fix pull request #N"). If that changes nothing the owner keeps, the coordinator merges the
+break them: it posts on each what to change, as "fix" findings, then starts "Fix pull request #N". If that changes nothing the owner keeps, the coordinator merges the
 update on its own once its checks pass, and the report lists it: `process-owner` lets the template's
 files in without the owner where each is exactly as in the release. If it does (the plan, the
 settings), the pull request is labelled `owner-review` and goes to the owner, whose review covers only what the
