@@ -1,5 +1,11 @@
 # The coordinator
 
+What the coordinator does is in [roles.md](roles.md); how it does it is here and in what this file
+links. Besides [rules.md](rules.md), it works from [workflow.md](workflow.md) (stages and gates, how a
+piece of work goes, the merge), [reports.md](reports.md) (what it tells the owner),
+[changes.md](changes.md) (recording the owner's words, the backlog, decisions) and
+[pull-requests.md](pull-requests.md).
+
 ## Each session
 
 - **Starts from the repository:** `CLAUDE.md`, `docs/now.md`, `docs/plan.md`, the backlog and the open
@@ -14,9 +20,8 @@
 
 Walk the exit list point by point, run the checks, have a reviewer hunt for gaps, and run a cold-start
 test: a fresh session given only the repository must say where we are and what comes next exactly as
-`docs/now.md` does. At the end of an increment, the owner has tried it first, in the order
-[workflow.md](workflow.md#stages-and-gates) gives. Then write out the next increment and bring it with
-the gate.
+`docs/now.md` does. How an increment ends, with the owner trying it, and when the next one is written
+out: [workflow.md](workflow.md#stages-and-gates).
 
 ## The tracker
 

@@ -29,18 +29,21 @@ Nikita Sivakov, under the MIT License.
 The template ships a placeholder for each of the project's files. The process expects the default
 branch to be `main`.
 
-## Read in this order
+## Who reads what
 
-1. [rules.md](rules.md): rules for every agent. `CLAUDE.md` imports it, so every session has it.
-2. [roles.md](roles.md): owner, coordinator, work session, reviewer.
-3. [workflow.md](workflow.md): stages and gates, and how one piece of work goes from item to merge.
-4. [pull-requests.md](pull-requests.md): kinds, labels, the description, the checks.
-5. [reports.md](reports.md): what the owner gets told, and what needs the owner's review.
-6. [changes.md](changes.md): how requests and decisions are recorded, the backlog, decision records,
-   IDs and coverage.
-7. [coordinator.md](coordinator.md): the coordinator's protocol, the tracker, stopping.
-8. [defences.md](defences.md): what could go wrong and what stops it.
+Every session has [rules.md](rules.md): `CLAUDE.md` imports it, and it tells a session its role.
 
-Setting up a project, or adopting the process in an existing one: [setup.md](setup.md). Getting a newer
-process, or changing it: [updates.md](updates.md). What changed between versions:
-[CHANGELOG.md](CHANGELOG.md).
+| Role | Reads |
+|---|---|
+| Work session | its backlog item and every document it links; [pull-requests.md](pull-requests.md) |
+| Reviewer | the pull request's item and the documents it links |
+| Coordinator | [coordinator.md](coordinator.md), which names the rest |
+| Setting up a project | [setup.md](setup.md) |
+| The template's coordinator | [updates.md](updates.md#changing-the-process) |
+
+The rest, for reference: [roles.md](roles.md) (who does what), [workflow.md](workflow.md) (stages,
+gates, how a piece of work goes, the merge), [pull-requests.md](pull-requests.md),
+[reports.md](reports.md), [changes.md](changes.md) (requests, decisions, the backlog, IDs),
+[defences.md](defences.md) (what could go wrong and what stops it), [config.md](config.md)
+(`docs/process.json`), [updates.md](updates.md) (getting a newer process),
+[CHANGELOG.md](CHANGELOG.md) (what changed between versions).

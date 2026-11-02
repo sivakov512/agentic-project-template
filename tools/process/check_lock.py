@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Checks a pull request against main's lock (docs/process/updates.md, "The lock"): if it changes the
-template's files, its lock must name a newer version than main's, and it must be labelled owner-review.
+template's files, its lock must name a newer version than main's.
 Standard library only.
 
     python3 tools/process/check_lock.py --base-lock <main's .process-lock.json> "$GITHUB_EVENT_PATH"
@@ -24,7 +24,7 @@ def changed_files(root, base_lock):
     return sorted(set(changed + [name for name in base if name not in present]))
 
 
-def check(root, base_lock, labels):
+def check(root, base_lock):
     changed = changed_files(root, base_lock)
     if not changed:
         return []
@@ -37,8 +37,6 @@ def check(root, base_lock, labels):
     if not newer:
         errors.append(f"it changes the template's files but its lock doesn't move past version "
                       f"{base_lock.get('version')}: " + ", ".join(changed))
-    if "owner-review" not in labels:
-        errors.append("it changes the process, so it needs the label owner-review: " + ", ".join(changed))
     return errors
 
 
@@ -51,11 +49,9 @@ def main(argv):
     base_path = Path(args.base_lock)
     try:
         base_lock = json.loads(base_path.read_text(encoding="utf-8")) if base_path.exists() else None
-        labels = [label["name"] for label in
-                  json.loads(Path(args.event).read_text(encoding="utf-8")).get("pull_request", {}).get("labels", [])]
-        errors = check(root, base_lock, labels) if base_lock else []
+        errors = check(root, base_lock) if base_lock else []
     except (OSError, ValueError, KeyError) as error:
-        errors = [f"can't read the lock or the event: {error}"]
+        errors = [f"can't read the lock: {error}"]
     if base_lock is None and not errors:
         print("main has no lock yet: nothing to compare with")
     for error in errors:

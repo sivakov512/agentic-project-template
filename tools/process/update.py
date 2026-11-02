@@ -50,8 +50,9 @@ anything.
 
 ## Owner review
 
-Only what the changelog entries above ask of this project (their "Projects:" lines), which the
-coordinator does in this pull request; the owner reviewed each change in the template already.
+None needed while this pull request only brings the template's release, which the owner agreed in the
+template, and what the changelog asks of the project changes nothing the owner keeps. If it does (the
+plan, the settings), the coordinator labels it owner-review and says here what to look at.
 
 ## Not done and open questions
 
@@ -132,8 +133,9 @@ def main():
     pull = gh_json("api", f"repos/{repo}/pulls", "-f", f"title=Plan: update the process to {new}",
                    "-f", f"head={branch}", "-f", "base=main", "-f", f"body={body}")
     run("gh", "api", f"repos/{repo}/issues/{pull['number']}/labels",
-        "-f", "labels[]=plan", "-f", "labels[]=owner-review")
-    print(f"Opened {pull['html_url']}. The checkout is on {branch}: do there what the changelog asks.")
+        "-f", "labels[]=plan", "-f", "labels[]=ok-without-reading")
+    print(f"Opened {pull['html_url']}. The checkout is on {branch}: do there what the changelog asks,"
+          " and label it owner-review if that changes what the owner keeps (docs/process/updates.md).")
     return 0
 
 

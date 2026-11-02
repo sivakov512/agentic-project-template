@@ -1,0 +1,28 @@
+name: process-owner
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, labeled, unlabeled, ready_for_review]
+  pull_request_review:
+    types: [submitted, dismissed]
+
+permissions:
+  contents: read
+  pull-requests: read
+
+concurrency:
+  group: process-owner-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+# Comes from the template (docs/process/pull-requests.md): a pull request that needs the owner's OK has
+# it, so the coordinator merges the rest on its own. It runs again when a review is given or dismissed.
+jobs:
+  process-owner:
+    runs-on: ${{ vars.CI_RUNNER || 'ubuntu-latest' }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - run: python3 tools/process/check_owner.py "$GITHUB_EVENT_PATH"
+        env:
+          GH_TOKEN: ${{ github.token }}

@@ -15,8 +15,9 @@ The first of these that fits is your role:
    "If you are the reviewer".
 4. **This repository is the template** (the `owner/name` of its `origin` remote is the `template` in
    `.process-lock.json`): you are the template's coordinator. Changes to the process go as
-   [updates.md](updates.md#changing-the-process) says; the rest of [coordinator.md](coordinator.md)
-   holds where it applies.
+   [updates.md](updates.md#changing-the-process) says, reviewed and merged as in
+   [workflow.md](workflow.md#how-a-piece-of-work-goes), steps 5 to 7; run `doctor.py` at the start of a
+   session. The template has no stages, backlog or tracker of its own.
 5. **The project is not set up yet** (`docs/process.json` on `main` says `"set_up": false`): you are
    setting it up. Follow [setup.md](setup.md).
 6. **Anything else, from the owner:** you are the coordinator. Follow [coordinator.md](coordinator.md),
@@ -159,7 +160,8 @@ written.
 ## Git and GitHub
 
 - Commits, pushes and pull requests go out under the account the project chose for agents
-  ([workflow.md](workflow.md#the-owners-ok-and-the-merge)). Call `git` and `gh` by name.
+  ([workflow.md](workflow.md#the-owners-ok-and-the-merge)). Call `git` and `gh` by name. Agents never
+  approve a pull request: an approval is the owner's OK.
 - **A pull request's history is what lands on `main`.** Each commit is one step a reader of `main`
   wants to see, with a subject that says that step. A fix from a review or a check, or any later change
   to a step already committed, goes into that commit, not into a commit of its own: commit it with
@@ -169,5 +171,5 @@ written.
   `git push --force-with-lease`. That also drops the empty start commit once a real one is there.
 - Open pull requests through the REST API (`gh api repos/{owner}/{repo}/pulls`), so nothing adds text
   to the description you wrote.
-- Nobody but the coordinator merges, and only after the owner's OK, by rebase; or the owner merges, as
-  the project chose ([workflow.md](workflow.md#the-owners-ok-and-the-merge)).
+- Nobody but the coordinator merges, by rebase, and a pull request that needs the owner's OK only after
+  it; or the owner merges those, as the project chose ([workflow.md](workflow.md#the-owners-ok-and-the-merge)).

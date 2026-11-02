@@ -3,8 +3,8 @@
 
 A GitHub repository template for building a product with AI agents, from the first idea to a working
 result, while you stay in control. The agents research, write the spec, plan, build, review each
-other's work and report to you. You decide what matters and approve every change. Nothing reaches
-`main` without your OK.
+other's work and report to you. You decide what matters: the agents bring you what needs your decision
+and merge the rest themselves after their own reviews and checks, listing it in their reports.
 
 It is for a person who wants agents to carry a whole project, not just write code on request, and
 needs the work to stay understandable and correctable months later.
@@ -28,22 +28,22 @@ This template puts the whole process into the repository, as rules the agents re
   repeat.
 - **Review before you see it.** A second agent with a fresh context checks each pull request against
   its item and the spec before the owner is asked.
-- **You decide, briefly.** Each report says what needs your review and what only needs an OK. Settings
-  come to you as clicks, questions in a batch with a recommendation.
+- **You decide, briefly.** Each report says what needs your review and lists what was merged without
+  it. Settings come to you as clicks, questions in a batch with a recommendation.
 - **Checked, not trusted.** CI checks links, the backlog, IDs and their coverage (every requirement has
   a source, every scenario has steps), pull request descriptions and commit messages.
 
 ## How work goes
 
 ```
-idea ─► spec ─► backlog item ─► draft PR with questions ─► work ─► review by an agent ─► report ─► your OK ─► merge
+idea ─► spec ─► backlog item ─► draft PR with questions ─► work ─► review by an agent ─► report ─► your OK, where needed ─► merge
 ```
 
 Four roles do it:
 
 | Role | Who | Does |
 |---|---|---|
-| Owner | you | Gives the goal and remarks, reviews what matters, approves. |
+| Owner | you | Gives the goal and remarks, reviews and approves what matters. |
 | Coordinator | an agent session | Runs the plan like a product manager: writes backlog items, starts work sessions and reviewers, checks results, reports to you, keeps your tracker in step. |
 | Work session | an agent session | Does one backlog item in one pull request. |
 | Reviewer | an agent with a fresh context | Looks for problems in a pull request; doesn't approve. |
@@ -54,8 +54,8 @@ The details are in [`docs/process/`](docs/process/README.md).
 
 1. **Use this template** on GitHub to make a new repository.
 2. **Choose whose account the agents work under:**
-   - a GitHub account of their own, a collaborator with Write access. You approve their pull requests
-     on GitHub, and GitHub enforces that nothing merges without your Approve;
+   - a GitHub account of their own, a collaborator with Write access. You approve on GitHub the pull
+     requests that need you, and a required check keeps them from merging without your Approve;
    - or yours. Everything carries your name, and you give your OK in the chat or merge yourself.
 3. **Open an agent session** (Claude Code) in the repository, signed in to `git` and `gh` as that
    account, and say in a few lines what the project is.
@@ -64,7 +64,7 @@ The details are in [`docs/process/`](docs/process/README.md).
    items, and a short list of repository settings for you to click.
 
 From then on you talk to the coordinator: give it goals and remarks, answer its questions, approve
-pull requests.
+what needs you.
 
 ## What is in it
 

@@ -14,13 +14,30 @@ The newest version first. Each entry says what changed and what projects must do
   meanwhile. Every stage ends with a gate where the owner agrees the next increment.
 - Setting up writes the foundation in full and the increments as a line each; adopting the process
   brings the plan into this shape too.
+- The owner looks where the work's direction is decided, not at every step (`reports.md`, "When the
+  owner looks"): the plan of each increment; the decisions it names as the owner's (what a person will
+  use or work with, what shapes the whole product, what is hard to reverse); the result of each
+  increment; what goes beyond the plan; and the rules of the work (`CLAUDE.md`, the plan, the settings,
+  CI, the process). A doubt is a one-line question in the report, not a whole pull request to read.
+- The coordinator merges everything else on its own once checks and reviews pass, and the report lists
+  it. A new required check, `process-owner`, holds this: a pull request labelled `owner-review` or with
+  no review label, or one that changes `CLAUDE.md`, `docs/plan.md`, `docs/process.json`, anything under
+  `.github/` or the template's files, needs the repository owner's approval of its last commit; agents
+  never approve. A process update that is exactly the template's release is the exception, and
+  `update.py` labels it `ok-without-reading`; `process-lock` no longer asks for a label. With the
+  agents' own account `process-owner` takes the place of GitHub's required approval.
 
-Projects: in the update pull request, or as the coordinator's next item, the coordinator brings the
-plan's stages into this shape, and the owner reviews it. Stages done stay as they are. A current stage
-that already ends with something the owner uses is an increment and stays; one that doesn't is cut to
-what the first increment needs and closes the foundation. The stages after it become increments, a
-line each, with the rest in the list for later. Backlog items left outside are dropped with the reason
-"moved to the list for later"; an open pull request left outside is the owner's to keep or close.
+Projects: in the update pull request, or as the next item, the coordinator brings the plan's stages
+into this shape as `workflow.md` says for a project already under way, and the owner reviews it.
+
+The owner, in the repository's settings (Settings → Rules → the ruleset for `main`, or Settings →
+Branches): add `process-owner` to the required checks and, where the agents have their own account, set
+required approvals to 0; until then what is OK without reading still waits for an approval. Where the
+agents work under the owner's account there is no required approval to remove, so the coordinator
+merges what is OK without reading from the update on, and `process-owner` guards the label once it is
+required. An open pull request gets the check at its next push or label change; until then a required
+`process-owner` shows as expected. `doctor.py` says when the settings are done. The description of the
+label `ok-without-reading` can be edited to the new one (Issues → Labels).
 
 ## 0.4.0 — 2026-11-02
 

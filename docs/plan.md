@@ -21,7 +21,8 @@ written, and, with code, which document describes the code's design and lists it
 
 The foundation, then increments ([the process's rules for stages](process/workflow.md#stages-and-gates)).
 Each stage: what it delivers (for an increment, what the owner gets from it), the owner's part, and its
-exit list. The increments not started yet are a line each until the stage before them ends. Then the
+exit list. The increments not started yet are a line each until they are written out
+([when](process/workflow.md#stages-and-gates)). Then the
 list for later: what is left out of the increments so far.
 
 ## Facts
@@ -30,8 +31,8 @@ Where facts found by experiment are recorded, and in what form.
 
 ## Owner review
 
-What, beyond [the process's list](process/reports.md#review-or-ok-without-reading), needs the owner's
-review in this project. Which code is risky, if any (it handles a secret, or acts on the owner's
+What, beyond [the process's list](process/reports.md#when-the-owner-looks), the owner looks at in
+this project. Which code is risky, if any (it handles a secret, or acts on the owner's
 machine, on infrastructure or on data that can't be restored), so it gets a review for harm, and
 whether it then goes as OK without reading.
 

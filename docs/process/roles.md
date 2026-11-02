@@ -2,8 +2,8 @@
 
 | Who | Does |
 |---|---|
-| Owner | The customer: wants the result, asks questions and gives remarks, which may land anywhere. Reviews what matters, gives an OK on the rest, says yes to each pull request (or merges it), can stop any work at any time. Not disturbed by default. |
-| Coordinator | Runs the plan like a product manager: keeps the documents, the backlog, `docs/now.md` and the tracker; writes backlog items; starts work sessions and reviewers and checks what they deliver; is the expert: weighs every owner remark on its merit and says where it agrees, where it belongs elsewhere and where it disagrees, with the reason; decides routine questions inside what the owner agreed; when something matters, makes sure the owner looks at it and says why; reports to the owner; merges after the owner's OK, unless the owner merges. Does not write product code. |
+| Owner | The customer: wants the result, asks questions and gives remarks, which may land anywhere. Reviews what matters and says yes to it (or merges it), sees the rest listed in reports, can stop any work at any time. Not disturbed by default. |
+| Coordinator | Runs the plan like a product manager: keeps the documents, the backlog, `docs/now.md` and the tracker; writes backlog items; starts work sessions and reviewers and checks what they deliver; is the expert: weighs every owner remark on its merit and says where it agrees, where it belongs elsewhere and where it disagrees, with the reason; decides routine questions inside what the owner agreed; when something matters, makes sure the owner looks at it and says why; reports to the owner; merges what is OK without reading on its own, and the rest after the owner's OK, unless the owner merges it. Does not write product code. |
 | Work session | Does exactly one backlog item and opens one pull request for it. |
 | Reviewer | A separate session that checks a pull request against its item and the documents above it. Its job is to find problems, not to approve. |
 
@@ -19,8 +19,7 @@ session, or a subagent that starts with no context of its own).
 
 | What | Where |
 |---|---|
-| Plan, rules, specs, decisions, backlog | this repository, `main` |
-| Where the work stands now | `docs/now.md` |
+| Plan, rules, specs, decisions, backlog, where the work stands | this repository, `main` ([README.md](README.md#what-lives-where)) |
 | Work in progress | pull requests, one per backlog item, on a branch `b-###-short-name` |
 | A reviewer's findings | a comment on the pull request it reviewed |
 | The owner's review, discussion and OK of a pull request | its comments and an Approve on GitHub; with the owner's account, the chat ([workflow.md](workflow.md#the-owners-ok-and-the-merge)) |

@@ -24,7 +24,7 @@ LABELS = {**check_pr.KIND_DESCRIPTIONS, **check_pr.REVIEW_LABELS}
 PROJECT_FILES = ["CLAUDE.md", "README.md", "docs/plan.md", "docs/now.md", "docs/backlog.md",
                  "docs/decisions/README.md", check_docs.CONFIG]
 PLACEHOLDER = "<!-- template placeholder -->"
-REQUIRED_CHECKS = ["process-docs", "process-pr", "process-lock", "process-commits"]
+REQUIRED_CHECKS = ["process-docs", "process-pr", "process-lock", "process-commits", "process-owner"]
 
 
 class Report:
@@ -117,6 +117,12 @@ def check_github(report, lock, set_up, fix_labels, agents_account):
         return
     is_template = repo == lock.get("template")
     report.line(True, f"repository {repo}" + (" (the template itself)" if is_template else ""))
+    if agents_account != "owner":
+        code, out = gh("api", f"repos/{repo}", "--jq", ".owner.type")
+        if code == 0:
+            report.line(out.strip() == "User", "the repository belongs to the owner's personal account",
+                        "process-owner counts only the repository owner's approval, and an organisation"
+                        " gives nobody that (docs/process/workflow.md, \"The owner's OK and the merge\")")
     if not is_template:
         report.line(bool(set_up), "the project is set up", "follow docs/process/setup.md")
 
@@ -156,21 +162,19 @@ def check_github(report, lock, set_up, fix_labels, agents_account):
         missing_checks = [name for name in REQUIRED_CHECKS if name not in contexts]
         report.line(protected and not missing_checks, "the process checks are required for main",
                     "the owner requires them: " + ", ".join(missing_checks))
+        # process-owner asks for the owner's approval where it is needed; a required approval on top of it
+        # would stop the coordinator from merging what is OK without reading.
         reviews = approvals(rules)
-        if agents_account == "own" and reviews is None:
-            report.line(None, "approvals for main",
-                        "the owner checks: one approval, dismissed by new commits (docs/process/setup.md, step 8)")
-        elif agents_account == "own":
-            count, dismissed = reviews
-            report.line(count >= 1 and dismissed, "one approval for main, dismissed by new commits",
-                        f"the ruleset asks {count} approval(s), dismissed by new commits: {dismissed}"
-                        " (docs/process/setup.md, step 8)")
-        elif agents_account == "owner" and reviews is None:
+        if reviews is None:
             report.line(None, "no required approvals for main",
-                        "the owner checks: nobody can approve their own pull request (docs/process/setup.md, step 8)")
-        elif agents_account == "owner" and reviews[0] > 0:
-            report.line(False, "no required approvals for main",
-                        "nobody can approve their own pull request, so nothing would merge (docs/process/setup.md, step 8)")
+                        "the owner checks: process-owner asks for approvals where needed (docs/process/setup.md, step 8)")
+        elif reviews[0] > 0:
+            report.line(None if agents_account != "owner" else False, "no required approvals for main",
+                        f"the ruleset asks {reviews[0]} approval(s): "
+                        + ("nobody can approve their own pull request, so nothing would merge"
+                           if agents_account == "owner" else
+                           "pull requests OK without reading still wait for the owner")
+                        + " (docs/process/setup.md, step 8)")
         if agents_account == "owner":
             report.line(None, "no bypassing for main",
                         "the owner checks it is on, or the protection doesn't bind the owner's account"
