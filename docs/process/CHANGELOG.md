@@ -3,6 +3,21 @@
 The newest version first. Each entry says what changed and what projects must do, if anything
 ([updates.md](updates.md#changing-the-process)).
 
+## 0.4.0 — 2026-11-02
+
+- A review for harm: code that `docs/plan.md` names as risky (it handles a secret, or acts on the
+  owner's machine, on infrastructure or on data that can't be restored) gets a second, independent
+  review, run at the same time as the usual one. Its reviewer reads no other findings before posting
+  its own, hunts for concrete ways the change does harm, and says whether the change is safe to merge
+  as is. One fix session answers both reviews. The pull request merges only when neither review has a
+  "fix" finding left; one the review for harm still has after its second round goes to the owner.
+- Such code is Review, unless the project's plan lets it go as OK without reading after both reviews.
+
+Projects: a project with such code names it in "Owner review" of `docs/plan.md`, with whether it then
+goes as OK without reading: a change to the plan the owner reviews, in the update pull request or as
+the coordinator's next item. Until then nothing changes. A rule of the project's that only repeats this
+one is removed. Open pull requests with code so named get a review for harm before their merge.
+
 ## 0.3.0 — 2026-11-02
 
 - The reviewer gives a verdict on three points in every pull request that changes the work: understood

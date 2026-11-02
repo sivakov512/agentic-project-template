@@ -30,7 +30,9 @@ Where facts found by experiment are recorded, and in what form.
 ## Owner review
 
 What, beyond [the process's list](process/reports.md#review-or-ok-without-reading), needs the owner's
-review in this project.
+review in this project. Which code is risky, if any (it handles a secret, or acts on the owner's
+machine, on infrastructure or on data that can't be restored), so it gets a review for harm, and
+whether it then goes as OK without reading.
 
 ## Tracker
 

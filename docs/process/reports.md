@@ -21,7 +21,8 @@ Settings the owner must change are given as a path of clicks with links (Setting
 Review is needed for: what the product must do and what is in and out of it, the design the owner will
 use, stack and architecture, the interfaces between parts (in whatever form they are written), any
 decision that is hard to reverse, changes to the plan, to `CLAUDE.md` and to the process, anything
-risky the project's rules name, and accepting what a stage, or an iteration within it, delivered.
+risky the project's rules name (risky code may go as OK without reading, below), and accepting what a
+stage, or an iteration within it, delivered.
 `docs/plan.md` may name more.
 
 OK without reading is enough for: documents written for machines other than interfaces, studies that only collect material
@@ -32,6 +33,10 @@ the coordinator asks for a review anyway and explains it in plain words), record
 experiment, `docs/now.md`, and the coordinator's records of the owner's own decisions, wherever they
 land, the plan included: the owner said them. Anything the coordinator adds of its own in such a record
 makes it a Review.
+
+Code `docs/plan.md` names as risky goes as OK without reading only where the plan says so, once
+neither its review nor its review for harm has a "fix" finding left
+([workflow.md](workflow.md#how-a-piece-of-work-goes)).
 
 When in doubt, it is Review. The coordinator never moves a kind of work from Review to OK without
 reading on its own; only the owner can, by a change to the plan.
