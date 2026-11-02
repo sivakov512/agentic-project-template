@@ -47,7 +47,7 @@ In the template, the process files are its documents, and its coordinator change
 2. The same pull request adds an entry at the top of [CHANGELOG.md](CHANGELOG.md): the new version
    (`MAJOR.MINOR.PATCH`; patch for wording, minor for new rules or files, major when projects must change
    something, a new required key in `docs/process.json` included; while the version is 0.x, minor
-   stands in for major), the date, what changed, and a last
+   stands in for major too, so new rules and changes projects must make both raise the minor), the date, what changed, and a last
    line `Projects: …` saying what projects must do, or `Projects: nothing to do.` A change that can fail
    a project's open pull requests (a new required section, a stricter check) says what to fix in them.
 3. It runs `python3 tools/process/lock.py`, which writes `.process-lock.json` for the new version, and

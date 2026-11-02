@@ -38,7 +38,8 @@ Always ask, whatever the brief says:
 3. **`docs/plan.md`:** fill in every section the placeholder lists. The first stage is usually
    requirements or research; keep the document chain as short as the project allows, and name in it
    where the interfaces between parts are written
-   ([workflow.md](workflow.md#how-the-repository-works)). Stages after the first may stay brief: each
+   ([workflow.md](workflow.md#how-the-repository-works)) and, with code, the document of the code's
+   design that lists its folders ([rules.md](rules.md#code)). Stages after the first may stay brief: each
    is written out at the end of the one before it.
 4. **`docs/process.json`:** the owner's language, the tracker, how the project ships, the agents'
    account and who merges, the commit rules, the kinds of ID and coverage rules

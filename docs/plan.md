@@ -14,8 +14,8 @@ What the project makes, for whom, and when the goal is met.
 ## Document chain
 
 The project's documents from the top down to the backlog and the code, each with what it holds and the
-IDs it defines (they are also in `docs/process.json`), and where the interfaces between parts are
-written. A change starts in the highest one it touches.
+IDs it defines (they are also in `docs/process.json`), where the interfaces between parts are
+written, and, with code, which document describes the code's design and lists its folders. A change starts in the highest one it touches.
 
 ## Stages
 

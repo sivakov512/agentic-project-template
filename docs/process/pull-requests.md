@@ -5,7 +5,7 @@ So the owner can see from the list what each pull request is and whether to read
 ## Kind and labels
 
 - **Its kind is its purpose,** not every file it touches: changes that follow from the work (the backlog
-  tick, `docs/now.md`, links) don't count. A pull request with two purposes is two pull requests.
+  tick or the split of its own item, `docs/now.md`, links) don't count. A pull request with two purposes is two pull requests.
 
   | Kind | Title starts with | For |
   |---|---|---|
