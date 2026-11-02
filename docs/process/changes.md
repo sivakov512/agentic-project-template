@@ -23,7 +23,9 @@
   (the bar for the work, specific enough for a reviewer to check point by point), with links to the
   documents it depends on;
 - items are never deleted: an item that is no longer needed is ticked and marked "Superseded by B-###"
-  or "Dropped", with the reason.
+  or "Dropped", with the reason;
+- the section "Later" at the end holds what is left out of the increments so far, a plain line each
+  ([workflow.md](workflow.md#stages-and-gates)).
 
 ## Decision records
 

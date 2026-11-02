@@ -148,6 +148,8 @@ written.
   where their names and types don't say it all; what it returns, empty results and failures included;
   the errors it raises. Something internal gets one when its purpose isn't plain from its name.
 - A comment says what and why, not how the next line works, and changes with the code it describes.
+- Behaviour the code adds or changes is covered by automated tests where the project has a way to run
+  them; a change without them is a "fix" finding.
 - Where the language has a linter for such comments, the project's checks run it
   ([config.md](config.md#checks)); whether the comments are clear and true is the reviewer's to judge.
 - The document the document chain names for the code's design lists its folders: those at the top of
