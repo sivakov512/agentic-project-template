@@ -25,6 +25,10 @@ PROJECT_FILES = ["CLAUDE.md", "README.md", "docs/plan.md", "docs/now.md", "docs/
                  "docs/decisions/README.md", check_docs.CONFIG]
 PLACEHOLDER = "<!-- template placeholder -->"
 REQUIRED_CHECKS = ["process-docs", "process-pr", "process-lock", "process-commits", "process-owner"]
+# With the agents' own account .github/CODEOWNERS gives the owner .github/, where the workflow of
+# process-owner is: it runs the check from main's copy, so the workflow is all a pull request could change
+# to get round it (docs/process/setup.md, step 8). Paths there that must fall to the owner alone:
+CODE_OWNED = [".github/CODEOWNERS", ".github/workflows/process-owner.yml", ".github/workflows/x.yml"]
 
 
 class Report:
@@ -63,6 +67,37 @@ def approvals(rules):
         return None
     return (max(int(p.get("required_approving_review_count", 0)) for p in found),
             any(bool(p.get("dismiss_stale_reviews_on_push")) for p in found))
+
+
+def code_owner_review(rules):
+    """Whether a ruleset's pull request rule asks for the code owners' review; None when no ruleset has a
+    pull request rule."""
+    found = [rule.get("parameters") or {} for rule in rules if rule.get("type") == "pull_request"]
+    return any(bool(p.get("require_code_owner_review")) for p in found) if found else None
+
+
+def codeowners_pattern(pattern):
+    """A CODEOWNERS pattern (gitignore-like) as a regular expression for a path from the repository's root."""
+    anchored = pattern.startswith("/") or "/" in pattern.rstrip("/")
+    body = re.escape(pattern.strip("/")).replace(r"\*\*", ".*").replace(r"\*", "[^/]*").replace(r"\?", "[^/]")
+    # "dir/*" covers the files in dir, not those in its folders; anything else covers what is under it too.
+    return re.compile(("^" if anchored else "^(.*/)?") + body + ("$" if pattern.endswith("/*") else "(/.*)?$"))
+
+
+def not_owners_alone(text, owner):
+    """The paths of CODE_OWNED whose owners in a CODEOWNERS file are not the owner alone: the last rule
+    that matches a path decides it, as GitHub reads the file."""
+    rules = []
+    for line in text.splitlines():
+        words = line.split("#", 1)[0].split()
+        if words:
+            rules.append((codeowners_pattern(words[0]), [word.lower() for word in words[1:]]))
+    wrong = []
+    for path in CODE_OWNED:
+        owners = next((owners for pattern, owners in reversed(rules) if pattern.match(path)), [])
+        if owners != ["@" + owner.lower()]:
+            wrong.append(path)
+    return wrong
 
 
 def check_files(report):
@@ -175,6 +210,17 @@ def check_github(report, lock, set_up, fix_labels, agents_account):
                            if agents_account == "owner" else
                            "pull requests OK without reading still wait for the owner")
                         + " (docs/process/setup.md, step 8)")
+        if agents_account != "owner":
+            owner = repo.split("/")[0]
+            codeowners = ROOT / ".github/CODEOWNERS"
+            text = codeowners.read_text(encoding="utf-8") if codeowners.exists() else ""
+            report.line(not not_owners_alone(text, owner), f".github/CODEOWNERS gives .github/ to @{owner} alone",
+                        f"its last rule for .github/ must be \"/.github/ @{owner}\" (docs/process/setup.md, step 8)")
+            report.line(code_owner_review(rules), "main requires the code owners' review",
+                        "the owner ticks \"Require review from Code Owners\" (docs/process/setup.md, step 8)")
+            report.line(None if reviews is None else reviews[1], "approvals are dismissed by new commits",
+                        "the owner ticks \"Dismiss stale pull request approvals when new commits are pushed\""
+                        " (docs/process/setup.md, step 8)")
         if agents_account == "owner":
             report.line(None, "no bypassing for main",
                         "the owner checks it is on, or the protection doesn't bind the owner's account"

@@ -689,6 +689,31 @@ class LockAgainstMain(unittest.TestCase):
         self.assertEqual(check_lock.check(self.root, self.base), [])
 
 
+class DoctorCodeOwners(unittest.TestCase):
+    def test_code_owner_review_comes_from_the_pull_request_rule(self):
+        self.assertTrue(doctor.code_owner_review([{"type": "pull_request", "parameters": {
+            "required_approving_review_count": 0, "require_code_owner_review": True}}]))
+        self.assertFalse(doctor.code_owner_review([{"type": "pull_request", "parameters": {}}]))
+        self.assertIsNone(doctor.code_owner_review([{"type": "deletion"}]))
+
+    def test_codeowners_must_give_github_to_the_owner_alone(self):
+        def wrong(text):
+            return doctor.not_owners_alone(text, "Owner")
+        self.assertEqual(wrong("# the owner keeps it\n/.github/ @owner  # workflows too\n"), [])
+        self.assertEqual(wrong("* @bot\n.github/ @owner\n"), [])
+        self.assertEqual(wrong(""), doctor.CODE_OWNED)
+        self.assertEqual(wrong("/.github/ @owner @bot\n"), doctor.CODE_OWNED)
+        self.assertEqual(wrong("/.github/ @bot\n"), doctor.CODE_OWNED)
+        self.assertEqual(wrong("/.github/ @owner\n* @bot\n"), doctor.CODE_OWNED)
+        self.assertEqual(wrong("/.github/ @owner\n/.github/workflows/ @bot\n"),
+                         [".github/workflows/process-owner.yml", ".github/workflows/x.yml"])
+        self.assertEqual(wrong("/.github/ @owner\n/.github/workflows/*.yml\n"),
+                         [".github/workflows/process-owner.yml", ".github/workflows/x.yml"])
+        self.assertEqual(wrong("/.github/* @owner\n"),
+                         [".github/workflows/process-owner.yml", ".github/workflows/x.yml"])
+        self.assertEqual(wrong("/.github/ @owner\n/.github/* @bot\n"), [".github/CODEOWNERS"])
+
+
 class DoctorRulesets(unittest.TestCase):
     def test_approvals_come_from_the_pull_request_rule(self):
         rules = [{"type": "deletion"}, {"type": "pull_request", "parameters": {

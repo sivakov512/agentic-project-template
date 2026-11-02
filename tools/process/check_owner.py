@@ -12,8 +12,9 @@ request's last commit by the repository's owner; with the owner's account nobody
 their own pull request, so the check only makes sure the label isn't ok-without-reading where it can't be,
 and the OK stays the owner's word that the coordinator quotes.
 
-In CI, with GH_TOKEN set to a token that can read the pull request's reviews:
-    python3 tools/process/check_owner.py "$GITHUB_EVENT_PATH"
+In CI, with GH_TOKEN set to a token that can read the pull request's reviews, run from main's copy of
+this file (.github/workflows/process-owner.yml), so the pull request can't change it:
+    python3 -I <main's checkout>/tools/process/check_owner.py "$GITHUB_EVENT_PATH"
 """
 
 import json

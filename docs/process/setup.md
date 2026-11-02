@@ -60,9 +60,15 @@ Always ask, whatever the brief says:
      checks `process-docs`, `process-pr`, `process-lock`, `process-commits` and `process-owner` required
      (the project's own jobs too, once they exist), and no required approvals (untick "Require
      approvals"): `process-owner` asks for the owner's approval where it is needed, and a required one
-     would hold back what the coordinator merges on its own. With the owner's account, also no bypassing ("Do not allow bypassing
-     the above settings", or no bypass list in a ruleset), because the owner's account is an admin and
-     the protection wouldn't bind it otherwise.
+     would hold back what the coordinator merges on its own. With the agents' own account, also "Require
+     review from Code Owners" and "Dismiss stale pull request approvals when new commits are pushed", and
+     the setting-up session makes `.github/CODEOWNERS` say `/.github/ @<the owner's login>` (the
+     template's own names the template's owner): `process-owner` runs the check from `main`'s copy, so
+     its workflow under `.github/` is all a pull request could change to get round it, and GitHub keeps
+     that for the owner. With the
+     owner's account, also no bypassing ("Do not allow bypassing the above settings", or no bypass list
+     in a ruleset), because the owner's account is an admin and the protection wouldn't bind it
+     otherwise.
    - Settings → Secrets and variables → Actions → Variables: `CI_RUNNER`, if the checks should run on a
      self-hosted runner.
    - The secrets the project itself needs, if any are known yet.
