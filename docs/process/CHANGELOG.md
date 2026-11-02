@@ -26,6 +26,9 @@ The newest version first. Each entry says what changed and what projects must do
   never approve. A process update that is exactly the template's release is the exception, and
   `update.py` labels it `ok-without-reading`; `process-lock` no longer asks for a label. With the
   agents' own account `process-owner` takes the place of GitHub's required approval.
+- Editing a pull request's description or labels reruns only the check of the description and the labels
+  (the new `process-pr.yml`), not the documents' check with the tests. The checks keep their
+  names, so the required checks don't change.
 
 Projects: in the update pull request, or as the next item, the coordinator brings the plan's stages
 into this shape as `workflow.md` says for a project already under way, and the owner reviews it.

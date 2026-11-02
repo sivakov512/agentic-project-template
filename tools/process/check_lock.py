@@ -3,7 +3,7 @@
 template's files, its lock must name a newer version than main's.
 Standard library only.
 
-    python3 tools/process/check_lock.py --base-lock <main's .process-lock.json> "$GITHUB_EVENT_PATH"
+    python3 tools/process/check_lock.py --base-lock <main's .process-lock.json>
 """
 
 import argparse
@@ -42,7 +42,6 @@ def check(root, base_lock):
 
 def main(argv):
     parser = argparse.ArgumentParser(description="Check a pull request against main's lock.")
-    parser.add_argument("event", help="the GitHub event file")
     parser.add_argument("--base-lock", required=True, help="main's .process-lock.json")
     args = parser.parse_args(argv[1:])
     root = Path(__file__).resolve().parents[2]

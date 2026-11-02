@@ -1,0 +1,24 @@
+name: process-pr
+
+# The check of the description and the labels: it runs again when they change, without rerunning the
+# checks of the content in process-checks.yml.
+on:
+  pull_request:
+    types: [opened, edited, synchronize, reopened, labeled, unlabeled, ready_for_review]
+
+permissions:
+  contents: read
+
+# A new event on a pull request cancels the run it makes stale.
+concurrency:
+  group: process-pr-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+# These checks come from the template (docs/process/pull-requests.md); what they need and where they run
+# is said in process-checks.yml.
+jobs:
+  process-pr:
+    runs-on: ${{ vars.CI_RUNNER || 'ubuntu-latest' }}
+    steps:
+      - uses: actions/checkout@v4
+      - run: python3 tools/process/check_pr.py "$GITHUB_EVENT_PATH"

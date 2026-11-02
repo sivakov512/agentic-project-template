@@ -41,7 +41,7 @@ Every section of `.github/pull_request_template.md`, filled in.
 
 ## The checks CI runs
 
-`.github/workflows/process-checks.yml` and `process-owner.yml` run these jobs; their names start with `process-` so they never
+The workflows `.github/workflows/process-*.yml` run these jobs; their names start with `process-` so they never
 clash with the project's own.
 
 | Job | Runs | Checks |
