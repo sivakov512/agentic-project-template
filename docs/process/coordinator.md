@@ -33,14 +33,13 @@ coordinator keeps it, the same day as things happen:
 
 - **It mirrors the repository,** never the other way round: no requirement or decision lives only
   there.
-- **What waits on the owner is there as the owner's,** with a short checklist: where to click (links),
-  what exactly to read or do, why it matters, about how many minutes, and which decisions are asked
-  for. While agents work on something, it waits on them.
+- **What waits on the owner is there as the owner's,** each with what the report's last point gives
+  for it ([reports.md](reports.md)). While agents work on something, it waits on them.
 - **Progress is recorded when results land:** a pull request merged, a gate passed. What the plan did
   not expect (a decision, an obstacle, a risk) is recorded where the owner sees it.
 - **It stays brief:** pieces of work, not single actions; facts, not plans.
 - **It is checked before every report,** and anything that no longer matches is fixed; the report says
-  what changed there ([reports.md](reports.md)).
+  what changed there if `docs/plan.md` asks for it ([reports.md](reports.md)).
 - **An urgent action by hand** that stops a session right now is not tracked: the coordinator asks the
   owner for it at once in the chat.
 

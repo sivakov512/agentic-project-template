@@ -3,6 +3,38 @@
 The newest version first. Each entry says what changed and what projects must do, if anything
 ([updates.md](updates.md#changing-the-process)).
 
+## 0.6.0 — 2026-11-05
+
+- A report to the owner fits on a phone's screen, about twelve lines, detail left in the pull requests.
+  Its points: where we are; what is in work now; what changed, each with how it ended (a fact without
+  its outcome isn't written), then the pull requests merged without the owner; decisions made alone,
+  deviations and risks; and last, what is needed from the owner. That opens with a call and gives a
+  numbered item per action, each with its link, what it decides, why it is the owner's, what to look at
+  and for how long (or why no reading is needed), and for risky code what could break and what guards
+  it; or one line that nothing is needed. Points with nothing to say are left out, all but the last.
+  When a report runs longer, the earlier points get shorter, never an item of the last one.
+- The report's line on the tracker is gone: `docs/plan.md` may add points of the project's own, the
+  tracker's among them, before the last one; `coordinator.md` and the `docs/plan.md` placeholder say so.
+  What waits on the owner in the tracker carries what the report's last point gives, instead of a
+  checklist of its own.
+- The owner asking for the status gets a report in this form, even with nothing new. Any other answer in
+  a conversation stays a plain answer, and any message ends with what waits on the owner, if something
+  does.
+- Whether the owner is needed is decided by the rules, not asked of the owner; the one question about it
+  is a doubt whether something stays inside the plan.
+- A new item in what is needed from the owner also gets a notice outside the chat (a push), once, never
+  for a repeat or for "nothing".
+- `setup.md`: a tool that opens pull requests for releases runs with a GitHub App's token, as
+  `pull-requests.md` already required.
+- Tried on the four projects' coordinators on 2026-11-03 to 2026-11-05 at the owner's request. From the
+  trial the owner asked for the outcome of each point, the reason the owner is needed and what to look
+  at, the work in progress, a short report, and the same report when asking for the status; with that,
+  the owner had it made a rule.
+
+Projects: to keep a line on the tracker in reports, the coordinator proposes it to the owner in
+`docs/plan.md`, section Tracker. A release tool that opens pull requests with the agents' token moves to
+a GitHub App the owner makes.
+
 ## 0.5.4 — 2026-11-04
 
 - `coordinator.md`, "Before a gate": a step to write out the next stage in `docs/plan.md`, as

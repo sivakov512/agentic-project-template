@@ -39,7 +39,8 @@ whether it then goes as OK without reading.
 
 How the tracker named in `docs/process.json` is kept: how
 [the process's rules](process/coordinator.md#the-tracker) map onto its own items (milestones, tasks,
-problems or whatever it calls them), and how agents reach it. Or "none".
+problems or whatever it calls them), how agents reach it, and whether reports to the owner carry a line
+on what changed there ([reports.md](process/reports.md)). Or "none".
 
 ## Releases
 
