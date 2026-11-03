@@ -26,7 +26,7 @@ PROJECT_FILES = ["CLAUDE.md", "README.md", "docs/plan.md", "docs/now.md", "docs/
 PLACEHOLDER = "<!-- template placeholder -->"
 REQUIRED_CHECKS = ["process-docs", "process-pr", "process-lock", "process-commits", "process-owner"]
 # With the agents' own account .github/CODEOWNERS gives the owner .github/, where the workflow of
-# process-owner is: it runs the check from main's copy, so the workflow is all a pull request could change
+# process-owner is: it runs the check from the base branch's copy, so the workflow is all a pull request could change
 # to get round it (docs/process/setup.md, step 8). Paths there that must fall to the owner alone:
 CODE_OWNED = [".github/CODEOWNERS", ".github/workflows/process-owner.yml", ".github/workflows/x.yml"]
 

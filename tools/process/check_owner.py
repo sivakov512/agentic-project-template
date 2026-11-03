@@ -12,9 +12,10 @@ request's last commit by the repository's owner; with the owner's account nobody
 their own pull request, so the check only makes sure the label isn't ok-without-reading where it can't be,
 and the OK stays the owner's word that the coordinator quotes.
 
-In CI, with GH_TOKEN set to a token that can read the pull request's reviews, run from main's copy of
-this file (.github/workflows/process-owner.yml), so the pull request can't change it:
-    python3 -I <main's checkout>/tools/process/check_owner.py "$GITHUB_EVENT_PATH"
+In CI, with GH_TOKEN set to a token that can read the pull request's labels and reviews, run from the
+base branch's copy of this file as it is now (.github/workflows/process-owner.yml), so the pull request
+can't change it:
+    python3 -I <the base branch's checkout>/tools/process/check_owner.py "$GITHUB_EVENT_PATH"
 """
 
 import json
@@ -122,15 +123,42 @@ def released_files(changed, base, head, repo):
     return {name for name in owned_changed if blob(head, name) == blob("FETCH_HEAD", name)}
 
 
+def api(path, method="GET"):
+    request = urllib.request.Request(f"https://api.github.com/{path}", method=method,
+                                     headers={"Authorization": f"Bearer {os.environ['GH_TOKEN']}",
+                                              "Accept": "application/vnd.github+json"})
+    with urllib.request.urlopen(request) as response:
+        body = response.read()
+        return json.loads(body) if body else None
+
+
+def rerun_red(repo, head, this_run):
+    """Runs again the failed runs of this check on the same commit. Each event (a push, a label, a review)
+    starts a run of its own, and a run an earlier event left red keeps blocking the merge after a later
+    one passes; run again, it reads the labels and reviews as they are now. Failures here are ignored:
+    the red run can still be run again by hand (docs/process/pull-requests.md)."""
+    try:
+        runs = api(f"repos/{repo}/actions/workflows/process-owner.yml/runs?head_sha={head}&status=failure&per_page=100")
+        red = [run["id"] for run in runs.get("workflow_runs", []) if str(run["id"]) != this_run]
+    except (OSError, ValueError, KeyError, AttributeError):
+        return
+    for run_id in red:
+        try:  # one already running again, or too old, doesn't stop the others
+            api(f"repos/{repo}/actions/runs/{run_id}/rerun", method="POST")
+        except (OSError, ValueError):
+            pass
+
+
+def labels(repo, number):
+    """The pull request's labels as they are now. The event's own list is how they were when it fired, so
+    a rerun of a run that an earlier event left red would judge the old labels."""
+    return [label["name"] for label in api(f"repos/{repo}/issues/{number}/labels?per_page=100")]
+
+
 def reviews(repo, number):
     found, page = [], 1
     while True:
-        request = urllib.request.Request(
-            f"https://api.github.com/repos/{repo}/pulls/{number}/reviews?per_page=100&page={page}",
-            headers={"Authorization": f"Bearer {os.environ['GH_TOKEN']}",
-                     "Accept": "application/vnd.github+json"})
-        with urllib.request.urlopen(request) as response:
-            batch = json.load(response)
+        batch = api(f"repos/{repo}/pulls/{number}/reviews?per_page=100&page={page}")
         found += batch
         if len(batch) < 100:
             return found
@@ -144,7 +172,7 @@ def main(argv):
         base, head = pull["base"]["sha"], pull["head"]["sha"]
         repo = event["repository"]["full_name"]
         changed = changed_files(base, head)
-        errors = check([label["name"] for label in pull.get("labels", [])], changed, agents_account(base, head),
+        errors = check(labels(repo, pull["number"]), changed, agents_account(base, head),
                        reviews(repo, pull["number"]), head, (pull.get("user") or {}).get("login"),
                        released_files(changed, base, head, repo))
     except (OSError, ValueError, KeyError, IndexError) as error:
@@ -154,6 +182,8 @@ def main(argv):
     if errors:
         return 1
     print("Owner's OK check passed")
+    if os.environ.get("GITHUB_RUN_ID"):
+        rerun_red(repo, head, os.environ["GITHUB_RUN_ID"])
     return 0
 
 

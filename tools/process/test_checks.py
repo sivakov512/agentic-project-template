@@ -1,12 +1,16 @@
 """Tests for the process checks. Run: python3 -m unittest discover -s tools/process -p "test_*.py"."""
 
+import contextlib
+import io
 import json
+import os
 import re
 import subprocess
 import sys
 import tempfile
 import textwrap
 import unittest
+from unittest import mock
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
@@ -549,6 +553,62 @@ class OwnerCheck(unittest.TestCase):
                 self.assertEqual(released(changed, base, faithful, "someone/template"), set())
             finally:
                 check_owner.ROOT, check_owner.TEMPLATE_SOURCE = saved
+
+    def test_a_passing_run_runs_again_the_other_red_runs(self):
+        calls = []
+        def api(path, method="GET"):
+            calls.append((method, path))
+            if method == "GET":
+                return {"workflow_runs": [{"id": 1}, {"id": 2}, {"id": 3}]}
+            if path.endswith("/1/rerun"):
+                raise OSError("already running")
+            return None
+        saved, check_owner.api = check_owner.api, api
+        try:
+            check_owner.rerun_red("someone/project", self.HEAD, "2")
+        finally:
+            check_owner.api = saved
+        self.assertEqual([path for method, path in calls if method == "POST"],
+                         ["repos/someone/project/actions/runs/1/rerun", "repos/someone/project/actions/runs/3/rerun"])
+
+    def test_rerunning_never_fails_the_check(self):
+        def api(path, method="GET"):
+            raise OSError("no access")
+        saved, check_owner.api = check_owner.api, api
+        try:
+            check_owner.rerun_red("someone/project", self.HEAD, "2")  # no exception
+        finally:
+            check_owner.api = saved
+
+    def test_only_a_passing_run_in_ci_runs_others_again(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            event = Path(tmp) / "event.json"
+            event.write_text(json.dumps({"pull_request": {"number": 7, "base": {"sha": "b"}, "head": {"sha": "h"},
+                                                          "user": {"login": "agents"}},
+                                         "repository": {"full_name": "someone/project"}}))
+            saved = {name: getattr(check_owner, name) for name in
+                     ("changed_files", "agents_account", "labels", "reviews", "released_files", "rerun_red")}
+            reran = []
+            check_owner.changed_files = lambda base, head: ["src/app.py"]
+            check_owner.agents_account = lambda base, head: "own"
+            check_owner.reviews = lambda repo, number: []
+            check_owner.released_files = lambda changed, base, head, repo: set()
+            check_owner.rerun_red = lambda repo, head, run: reran.append(run)
+            try:
+                for labels, run_id, expected in ((["code", "ok-without-reading"], "9", ["9"]),
+                                                 (["code", "owner-review"], "9", []),
+                                                 (["code", "ok-without-reading"], None, [])):
+                    reran.clear()
+                    check_owner.labels = lambda repo, number, labels=labels: labels
+                    with mock.patch.dict("os.environ", {"GITHUB_RUN_ID": run_id} if run_id else {}, clear=False):
+                        if not run_id:
+                            os.environ.pop("GITHUB_RUN_ID", None)
+                        with contextlib.redirect_stdout(io.StringIO()):
+                            check_owner.main(["check_owner.py", str(event)])
+                    self.assertEqual(reran, expected, (labels, run_id))
+            finally:
+                for name, value in saved.items():
+                    setattr(check_owner, name, value)
 
     def test_with_the_owners_account_only_the_label_is_checked(self):
         self.assertEqual(self.errors(["owner-review"], account="owner"), [])
