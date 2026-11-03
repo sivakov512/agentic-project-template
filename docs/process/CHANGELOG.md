@@ -3,6 +3,21 @@
 The newest version first. Each entry says what changed and what projects must do, if anything
 ([updates.md](updates.md#changing-the-process)).
 
+## 0.5.1 — 2026-11-03
+
+- `process-owner` reads the pull request's labels when it runs, not from the event that started it, and
+  runs the check from the base branch as it is now, not as it was at the pull request's last push. A run
+  left red by an earlier event (a review given while the labels were different) stays red until it is
+  run again, and now running it again brings it up to date; `pull-requests.md` says how.
+- `process-owner` runs have no concurrency group any more: a run cancelled by a newer event counted as
+  failed for the merge.
+- A passing `process-owner` run runs again the red ones on the same commit. Before, a pull request that
+  needed the owner's OK stayed blocked after the Approve: the run from its last push, red for want of
+  the OK, still counted until someone ran it again.
+
+Projects: nothing to do. The update changes `.github/workflows/process-owner.yml`, so with the agents'
+own account it goes to the owner (`update.py` labels it `owner-review`).
+
 ## 0.5.0 — 2026-11-02
 
 - The work goes in increments, each ending with something the owner uses. The first stage is a short

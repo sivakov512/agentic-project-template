@@ -9,11 +9,11 @@ on:
 permissions:
   contents: read
   pull-requests: read
+  # to run again the runs earlier events left red (tools/process/check_owner.py, rerun_red)
+  actions: write
 
-concurrency:
-  group: process-owner-${{ github.event.pull_request.number }}
-  cancel-in-progress: true
-
+# No concurrency group: the check takes seconds, and a run cancelled by a newer event would count as
+# failed for the merge.
 # Comes from the template (docs/process/pull-requests.md): a pull request that needs the owner's OK has
 # it, so the coordinator merges the rest on its own. It runs again when a review is given or dismissed.
 jobs:
@@ -23,17 +23,19 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      # The check runs from main's copy, isolated from the pull request's files, so a pull request can't
+      # The check runs from the base branch's copy as it is now (the event's base.sha is where the base was
+      # at the pull request's last push), isolated from the pull request's files, so a pull request can't
       # change the check that judges it; the workflow file itself is the owner's (.github/CODEOWNERS). The
-      # first update that brings the check, while main has none, runs its own.
+      # first update that brings the check, while the base has none, runs its own.
       - run: |
-          if git cat-file -e "$BASE_SHA:tools/process/check_owner.py" 2>/dev/null; then
+          git fetch --quiet origin "refs/heads/$BASE_REF"
+          if git cat-file -e "FETCH_HEAD:tools/process/check_owner.py" 2>/dev/null; then
             git worktree prune
-            git worktree add --quiet --detach "$RUNNER_TEMP/base" "$BASE_SHA"
+            git worktree add --quiet --detach "$RUNNER_TEMP/base" FETCH_HEAD
             python3 -I "$RUNNER_TEMP/base/tools/process/check_owner.py" "$GITHUB_EVENT_PATH"
           else
             python3 -I tools/process/check_owner.py "$GITHUB_EVENT_PATH"
           fi
         env:
           GH_TOKEN: ${{ github.token }}
-          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          BASE_REF: ${{ github.event.pull_request.base.ref }}
