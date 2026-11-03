@@ -236,6 +236,11 @@ class DocsCheck(unittest.TestCase):
         backlog = BACKLOG + "\n- [ ] **B-003** Depends on nothing.\n  Done when: it is all there.\n"
         self.assertFound("B-003 has no \"Depends on\"", self.errors({"docs/backlog.md": backlog}))
 
+    def test_backlog_item_titled_with_code_is_defined(self):
+        backlog = BACKLOG + "\n- [ ] **B-003** `tool check` runs.\n  Depends on: nothing.\n  Done when: the command runs and passes.\n"
+        files = {"docs/backlog.md": backlog, "docs/plan.md": "Then B-003.\n"}
+        self.assertEqual(self.errors(files), [])
+
     def test_backlog_item_in_wrong_form_fails(self):
         errors = self.errors({"docs/backlog.md": BACKLOG + "\n  - [ ] B-003 Third.\n"})
         self.assertFound("must be a top-level", errors)

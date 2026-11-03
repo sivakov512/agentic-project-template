@@ -3,6 +3,13 @@
 The newest version first. Each entry says what changed and what projects must do, if anything
 ([updates.md](updates.md#changing-the-process)).
 
+## 0.5.3 — 2026-11-03
+
+- The docs check finds a backlog item whose title opens with inline code (``**B-021** `tool check` …``).
+  Before, it saw no item there and said "B-021 is defined nowhere" wherever the ID came up.
+
+Projects: nothing to do.
+
 ## 0.5.2 — 2026-11-03
 
 - `process-pr` reads the pull request from the API when it runs, not from the event, has no concurrency

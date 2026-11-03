@@ -40,6 +40,9 @@ TABLE_ROW = re.compile(r"^\s*\|")
 TABLE_RULE = re.compile(r"^\s*\|[\s:|-]+\|\s*$")
 
 BACKLOG_ITEM = re.compile(r"^- \[( |x)\] \*\*(B-\d{3})\*\* \S")
+# The ID a backlog item defines, read from prose lines, whose inline code is cut out: a title that opens
+# with code leaves no text right after the ID. BACKLOG_ITEM on the raw line checks that the title is there.
+BACKLOG_ID = re.compile(r"^- \[( |x)\] \*\*(B-\d{3})\*\*(\s|$)")
 # Anything that looks like an ID: capital letters, an optional dash, numbers with dots.
 TOKEN = re.compile(r"(?<!\w)([A-Z]+)(-?)(\d+(?:\.\d+)*)(?!\w)")
 BACKLOG_KIND = {"kind": "backlog", "prefix": "B", "dash": True, "parts": 1, "digits": 3,
@@ -182,7 +185,7 @@ def kind_of(all_kinds, match):
 def defining_token(kind, line):
     """The ID a line defines for the kind, or None."""
     if kind["defined_by"] == "backlog":
-        match = BACKLOG_ITEM.match(line)
+        match = BACKLOG_ID.match(line)
         return match.group(2) if match else None
     if kind["defined_by"] == "heading":
         start = HEADING_START.match(line)

@@ -1,12 +1,12 @@
 {
   "template": "sivakov512/agentic-project-template",
-  "version": "0.5.2",
+  "version": "0.5.3",
   "files": {
     ".github/pull_request_template.md": "bb3c085621399e8dbb70671bdcde473577349ce9fdc4908107f1718ded484c58",
     ".github/workflows/process-checks.yml": "5fbb3947be4a6927ef9288a284cd858454c2bc07c9f948ec334c0a634e68f087",
     ".github/workflows/process-owner.yml": "e6e843193c6dd413fc3cbf5987110b8592effe20e2db8826b364ea5e0f12a16b",
     ".github/workflows/process-pr.yml": "b6a84da4ff7bc2201a33bd015681351e71d31e1914b298dee339005d7763a833",
-    "docs/process/CHANGELOG.md": "54672b1a5dae04ba574c67bea56a1af81ea0b8c457f1eafb127a1260beb6c401",
+    "docs/process/CHANGELOG.md": "e7a7a8fd049ad5cc4f85c3fd88b9212cbc6cd302643eb6af41f4390c38682c3c",
     "docs/process/README.md": "1c66ed64054b804a34edca5116767c21d5f036cf492fc62e7983b4efc49dae09",
     "docs/process/changes.md": "c04fb5995bac644b414026a0bdf4df6ab7d5817b7b124b46b9ffd9c1ca71561c",
     "docs/process/config.md": "c0a08d6fcd3dbcb01b51f349ee7234792d7165877a2270f5cfe244ee108c7181",
@@ -21,7 +21,7 @@
     "docs/process/workflow.md": "3fdd24ead46aaf834c12f0a6f9d621b3ebe83fe06b7117ac77c3ef4f61ca51de",
     "tools/process/check.py": "1e9abc69a1da209ea309f545eaebf64c9db6ab8b09d6d41d4483b758b82204e7",
     "tools/process/check_commits.py": "354141ed8dd24d3f7f87d4237b5b8895427277a5af2a51b4b1d3975cc6af1787",
-    "tools/process/check_docs.py": "7a5432326a0e2d488325e03afc541dae805f3cfef94d0a9221a6a1bff97def10",
+    "tools/process/check_docs.py": "4376d3245ae2eff0ffaeb8c6c5afe4e05d28e3342624e68a42517a5093699d7a",
     "tools/process/check_lock.py": "23f30b86aa59419083570b993a2c44acbad483c106c15f2f5c37c2cd6b96789f",
     "tools/process/check_owner.py": "785b3aac054f5ee21bc44dd380513d464397c49b3aa09c0c205c59debdfe21fd",
     "tools/process/check_pr.py": "f36663c5842d6758d1050ca4bf72d06127475a08f898797776bd3e9e672d34a8",
@@ -29,7 +29,7 @@
     "tools/process/lock.py": "9471e9d741b07bc4f5434e8b36f5d2aca93601a5b184985e2aa9fa3a3d7fb283",
     "tools/process/owned.py": "0c027c431de12c419e495643cf1fab43c1442b9a946b374659ae686eee8d5f95",
     "tools/process/sync.py": "86dcce97e07a06915e5de6b7376f85ea86df0882ca63952d3f754664960123ef",
-    "tools/process/test_checks.py": "5f8ef5a0492732cc83a9eb5128d04996d640830b19e3497a8a104bdce23b17bf",
+    "tools/process/test_checks.py": "d65a8384bb8404ea3afcd9cd2c95963b65b3c568dc23dd4224ca76e5b56bb323",
     "tools/process/update.py": "8746af750d3a8f986161e594b6ea328ff82d001258a2333e32c7773566703acc"
   }
 }
