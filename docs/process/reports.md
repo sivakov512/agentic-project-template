@@ -1,17 +1,41 @@
 # Reports to the owner
 
 Whenever there is something for the owner (one or more pull requests ready to merge, pull requests it
-merged on its own since the last report, or a gate), the coordinator reports, in this order:
+merged on its own since the last report, or a gate), the coordinator reports. The whole report fits on a
+phone's screen, about twelve lines; detail stays in the pull requests, which it links. In this order,
+each point left out when it has nothing to say, all but the last:
 
-1. **Where we are:** the stage and the next step.
-2. **Summary:** two or three lines on what was done and why.
-3. **How it was checked.**
-4. **Decisions the coordinator made itself,** one line each, so the owner can reverse any of them.
-5. **Deviations from the plan, and risks,** if any.
-6. **What is needed from the owner:** for each pull request that needs the owner's OK (labelled
-   `owner-review`, or a bot's with no review label), what to look at, a link and how many minutes; the questions, each with a recommendation; then the pull requests merged
-   without the owner, one line each.
-7. **The tracker:** one line on what changed there, if the project has one.
+1. **Where we are,** one line: the stage and the next step.
+2. **In work:** what is going on right now, one line per item or pull request and what it does.
+3. **What changed,** one line each, every one saying how it ended: fixed and merged, not fixed and what
+   it waits on, checked and how. A fact without its outcome isn't written. Then the pull requests merged
+   without the owner since the last report, one line each.
+4. **Decisions the coordinator made itself,** so the owner can reverse any of them, **deviations from the
+   plan, and risks,** one line each.
+5. **What is needed from the owner,** opening with a call ("Needed from you:"), then a numbered item per
+   action: an approval, a question with a recommendation, an increment to try, a setting to change,
+   anything only the owner can do. Each item gives the action and its link; what it decides, in plain
+   words, one line; why it is the owner's and not the coordinator's, by the rule that makes it so
+   ("When the owner looks" below, or what [workflow.md](workflow.md#the-owners-ok-and-the-merge) keeps
+   for the owner); what to look at and how many minutes, several places as a list with links, or that no
+   reading is needed and why; and for risky code, what could break and what guards it. Or one line that
+   nothing is needed.
+
+When the report runs longer, the earlier points get shorter; each item of the last one keeps all its
+parts. `docs/plan.md` may add points of the project's own, all before the last one (a line on what
+changed in its tracker, say).
+
+The owner asking for the status gets a report in this form too, whether or not anything is new since the
+last one; where the owner asks for more, the points grow and keep their order. Any other answer in a
+conversation with the owner stays a plain answer. Whatever the message, what waits on the owner comes at
+its end, since the owner reads the chat from the bottom. Whether the owner is needed is decided by these
+rules, not asked of the owner; the one question about it is a doubt whether something stays inside the
+plan (below).
+
+When what is needed from the owner gains an item the last notice didn't have, the coordinator also
+notifies the owner outside the chat, where its tools can (a push notification): once per message, one
+line with the project and what is needed. A request the owner hasn't answered yet, "nothing", and news
+along the way get no notice.
 
 Settings the owner must change are given as a path of clicks with links (Settings → Branches → `main`
 → …), not as commands to run.
