@@ -407,7 +407,9 @@ class PullRequestEvent(unittest.TestCase):
             event = Path(tmp) / "event.json"
             event.write_text(json.dumps({"pull_request": pull_request}), encoding="utf-8")
             script = Path(__file__).resolve().parent / "check_pr.py"
-            return subprocess.run([sys.executable, str(script), str(event), *more], capture_output=True, text=True)
+            env = {key: value for key, value in os.environ.items() if key not in ("GH_TOKEN", "GITHUB_RUN_ID")}
+            return subprocess.run([sys.executable, str(script), str(event), *more], capture_output=True, text=True,
+                                  env=env)
 
     def test_draft_is_not_checked(self):
         result = self.run_check({"draft": True, "body": "Plan and questions.", "title": "x", "labels": []})
@@ -422,6 +424,28 @@ class PullRequestEvent(unittest.TestCase):
                         "user": {"type": "Bot"}}
         self.assertEqual(self.run_check(pull_request).returncode, 0)
         self.assertEqual(self.run_check({**pull_request, "user": {"type": "User"}}).returncode, 1)
+
+    def test_in_ci_the_pull_request_is_read_now_and_red_runs_are_run_again(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            event = Path(tmp) / "event.json"
+            event.write_text(json.dumps({"pull_request": {"number": 5, "draft": False, "title": "Plan: x", "body": "",
+                                                          "labels": []},
+                                         "repository": {"full_name": "someone/project"}}))
+            now = {"number": 5, "draft": False, "title": "Plan: the work", "body": GOOD_BODY,
+                   "labels": [{"name": "plan"}, {"name": "ok-without-reading"}], "user": {"type": "User"},
+                   "head": {"sha": "h"}}
+            reran = []
+            saved = check_owner.api, check_owner.rerun_red, check_pr.check
+            check_owner.api = lambda path, method="GET": now
+            check_owner.rerun_red = lambda repo, head, run, workflow: reran.append((head, run, workflow))
+            check_pr.check = lambda body, root, title, labels: [] if labels == ["plan", "ok-without-reading"] else ["x"]
+            try:
+                with mock.patch.dict("os.environ", {"GH_TOKEN": "t", "GITHUB_RUN_ID": "9"}):
+                    with contextlib.redirect_stdout(io.StringIO()):
+                        self.assertEqual(check_pr.main(["check_pr.py", str(event)]), 0)
+            finally:
+                check_owner.api, check_owner.rerun_red, check_pr.check = saved
+            self.assertEqual(reran, [("h", "9", "process-pr.yml")])
 
     def test_body_and_event_together_are_refused(self):
         result = self.run_check({"draft": False}, "--body", "x.md")
@@ -566,10 +590,14 @@ class OwnerCheck(unittest.TestCase):
         saved, check_owner.api = check_owner.api, api
         try:
             check_owner.rerun_red("someone/project", self.HEAD, "2")
+            check_owner.rerun_red("someone/project", self.HEAD, "2", "process-pr.yml")
         finally:
             check_owner.api = saved
-        self.assertEqual([path for method, path in calls if method == "POST"],
+        self.assertEqual([path for method, path in calls if method == "POST"][:2],
                          ["repos/someone/project/actions/runs/1/rerun", "repos/someone/project/actions/runs/3/rerun"])
+        self.assertEqual([path.split("?")[0] for method, path in calls if method == "GET"],
+                         ["repos/someone/project/actions/workflows/process-owner.yml/runs",
+                          "repos/someone/project/actions/workflows/process-pr.yml/runs"])
 
     def test_rerunning_never_fails_the_check(self):
         def api(path, method="GET"):

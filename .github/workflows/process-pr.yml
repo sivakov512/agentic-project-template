@@ -8,11 +8,12 @@ on:
 
 permissions:
   contents: read
+  pull-requests: read
+  # to run again the runs earlier events left red (tools/process/check_pr.py)
+  actions: write
 
-# A new event on a pull request cancels the run it makes stale.
-concurrency:
-  group: process-pr-${{ github.event.pull_request.number }}
-  cancel-in-progress: true
+# No concurrency group: a run cancelled by a newer event would count as failed for the merge. Each run
+# reads the pull request as it is when it runs.
 
 # These checks come from the template (docs/process/pull-requests.md); what they need and where they run
 # is said in process-checks.yml.
@@ -22,3 +23,5 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - run: python3 tools/process/check_pr.py "$GITHUB_EVENT_PATH"
+        env:
+          GH_TOKEN: ${{ github.token }}

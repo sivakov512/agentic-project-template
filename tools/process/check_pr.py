@@ -9,7 +9,9 @@ exactly one item that exists in docs/backlog.md (or say what else it is: "Coordi
 labels aren't one kind and one review label that agree with the title (docs/process/pull-requests.md).
 Pull requests opened by a GitHub App (a release or dependency bot) are not checked.
 
-In CI:
+In CI, with GH_TOKEN set (.github/workflows/process-pr.yml); the pull request is read from the API when
+the check runs, since the event's copy is how it was when the event fired, and a passing run runs again
+the red runs earlier events left on the same commit:
     python3 tools/process/check_pr.py "$GITHUB_EVENT_PATH"
 Locally, on a draft:
     python3 tools/process/check_pr.py --body description.md [--title "Code: …" --labels code,owner-review]
@@ -17,9 +19,14 @@ Locally, on a draft:
 
 import argparse
 import json
+import os
 import re
 import sys
 from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+
+import check_owner  # noqa: E402
 
 SECTIONS = [
     "Backlog item",
@@ -123,6 +130,7 @@ def main(argv):
     parser.add_argument("--title", help="with --body: the title to check")
     parser.add_argument("--labels", help="with --body: the labels to check, comma-separated")
     args = parser.parse_args(argv[1:])
+    repo = None
     if bool(args.body) == bool(args.event):
         parser.print_help()
         return 2
@@ -132,7 +140,11 @@ def main(argv):
             title = args.title
             labels = args.labels.split(",") if args.labels is not None else None
         else:
-            pull_request = json.loads(Path(args.event).read_text(encoding="utf-8")).get("pull_request", {})
+            event = json.loads(Path(args.event).read_text(encoding="utf-8"))
+            pull_request = event.get("pull_request", {})
+            repo = (event.get("repository") or {}).get("full_name")
+            if os.environ.get("GH_TOKEN") and repo and pull_request.get("number"):
+                pull_request = check_owner.api(f"repos/{repo}/pulls/{pull_request['number']}")
             if pull_request.get("draft"):
                 print("Draft pull request: its description is checked when it leaves draft")
                 return 0
@@ -142,7 +154,7 @@ def main(argv):
             body = pull_request.get("body") or ""
             title = pull_request.get("title") or ""
             labels = [label["name"] for label in pull_request.get("labels", [])]
-    except (OSError, ValueError) as error:
+    except (OSError, ValueError, KeyError) as error:
         print(f"Pull request description: can't read it: {error}")
         return 2
     errors = check(body, Path(__file__).resolve().parents[2], title, labels)
@@ -152,6 +164,8 @@ def main(argv):
         print("Fill it in by .github/pull_request_template.md")
         return 1
     print("Pull request description check passed")
+    if args.event and os.environ.get("GITHUB_RUN_ID") and repo:
+        check_owner.rerun_red(repo, pull_request["head"]["sha"], os.environ["GITHUB_RUN_ID"], "process-pr.yml")
     return 0
 
 

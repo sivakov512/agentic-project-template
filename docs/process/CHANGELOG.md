@@ -3,6 +3,18 @@
 The newest version first. Each entry says what changed and what projects must do, if anything
 ([updates.md](updates.md#changing-the-process)).
 
+## 0.5.2 — 2026-11-03
+
+- `process-pr` reads the pull request from the API when it runs, not from the event, has no concurrency
+  group, and a passing run runs again the red ones on the same commit, as `process-owner` does. Before, a
+  run from the pull request's opening, cancelled by the next event or red for labels not set yet, kept
+  the merge waiting ("process-pr is expected") until someone ran it again.
+
+Projects: nothing to do. The update changes `.github/workflows/process-pr.yml`, so with the agents' own
+account it goes to the owner. A pull request left with a red `process-pr` run from before 0.5.2 needs a
+new commit (a rebase onto `main` will do): running the old run again repeats the old check on the old
+event.
+
 ## 0.5.1 — 2026-11-03
 
 - `process-owner` reads the pull request's labels when it runs, not from the event that started it, and

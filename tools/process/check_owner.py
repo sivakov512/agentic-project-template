@@ -12,6 +12,8 @@ request's last commit by the repository's owner; with the owner's account nobody
 their own pull request, so the check only makes sure the label isn't ok-without-reading where it can't be,
 and the OK stays the owner's word that the coordinator quotes.
 
+check_pr.py takes api and rerun_red from here for its own runs.
+
 In CI, with GH_TOKEN set to a token that can read the pull request's labels and reviews, run from the
 base branch's copy of this file as it is now (.github/workflows/process-owner.yml), so the pull request
 can't change it:
@@ -124,6 +126,9 @@ def released_files(changed, base, head, repo):
 
 
 def api(path, method="GET"):
+    """Calls GitHub's API at path (after api.github.com/) with GH_TOKEN; returns the parsed JSON, or None
+    for an empty answer. Raises OSError (HTTPError) when the call fails, and KeyError without GH_TOKEN.
+    check_pr.py uses it too."""
     request = urllib.request.Request(f"https://api.github.com/{path}", method=method,
                                      headers={"Authorization": f"Bearer {os.environ['GH_TOKEN']}",
                                               "Accept": "application/vnd.github+json"})
@@ -132,13 +137,13 @@ def api(path, method="GET"):
         return json.loads(body) if body else None
 
 
-def rerun_red(repo, head, this_run):
-    """Runs again the failed runs of this check on the same commit. Each event (a push, a label, a review)
+def rerun_red(repo, head, this_run, workflow="process-owner.yml"):
+    """Runs again the failed runs of a check (its workflow file) on the same commit. Each event (a push, a label, a review)
     starts a run of its own, and a run an earlier event left red keeps blocking the merge after a later
     one passes; run again, it reads the labels and reviews as they are now. Failures here are ignored:
     the red run can still be run again by hand (docs/process/pull-requests.md)."""
     try:
-        runs = api(f"repos/{repo}/actions/workflows/process-owner.yml/runs?head_sha={head}&status=failure&per_page=100")
+        runs = api(f"repos/{repo}/actions/workflows/{workflow}/runs?head_sha={head}&status=failure&per_page=100")
         red = [run["id"] for run in runs.get("workflow_runs", []) if str(run["id"]) != this_run]
     except (OSError, ValueError, KeyError, AttributeError):
         return
