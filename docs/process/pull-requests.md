@@ -47,7 +47,7 @@ clash with the project's own.
 | Job | Runs | Checks |
 |---|---|---|
 | `process-docs` | `tools/process/check.py --process-only` | the documents (links, the backlog, IDs and coverage, decision records), the template's files against the lock, the checks' own tests |
-| `process-pr` | `tools/process/check_pr.py` | the sections of the description, the title and the labels; a draft is checked when it leaves draft |
+| `process-pr` | `tools/process/check_pr.py` | the sections of the description, the title and the labels, read when it runs; a draft is checked when it leaves draft; a passing run runs again the red ones earlier events left on the same commit; if one stays red, `gh run list --workflow process-pr.yml --commit <the pull request's last commit>`, then `gh run rerun <id>` |
 | `process-lock` | `tools/process/check_lock.py` | a pull request that changes the template's files moves to a newer version ([updates.md](updates.md#the-lock)) |
 | `process-commits` | `tools/process/check_commits.py` | the commit messages ([config.md](config.md#commits)) |
 | `process-owner` | `tools/process/check_owner.py` | a pull request that needs the owner's OK has the owner's approval of its last commit, and one labelled `ok-without-reading` changes nothing the owner keeps for themself, a process update that is exactly the template's release aside ([workflow.md](workflow.md#the-owners-ok-and-the-merge)); it runs again on every review and reads the labels and reviews as they are when it runs; a passing run runs again the red ones earlier events left on the same commit, which would block the merge; if one stays red, `gh run list --workflow process-owner.yml --commit <the pull request's last commit>`, then `gh run rerun <id>` |
