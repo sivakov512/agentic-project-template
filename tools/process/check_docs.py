@@ -7,7 +7,8 @@ Fails on:
 - an ID (B-### or a kind from docs/process.json) in the wrong form, defined twice, or referred to but
   defined nowhere;
 - a decision record whose number is taken twice, or that docs/decisions/README.md doesn't list;
-- a gap in coverage, by the rules in docs/process.json (docs/process/config.md).
+- a gap in coverage, by the rules in docs/process.json (docs/process/config.md);
+- a docs/process.json that doesn't follow docs/process/config.md.
 
 Run from anywhere: python3 tools/process/check_docs.py
 """
