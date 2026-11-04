@@ -18,10 +18,12 @@ piece of work goes, the merge), [reports.md](reports.md) (what it tells the owne
 
 ## Before a gate
 
-Walk the exit list point by point, run the checks, have a reviewer hunt for gaps, and run a cold-start
-test: a fresh session given only the repository must say where we are and what comes next exactly as
-`docs/now.md` does. How an increment ends, with the owner trying it, and when the next one is written
-out: [workflow.md](workflow.md#stages-and-gates).
+Walk the exit list point by point and write out the next stage in `docs/plan.md`: a stage left as one
+line gives its sessions nothing to work from. Then run the checks, have a reviewer hunt for gaps, the
+next stage's among them, and run a cold-start test: a fresh session given only the repository must say
+where we are and what comes next exactly as `docs/now.md` does. The next stage goes to the owner in the
+same report as the gate. How a stage is written out, how an increment ends, with the owner trying it,
+and when the next one is written out: [workflow.md](workflow.md#stages-and-gates).
 
 ## The tracker
 
