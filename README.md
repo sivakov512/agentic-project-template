@@ -80,7 +80,8 @@ what needs you.
 
 The process files belong to the template and are locked by hash in each project, so a project can't
 drift from them by accident. When the template releases a new version, the project's coordinator brings
-it in as a pull request, and you approve it. A change to the process is made here, never in a project
+it in as a pull request and merges it once its checks pass; it comes to you only where it changes what
+you keep. A change to the process is made here, never in a project
 ([`docs/process/updates.md`](docs/process/updates.md)); what changed is in
 [`docs/process/CHANGELOG.md`](docs/process/CHANGELOG.md).
 

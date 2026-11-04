@@ -9,6 +9,15 @@ The newest version first. Each entry says what changed and what projects must do
   `workflow.md` says, before the reviewer and the cold-start test, and to give it to the owner with the
   gate. `workflow.md` had the rule; the gate's checklist didn't name it, and a stage written as one line
   went unnoticed.
+- What a written-out stage holds is said once, in `workflow.md`: what it delivers (for an increment,
+  what the owner gets and what is in and out), its big steps, the owner's part and the decisions it
+  brings to the owner, its risks, its exit list, and what it builds on. `reports.md` (the owner looks at
+  the plan of each increment) and the `docs/plan.md` placeholder link there instead of listing parts of
+  it, each a different part.
+- Wording that no longer matched the process: the README says an update comes to the owner only where it
+  changes what the owner keeps; `updates.md` says `update.py` picks the review label; the docstrings of
+  `sync.py` (run by `update.py`), `check_docs.py` (it also checks `docs/process.json`) and
+  `check_owner.py` (whose release vouches for an update).
 
 Projects: nothing to do.
 

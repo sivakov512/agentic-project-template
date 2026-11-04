@@ -18,16 +18,16 @@ that belongs to the template ([README.md](README.md#what-lives-where)).
 
 ## Getting a newer process
 
-A project takes a new release of the template when it is worked on: `tools/process/doctor.py`, which
-the coordinator runs at the start of every session, says when a newer version is out. The coordinator
-then runs `python3 tools/process/update.py` with a clean working tree. It makes a branch
+A project takes a new release of the template when it is worked on: `tools/process/doctor.py`, which the
+coordinator runs at the start of every session, says when a newer version is out. The coordinator then
+runs `python3 tools/process/update.py` with a clean working tree. It makes a branch
 `process-update-X.Y.Z` from `main` as it is on GitHub, copies the template's files at the release,
 writes the new lock, and opens a pull request `Plan: update the process to X.Y.Z` with "Backlog item:
-Process update", labelled `plan` and `ok-without-reading`, and the changelog entries since the current
-version; the checkout stays on that branch. While any process update pull request is open, it does
-nothing. A project nobody works on needs no update. A release may change
-`.github/workflows/process-*.yml`, so the agents' account's git credentials must be allowed to change
-workflow files (a classic token's `workflow` scope, or Workflows: write).
+Process update", labelled `plan` and `ok-without-reading`, or `owner-review` where it goes to the owner
+(below), and the changelog entries since the current version; the checkout stays on that branch. While
+any process update pull request is open, it does nothing. A project nobody works on needs no update. A
+release may change `.github/workflows/process-*.yml`, so the agents' account's git credentials must be
+allowed to change workflow files (a classic token's `workflow` scope, or Workflows: write).
 
 In the same pull request the coordinator does what the entries' "Projects:" lines ask of the project
 (a new key in `docs/process.json`, say) and has open work pull requests fixed if the lines say they

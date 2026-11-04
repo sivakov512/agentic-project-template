@@ -21,8 +21,8 @@ Settings the owner must change are given as a path of clicks with links (Setting
 The owner agrees where the work goes and checks what it gives; the agents do the rest. The owner looks
 at:
 
-1. **The plan of each increment,** at the gate before it: what the owner gets, what is in and out, the
-   big steps, which decisions it will bring to the owner, and its risks.
+1. **The plan of each increment,** at the gate before it, written out as
+   [workflow.md](workflow.md#stages-and-gates) says.
 2. **The decisions that plan names as the owner's,** each when it is ready: what a person will use or
    work with (the interface, an API or a driver others program against, a file or data format a person
    reads or writes, a command line, settings), what shapes the whole product (the architecture, the

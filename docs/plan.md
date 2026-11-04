@@ -19,11 +19,10 @@ written, and, with code, which document describes the code's design and lists it
 
 ## Stages
 
-The foundation, then increments ([the process's rules for stages](process/workflow.md#stages-and-gates)).
-Each stage: what it delivers (for an increment, what the owner gets from it), the owner's part, and its
-exit list. The increments not started yet are a line each until they are written out
-([when](process/workflow.md#stages-and-gates)). What is left out of the increments waits in the list
-for later at the end of the backlog.
+The foundation, then increments, each stage written out as [the process's rules for
+stages](process/workflow.md#stages-and-gates) say. The increments not started yet are a line each until
+they are written out. What is left out of the increments waits in the list for later at the end of the
+backlog.
 
 ## Facts
 

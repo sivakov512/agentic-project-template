@@ -3,7 +3,7 @@
 ones the new version no longer has, and copies the lock. Prints the changelog entries newer than the
 project's version. Standard library only.
 
-The update workflow runs the new version's copy of this script (docs/process/updates.md):
+update.py runs the new version's copy of this script (docs/process/updates.md):
     python3 <template>/tools/process/sync.py <template> <project>
 """
 

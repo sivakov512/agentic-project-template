@@ -22,8 +22,8 @@
 ## Stages and gates
 
 The work goes in increments, each ending with something the owner uses: a build, a document, a board,
-whatever the project makes. `docs/plan.md` lists the project's stages, each with what it delivers and
-its exit list:
+whatever the project makes. `docs/plan.md` lists the project's stages, each written out as the rules
+below say:
 
 - **The foundation,** the first stage, once and short: what the product is for and for whom, the
   owner's main scenarios, the limits; research only where a decision can't be made without it; the
@@ -44,12 +44,13 @@ The process holds the stages to these rules:
 - A stage is finished only when every point of its exit list is true. Every exit list includes: every
   backlog item of the stage is merged, or dropped with a reason. An increment's also includes: the
   owner has used it in real work, and it is released as `docs/plan.md` says.
-- Each stage is written out at the end of the one before it, from what is known by then: what the
-  stage delivers and its exit list in `docs/plan.md`, concrete enough to write its items from. It names
-  everything the stage builds on (documents, interfaces, the technologies it uses), each either
-  decided and written down already or settled at the stage's start,
-  before the work that depends on it. This change to the plan goes to the owner in the same report as
-  the gate.
+- Each stage is written out at the end of the one before it, from what is known by then, in
+  `docs/plan.md` and concrete enough to write its items from: what it delivers (for an increment, what
+  the owner gets from it, and what is in and out), its big steps, the owner's part and the decisions it
+  will bring to the owner ([reports.md](reports.md#when-the-owner-looks)), its risks, and its exit list.
+  It names everything the stage builds on (documents, interfaces, the technologies it uses), each
+  either decided and written down already or settled at the stage's start, before the work that
+  depends on it. This change to the plan goes to the owner in the same report as the gate.
 - An item starts only when everything it depends on is merged and its stage has started. A stage starts
   when the previous one is finished and its own written-out plan is merged. Items whose "Depends on"
   says "any time" are the only exception.

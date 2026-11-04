@@ -5,8 +5,8 @@ on its own (docs/process/workflow.md, "The owner's OK and the merge"). Standard 
 A pull request needs the owner's OK unless it is labelled ok-without-reading, and it always needs it
 when it changes what the owner keeps for themself: CLAUDE.md, docs/plan.md, docs/process.json, anything
 under .github/, or the template's files and its lock. The template's files and the lock of a process
-update are the exception where each is exactly as in the release of the template that main's lock
-already names: the owner
+update are the exception where each is exactly as in the release the update's lock names, of the
+template main's lock names: the owner
 agreed that release in the template. With the agents' own account the OK is an approval of the pull
 request's last commit by the repository's owner; with the owner's account nobody can approve
 their own pull request, so the check only makes sure the label isn't ok-without-reading where it can't be,
