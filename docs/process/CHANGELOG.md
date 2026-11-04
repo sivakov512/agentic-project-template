@@ -3,6 +3,15 @@
 The newest version first. Each entry says what changed and what projects must do, if anything
 ([updates.md](updates.md#changing-the-process)).
 
+## 0.5.4 — 2026-11-04
+
+- `coordinator.md`, "Before a gate": a step to write out the next stage in `docs/plan.md`, as
+  `workflow.md` says, before the reviewer and the cold-start test, and to give it to the owner with the
+  gate. `workflow.md` had the rule; the gate's checklist didn't name it, and a stage written as one line
+  went unnoticed.
+
+Projects: nothing to do.
+
 ## 0.5.3 — 2026-11-03
 
 - The docs check finds a backlog item whose title opens with inline code (``**B-021** `tool check` …``).
