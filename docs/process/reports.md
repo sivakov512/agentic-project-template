@@ -74,7 +74,9 @@ plan's Releases section says.
 
 Code `docs/plan.md` names as risky goes as OK without reading only where the plan says so, once
 neither its review nor its review for harm has a "fix" finding left
-([workflow.md](workflow.md#how-a-piece-of-work-goes)).
+([workflow.md](workflow.md#how-a-piece-of-work-goes)). Otherwise, at that point, it comes to the owner
+as an item of "Needed from you": what the pull request does, in a line or two, and either what exactly
+to look at (files, sections) or "just OK, no reading needed" with the reason; the owner approves.
 
 When the coordinator isn't sure whether something stays inside the plan, it asks the owner in one line
 in the report, with its recommendation, instead of sending the whole pull request to be read, and holds

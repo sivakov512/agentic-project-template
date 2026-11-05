@@ -11,8 +11,8 @@ The first of these that fits is your role:
 1. **Your first message is "Do B-###":** you are a work session. Follow "Your work" below.
 2. **It is "Fix pull request #N":** you are a work session fixing review findings. Follow "If you fix a
    pull request".
-3. **It is "Review pull request #N", or "Review pull request #N for harm":** you are a reviewer. Follow
-   "If you are the reviewer".
+3. **It is "Review pull request #N", or the same "for harm", "for architecture" or "for UI":** you are
+   a reviewer. Follow "If you are the reviewer".
 4. **This repository is the template** (the `owner/name` of its `origin` remote is the `template` in
    `.process-lock.json`): you are the template's coordinator. Changes to the process go as
    [updates.md](updates.md#changing-the-process) says, reviewed and merged as in
@@ -79,12 +79,12 @@ Whatever your role: a question from the owner is a question. Answer it and propo
 - Fill in every section of `.github/pull_request_template.md`, and name and label it as
   [pull-requests.md](pull-requests.md) says. CI rejects a pull request that doesn't.
 - "How it was checked" gives commands, output or screenshots someone else can repeat. "It works" is not
-  evidence.
+  evidence. A pull request that changes what a person sees shows it there: screenshots, or how to run it.
 - Your report is not proof: the coordinator checks the diff, the checks and the running result.
 
 ## If you fix a pull request
 
-- Read the findings on the pull request: the review, the review for harm where there is one, and those
+- Read the findings on the pull request: the review, the review for harm, architecture review or UI review where there is one, and those
   the coordinator posts (the owner's remarks, a conflict with `main`). Fix every finding marked **fix**
   in all of them, on the pull request's branch, except those marked "outside the item", which you list
   under "Not done and open questions" instead, and those the coordinator closed in a comment; leave the
@@ -131,12 +131,27 @@ Whatever your role: a question from the owner is a question. Answer it and propo
   that `docs/plan.md` names as risky ([workflow.md](workflow.md#how-a-piece-of-work-goes)). Until your
   findings are posted, read the pull request's description, diff and commits, not its comments; in the
   second round, only your own earlier comment and the fix reply besides. Your comment opens with
-  "Review for harm" and the head you reviewed, so it can be told from the other. Hunt for concrete ways
+  "Review for harm" and the head you reviewed, so it can be told from the others. Hunt for concrete ways
   the change does harm: a secret that leaks or reaches the wrong place, damage to the owner's machine,
   to infrastructure or to data, a state nothing can recover from, a race or an interruption that leads
-  there. Each finding says how it would happen. The three-point verdict is the other review's; your
+  there. Each finding says how it would happen. The three-point verdict is the ordinary review's; your
   comment ends by saying whether the change is safe to merge as is: yes when no "fix" finding is left,
   otherwise no. Findings, marks and the second round are as above.
+- **An architecture review** ("Review pull request #N for architecture") is for a pull request that
+  changes the architecture or a contract between parts (the design document, an interface, an API, a
+  data or file format). Judge whether each part sits where the design puts it and the boundaries hold.
+  Then the contributor test: from the documentation alone, without reading the implementation, write a
+  small implementation of the other side of the contract, outside the repository; every place you had
+  to guess is a "fix" finding.
+- **A UI review** ("Review pull request #N for UI") is for a pull request that changes what a person
+  sees and uses (a GUI, web pages and the like), judged from its screenshots or a run it describes:
+  the experience against the owner's scenarios; neatness and consistency; attention (a clear
+  hierarchy, one main action per screen, nothing competing for attention without reason); the empty,
+  loading and error states; basic accessibility; and conformity to the project's design system. A
+  project with a user interface keeps a design-system document in its chain, which `docs/plan.md`
+  names, written before the first UI work; a UI pull request without one is a "fix" finding.
+- Both comments open with the review's name and the head you reviewed; findings, marks and the second
+  round are as above.
 
 ## Writing
 

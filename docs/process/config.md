@@ -66,7 +66,7 @@ subject on `main` stays within 72 however it is merged. The project may also ask
   the kind this way: `docs(plan): …`, `docs(spec): …` and `docs(research): …`, and for code `feat`,
   `fix`, `refactor` and the like ([pull-requests.md](pull-requests.md#kind-title-and-label)).
 
-It defaults to `false`. `one_line` and `no_co_authors`, from versions before 0.8.0, are still accepted
+It defaults to `false`. `one_line` and `no_co_authors`, from versions before 0.7.0, are still accepted
 and do nothing: a squash commit with an empty body keeps both. Rules beyond these go in the project's
 own check.
 

@@ -107,16 +107,21 @@ The process holds the milestones to these rules:
    in the product goes back to a work session. If blocking problems remain after that, the coordinator
    stops, rethinks the item (its approach or its size) and tells the owner.
    Code that `docs/plan.md` names as risky also gets a review for harm ("Review pull request #N for
-   harm") by another reviewer at the same time; one "Fix pull request #N" fixes the findings of both.
+   harm") by another reviewer at the same time.
    Any later change to the risky code goes back to the review for harm before the merge, and the
    coordinator never makes such a change itself. If a finding of the review for harm is still open
    after its second round, or a change to the risky code would need a third round, the coordinator
-   neither fixes it nor merges, but stops and tells the owner. The pull request merges only when
-   neither review has a "fix" finding left.
-   A finding of the review for harm is closed only by its reviewer. A finding of the other review the
+   neither fixes it nor merges, but stops and tells the owner.
+   A pull request that changes the architecture or a contract between parts also gets an architecture
+   review ("Review pull request #N for architecture"), and one that changes what a person sees and
+   uses a UI review ("Review pull request #N for UI"), each by another reviewer at the same time, in
+   the same rounds. The coordinator decides which reviews a pull request gets, by these rules and any
+   more `docs/plan.md` names. One "Fix pull request #N" fixes the findings of all of them, and the pull
+   request merges only when none has a "fix" finding left.
+   A finding of the review for harm is closed only by its reviewer. A finding of another review the
    coordinator judges wrong (it contradicts the item or the plan, or rests on something untrue about
    the code, such as a test it calls missing that exists) it may close, with the reason in a comment on
-   the pull request, and the next report names it among the decisions it made itself. Where the two reviews ask for opposite things, the review for harm wins.
+   the pull request, and the next report names it among the decisions it made itself. Where reviews ask for opposite things, the review for harm wins.
    Then **the coordinator's own check:** the diff against "Done when", the running result, and that the
    review label follows [reports.md](reports.md#when-the-owner-looks) and the decisions the milestone's plan gave the
    owner; it corrects the label if not.

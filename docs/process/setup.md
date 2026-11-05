@@ -50,8 +50,9 @@ Always ask, whatever the brief says:
    then those that each end with something the owner uses
    ([workflow.md](workflow.md#milestones-and-gates)); keep the document chain as short as the project
    allows, and name in it where the interfaces between parts are written
-   ([workflow.md](workflow.md#how-the-repository-works)) and, with code, the document of the code's
-   design that lists its folders ([rules.md](rules.md#code)). The foundation is written out in full; the
+   ([workflow.md](workflow.md#how-the-repository-works)), with code, the document of the code's
+   design that lists its folders ([rules.md](rules.md#code)), and, with a user interface, its
+   design-system document ([rules.md](rules.md#if-you-are-the-reviewer)). The foundation is written out in full; the
    milestones after it are a line each, what the owner gets from it.
 4. **`docs/process.json`:** the owner's language, the tracker, how the project ships, the agents'
    account and who merges, the commit rules, the kinds of ID and coverage rules
