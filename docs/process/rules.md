@@ -83,9 +83,11 @@ Whatever your role: a question from the owner is a question. Answer it and propo
 
 ## If you fix a pull request
 
-- Read the reviewers' comments on the pull request: the review, and the review for harm where there is
-  one. Fix every finding marked **fix** in all of them, on the pull request's branch, and list those
-  marked "outside the item" under "Not done and open questions"; leave the **drop** ones.
+- Read the findings on the pull request: the review, the review for harm where there is one, and those
+  the coordinator posts (the owner's remarks, a conflict with `main`). Fix every finding marked **fix**
+  in all of them, on the pull request's branch, except those marked "outside the item", which you list
+  under "Not done and open questions" instead, and those the coordinator closed in a comment; leave the
+  **drop** ones.
 - Fold each fix into the commit it corrects ("Git and GitHub" below), run the checks as in "Your
   work", push, and answer with one comment: the new head commit, and for each "fix" finding what you
   changed and where, or why you couldn't. The coordinator then runs the second rounds on that new head.
@@ -119,8 +121,9 @@ Whatever your role: a question from the owner is a question. Answer it and propo
 - A second round comes only if the first had "fix" findings, or, for a review for harm, if a fix
   changed the code `docs/plan.md` names as risky: review only the fix, the change from the
   head you reviewed to the new head the fix comment names (`git range-diff --creation-factor=100
-  origin/main <reviewed> <new>`; a head that is gone from the branch comes back with `git fetch origin <sha>`): whether each
-  is fixed and whether the fix broke anything nearby.
+  origin/main <reviewed> <new>`; a head that is gone from the branch comes back with
+  `git fetch origin <sha>`): whether each finding the coordinator didn't close is fixed, and whether
+  the fix broke anything nearby.
 - **A review for harm** ("Review pull request #N for harm") is a second, independent review of code
   that `docs/plan.md` names as risky ([workflow.md](workflow.md#how-a-piece-of-work-goes)). Until your
   findings are posted, read the pull request's description, diff and commits, not its comments; in the

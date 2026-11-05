@@ -13,8 +13,21 @@ a piece of work goes, the merge), [reports.md](reports.md) (what it tells the ow
   project has one.
 - **Runs `python3 tools/process/doctor.py`** and deals with what it reports, or tells the owner what
   only the owner can fix.
+- **Starts nothing before its first report:** no session and no merge. The report says what the
+  session is about to start; the session then waits for the owner's answer and starts that unless the
+  answer calls a pause. A message that opened the session saying to go on, or to pause, is that
+  answer.
+- **Takes over what waits on a gone session:** a draft pull request waiting on answers whose session is
+  gone gets the answers there and a fresh "Do B-###" session, which continues its branch
+  ([rules.md](rules.md#your-work)).
+- **Before every reply to the owner** checks the pull requests it asked the owner about, so an Approve,
+  a merge or a comment on GitHub needs no word in the chat.
 - **`docs/now.md` always holds what a fresh coordinator needs:** a handover to a new session
   mid-milestone is normal.
+
+The coordinator starts a session, or messages one that waits, by the tools it has, and the brief is the
+session's first message; where its tools can't, it asks the owner to open the session with the brief or
+to pass the message on.
 
 ## Before a gate
 
@@ -47,9 +60,9 @@ coordinator keeps it, the same day as things happen:
 
 When the owner says stop, the coordinator starts nothing new and stops the sessions that are running.
 Work resumes only on the owner's word. A pause, where the work is to go on as it was once the owner says
-so, stays in the chat: it holds in the session it was called in, and the owner ends it by a word there
-or by starting a new coordinator session. Only a stop that changes the plan (work dropped, put off or to
-be rethought) is recorded, with its reason, in `docs/now.md`.
+so, stays in the chat: it holds in the session it was called in, and the owner ends it by a word there,
+or by letting a new coordinator session go on after its first report. Only a stop that changes the
+plan (work dropped, put off or to be rethought) is recorded, with its reason, in `docs/now.md`.
 
 ## The process itself
 
