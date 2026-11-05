@@ -1,0 +1,57 @@
+name: template-release
+
+# Releases the template's process (docs/process/updates.md, "Changing the process"): when a merge to main
+# brings a version that has no tag yet, the top one in docs/process/CHANGELOG.md, it tags that commit
+# vX.Y.Z and makes a GitHub release of it with the version's changelog entry as notes. It belongs to the
+# template, not to its process: projects never get it by an update (only process-*.yml are synced), but
+# a project made with "Use this template" has a copy, and there the first step stops it.
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+# Two merges in a row release one after the other, never at once.
+concurrency:
+  group: template-release
+  cancel-in-progress: false
+
+jobs:
+  template-release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Stop outside the template
+        id: here
+        run: |
+          template=$(python3 -c 'import json; print(json.load(open(".process-lock.json"))["template"])' 2>/dev/null || true)
+          if [ "${template,,}" = "${GITHUB_REPOSITORY,,}" ]; then
+            echo "template=yes" >> "$GITHUB_OUTPUT"
+          else
+            echo "$GITHUB_REPOSITORY is not the template ${template:-(no lock)}: nothing to release"
+          fi
+      - name: Tag and release
+        if: steps.here.outputs.template == 'yes'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          version=$(python3 -c 'import sys; sys.path.insert(0, "tools/process"); import owned; print(owned.changelog_version(owned.ROOT))')
+          # A tag made before the merge, or off main, would keep the version from going out: fail red.
+          if git ls-remote --exit-code --tags origin "refs/tags/v$version" > /dev/null; then
+            status=$(gh api "repos/$GITHUB_REPOSITORY/compare/v$version...$GITHUB_SHA" --jq .status || true)
+            if { [ "$status" = "ahead" ] || [ "$status" = "identical" ]; } && gh release view "v$version" > /dev/null; then
+              echo "v$version is out already"
+              exit 0
+            fi
+            echo "::error::Tag v$version exists but is not on main below this commit, or has no release:" \
+              "the owner deletes the tag (docs/process/updates.md, step 4) and runs this workflow again"
+            exit 1
+          fi
+          python3 - "$version" > "$RUNNER_TEMP/notes.md" <<'EOF'
+          import re, sys
+          text = open("docs/process/CHANGELOG.md", encoding="utf-8").read()
+          entry = re.search(r"^## " + re.escape(sys.argv[1]) + r"\b.*?\n(.*?)(?=^## |\Z)", text, re.M | re.S)
+          print(entry.group(1).strip())
+          EOF
+          gh release create "v$version" --target "$GITHUB_SHA" --title "$version" --notes-file "$RUNNER_TEMP/notes.md"
