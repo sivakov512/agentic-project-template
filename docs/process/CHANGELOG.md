@@ -26,13 +26,20 @@ Three simplifications an independent review proposed and the owner accepted:
 - `doctor.py` checks the repository's merge settings: squash merging only, titled by the pull request,
   with an empty message.
 
-Projects: the owner sets Settings > General > Pull Requests: untick "Allow merge commits" and "Allow
-rebase merging", tick "Allow squash merging", and set its default commit message to "Default to pull
-request title"; the coordinator merges this update by squash already, so the owner does it first, and
-`doctor.py` reports it until then. The labels `plan`, `spec`, `research` and `code` can be deleted
-(Issues > Labels). Open pull requests keep their kind labels harmlessly. Where the project asks for
-Conventional Commits, the coordinator retitles this update (`chore: update the process to 0.8.0`) and
-each open pull request as a Conventional Commits subject, or its `process-commits` turns red.
+Projects: in this order.
+
+1. Where `docs/process.json` asks for Conventional Commits, the coordinator retitles this update
+   `chore: update the process to 0.8.0`, or its `process-commits` stays red.
+2. The coordinator asks the owner, in one request together with this update's Approve where it needs
+   one, for Settings > General > Pull Requests: untick "Allow merge commits" and "Allow rebase
+   merging", tick "Allow squash merging", and set its default commit message to "Default to pull
+   request title". From then on nothing merges by rebase, so nothing else merges before step 3.
+3. Once `doctor.py` shows the settings, the coordinator merges this update first, by squash with the
+   command of the new `workflow.md`, step 7 (`gh api -X PUT .../merge -f merge_method=squash ...`).
+4. If the owner wants, the labels `plan`, `spec`, `research` and `code` are deleted (Issues > Labels);
+   kept, they do no harm.
+5. Where the project asks for Conventional Commits, each open pull request is retitled as a
+   Conventional Commits subject, or its `process-commits` turns red on its next event.
 
 ## 0.7.1 — 2026-11-05
 
