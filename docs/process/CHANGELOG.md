@@ -7,6 +7,11 @@ The newest version first. Each entry says what changed and what projects must do
 
 From an independent review of 0.6.0 and the owner's decisions on it.
 
+Talking to the owner:
+
+- Anything named by an ID is said to the owner in plain words first, the ID after it in brackets
+  (`rules.md`, "Writing"). The owner didn't know what a coordinator's "test T-013" was.
+
 Merging and pull requests:
 
 - Squash merge. `main` gets one commit per pull request, its subject the pull request's title and

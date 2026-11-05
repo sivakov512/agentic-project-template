@@ -215,6 +215,9 @@ owner is shown 6 to 10 chosen images; the final judgement is the owner's use at 
   language the owner writes in): the chat, and every comment and review on pull requests, agents' to
   each other included, since the owner reads them. Text proposed for the repository is quoted in
   English.
+- To the owner, anything named by an ID (a backlog item, a requirement, a test, a milestone) is said in
+  plain words first, the ID after it in brackets: "the test of the cable length with you, about 20
+  minutes (T-013)", not "the T-013 test".
 - A pull request's title becomes the subject of its commit on `main` and follows the commit rules
   ([config.md](config.md#commits)).
 
