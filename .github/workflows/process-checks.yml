@@ -1,7 +1,7 @@
 name: process-checks
 
-# The checks of the content: they run on new commits only. The description and the labels are checked
-# in process-pr.yml, so editing them doesn't rerun these.
+# The checks of the content: they run on new commits only. The description, the title and the labels
+# are checked in process-pr.yml, so editing them doesn't rerun these.
 on:
   pull_request:
     types: [opened, synchronize, reopened]
@@ -37,12 +37,3 @@ jobs:
           git fetch --depth=1 origin "$GITHUB_BASE_REF"
           git show FETCH_HEAD:.process-lock.json > "$RUNNER_TEMP/base-lock.json" 2>/dev/null || rm -f "$RUNNER_TEMP/base-lock.json"
           python3 tools/process/check_lock.py --base-lock "$RUNNER_TEMP/base-lock.json"
-
-  process-commits:
-    if: github.event_name == 'pull_request'
-    runs-on: ${{ vars.CI_RUNNER || 'ubuntu-latest' }}
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-      - run: python3 tools/process/check_commits.py "${{ github.event.pull_request.base.sha }}" "${{ github.event.pull_request.head.sha }}"

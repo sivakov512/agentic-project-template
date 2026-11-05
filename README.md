@@ -31,7 +31,7 @@ This template puts the whole process into the repository, as rules the agents re
 - **You decide, briefly.** Each report says what needs your review and lists what was merged without
   it. Settings come to you as clicks, questions in a batch with a recommendation.
 - **Checked, not trusted.** CI checks links, the backlog, IDs and their coverage (every requirement has
-  a source, every scenario has steps), pull request descriptions and commit messages.
+  a source, every scenario has steps), pull request descriptions and titles.
 
 ## How work goes
 
@@ -54,9 +54,13 @@ The details are in [`docs/process/`](docs/process/README.md).
 
 1. **Use this template** on GitHub to make a new repository.
 2. **Choose whose account the agents work under:**
-   - a GitHub account of their own, a collaborator with Write access. You approve on GitHub the pull
-     requests that need you, and a required check keeps them from merging without your Approve;
-   - or yours. Everything carries your name, and you give your OK in the chat or merge yourself.
+   - **an account of their own (recommended).** GitHub itself keeps what needs you from merging
+     without your Approve. It needs a second GitHub account, invited to the repository with Write
+     access (not Admin), with a token that may change workflow files; the repository under your
+     personal account, not an organisation; and your own login kept off wherever the agents run.
+   - **your account.** Simpler to set up, but the agents act with your full GitHub access, everything
+     carries your name, and only their rules stop a merge without your OK, which you give in the chat
+     or by merging yourself.
 3. **Open an agent session** (Claude Code) in the repository, signed in to `git` and `gh` as that
    account, and say in a few lines what the project is.
 4. **The agent sets the project up.** It asks you what it needs to know: the goal, your tracker, how
@@ -65,6 +69,17 @@ The details are in [`docs/process/`](docs/process/README.md).
 
 From then on you talk to the coordinator: give it goals and remarks, answer its questions, approve
 what needs you.
+
+## What you will be asked
+
+- At each gate: accept what the milestone delivered and agree the plan of the next one.
+- The decisions that plan names as yours (an interface, a file format, the stack), each when it is
+  ready. Reviewed risky code and decisions of those kinds the plan didn't name are offered to you, and
+  you can stop those offers until the milestone's end.
+- To use each milestone's result in your real work and say what came up: a milestone isn't finished
+  without it.
+- Questions in a batch, each with a recommendation; an Approve on GitHub for what needs you; now and
+  then a setting to click, or something only you can do (an account, money, hardware).
 
 ## What is in it
 
@@ -90,6 +105,7 @@ you keep. A change to the process is made here, never in a project
 - GitHub, with GitHub Actions.
 - An agent that reads `CLAUDE.md`: the rules are written for Claude Code.
 - Python 3.9 or newer for the checks; they use only its standard library.
+- The repository is written in English; the agents talk to you in your language.
 
 ## License
 

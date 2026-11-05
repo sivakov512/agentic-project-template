@@ -1,7 +1,8 @@
 name: process-pr
 
-# The check of the description and the labels: it runs again when they change, without rerunning the
-# checks of the content in process-checks.yml.
+# The checks of the description, the title and the labels: they run again when these change, without
+# rerunning the checks of the content in process-checks.yml. A passing process-pr runs again the red runs
+# of this workflow on the same commit, process-commits' among them.
 on:
   pull_request:
     types: [opened, edited, synchronize, reopened, labeled, unlabeled, ready_for_review]
@@ -23,5 +24,18 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - run: python3 tools/process/check_pr.py "$GITHUB_EVENT_PATH"
+        env:
+          GH_TOKEN: ${{ github.token }}
+
+  # The title becomes the subject of main's squash commit, so it is checked against the commit rules.
+  process-commits:
+    runs-on: ${{ vars.CI_RUNNER || 'ubuntu-latest' }}
+    # It only reads the pull request; running other runs again is process-pr's.
+    permissions:
+      contents: read
+      pull-requests: read
+    steps:
+      - uses: actions/checkout@v4
+      - run: python3 tools/process/check_commits.py "$GITHUB_EVENT_PATH"
         env:
           GH_TOKEN: ${{ github.token }}

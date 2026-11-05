@@ -25,6 +25,12 @@ SKIP = {".git", "__pycache__", ".DS_Store", "node_modules", ".venv"}
 
 VERSION_HEADING = re.compile(r"^## (\d+\.\d+\.\d+)\b", re.MULTILINE)
 
+# Where a template's releases are fetched from; {} is its owner/name from the lock. The checks' tests
+# point it at local folders.
+TEMPLATE_SOURCE = "https://github.com/{}.git"
+# Where fetch_release keeps what it fetched, apart from the repository's own branches and tags.
+RELEASE_REF, TEMPLATE_MAIN_REF = "refs/process/release", "refs/process/template-main"
+
 
 def repo_files(root):
     """The repository's files, tracked or not but not ignored by git, as POSIX paths relative to root."""
@@ -40,6 +46,27 @@ def is_owned(name):
     folder, _, base = name.rpartition("/")
     return (any(name.startswith(prefix + "/") for prefix in OWNED_DIRS) or name in OWNED_FILES
             or any(folder == where and fnmatch.fnmatch(base, pattern) for where, pattern in OWNED_PATTERNS))
+
+
+def fetch_release(root, template, version):
+    """Fetches the template's release vX.Y.Z and the template's main into the git repository at root.
+    Returns the release's commit, or None when that commit is not on the template's main: anyone who can
+    push to the template can make a tag at any commit, but only main holds what the owner approved there
+    (docs/process/updates.md, "Changing the process"). check_owner.py, check_lock.py and update.py trust
+    a release only through this. Raises ValueError when git fails, a missing release included."""
+    def git(*args):
+        done = subprocess.run(["git", *args], cwd=root, capture_output=True, text=True)
+        if done.returncode != 0:
+            raise ValueError(f"git {' '.join(args[:2])}: {done.stderr.strip()}")
+        return done.stdout.strip()
+    git("fetch", "--quiet", "--no-tags", TEMPLATE_SOURCE.format(template),
+        f"+refs/tags/v{version}:{RELEASE_REF}", f"+refs/heads/main:{TEMPLATE_MAIN_REF}")
+    commit = git("rev-parse", "--verify", f"{RELEASE_REF}^{{commit}}")
+    try:
+        git("merge-base", "--is-ancestor", commit, TEMPLATE_MAIN_REF)
+    except ValueError:
+        return None
+    return commit
 
 
 def owned_files(root):

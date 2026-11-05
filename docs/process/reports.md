@@ -1,88 +1,107 @@
 # Reports to the owner
 
-Whenever there is something for the owner (one or more pull requests ready to merge, pull requests it
+## The report
+
+Whenever there is something for the owner (pull requests ready to merge, pull requests the coordinator
 merged on its own since the last report, or a gate), the coordinator reports. The whole report fits on a
 phone's screen, about twelve lines; detail stays in the pull requests, which it links. In this order,
-each point left out when it has nothing to say, all but the last:
+each point but the last left out when it has nothing to say:
 
 1. **Where we are,** one line: the milestone and the next step.
-2. **In work:** what is going on right now, one line per item or pull request and what it does.
+2. **In work:** one line per item or pull request in work and what it does.
 3. **What changed,** one line each, every one saying how it ended: fixed and merged, not fixed and what
-   it waits on, checked and how. A fact without its outcome isn't written. Then the pull requests merged
-   without the owner since the last report, one line each.
+   it waits on, checked and how. Then the pull requests merged without the owner since the commit
+   `docs/now.md` gives as "Reported up to", one line each, apart from coordinator records that change
+   only `docs/now.md`; the coordinator's next record of `docs/now.md` moves that line to the last merge
+   the report listed.
 4. **Decisions the coordinator made itself,** so the owner can reverse any of them, **deviations from the
    plan, and risks,** one line each.
-5. **What is needed from the owner,** opening with a call ("Needed from you:"), then a numbered item per
-   action: an approval, a question with a recommendation, a milestone to try, a setting to change,
-   anything only the owner can do. Each item gives the action and its link; what it decides, in plain
-   words, one line; why it is the owner's and not the coordinator's, by the rule that makes it so
-   ("When the owner looks" below, or what [workflow.md](workflow.md#the-owners-ok-and-the-merge) keeps
-   for the owner); what to look at and how many minutes, several places as a list with links, or that no
-   reading is needed and why; and for risky code, what could break and what guards it. Or one line that
-   nothing is needed.
+5. **What is needed from the owner,** opening with "Needed from you:", then a numbered item per action:
+   an approval, a question, a milestone to try, a setting to change, anything only the owner can do.
+   Questions come in a batch, each with the coordinator's recommendation. Each item gives:
+   - the action and its link;
+   - what it decides, in plain words, one line;
+   - why it is the owner's, by the rule that makes it so ("When the owner looks" below, or what
+     [workflow.md](workflow.md#the-owners-ok-and-the-merge) keeps for the owner);
+   - what to look at and how many minutes, several places as a list with links, or that no reading is
+     needed and why;
+   - for risky code, what could break and what guards it.
+
+   Or one line that nothing is needed.
 
 When the report runs longer, the earlier points get shorter; each item of the last one keeps all its
-parts. `docs/plan.md` may add points of the project's own, all before the last one (a line on what
-changed in its tracker, say).
+parts. `docs/plan.md` may add points of the project's own, all before the last one.
 
-The owner asking for the status gets a report in this form too, whether or not anything is new since the
-last one; where the owner asks for more, the points grow and keep their order. Any other answer in a
-conversation with the owner stays a plain answer. Whatever the message, what waits on the owner comes at
-its end, since the owner reads the chat from the bottom. Whether the owner is needed is decided by these
-rules, not asked of the owner; the one question about it is a doubt whether something stays inside the
-plan (below).
+The owner asking for the status gets a report in this form too, new or not; where the owner asks for
+more, the points grow and keep their order. Any other answer to the owner stays a plain answer.
+Whatever the message, what waits on the owner comes at its end.
 
-When what is needed from the owner gains an item the last notice didn't have, the coordinator also
-notifies the owner outside the chat, where its tools can (a push notification): once per message, one
-line with the project and what is needed. A request the owner hasn't answered yet, "nothing", and news
-along the way get no notice.
+When "Needed from you" gains an item the last notice didn't have, the coordinator also notifies the
+owner outside the chat, where its tools can (a push notification): once per message, one line with the
+project and what is needed.
 
 Settings the owner must change are given as a path of clicks with links (Settings → Branches → `main`
 → …), not as commands to run.
 
 ## When the owner looks
 
-The owner agrees where the work goes and checks what it gives; the agents do the rest. The owner looks
-at:
+The owner agrees where the work goes and checks what it gives; the agents do the rest. Whether the owner
+is needed is decided by these rules, not asked of the owner, except for the offer's question and a doubt
+whether something stays inside the plan (both below). The owner looks at:
 
-1. **The plan of each milestone after the foundation,** at the gate before it, written out as
-   [workflow.md](workflow.md#milestones-and-gates) says.
+1. **The plan of each milestone after the foundation,** at the gate before it
+   ([workflow.md](workflow.md#writing-a-milestone-out)).
 2. **The decisions that plan names as the owner's,** each when it is ready: what a person will use or
    work with (the interface, an API or a driver others program against, a file or data format a person
    reads or writes, a command line, settings), what shapes the whole product (the architecture, the
    stack, the model of the data), and what is hard to reverse. `docs/plan.md` may name more. A decision
-   of these kinds that the plan didn't name goes beyond the plan (4).
+   of these kinds that the plan didn't name is offered to the owner (below).
 3. **The result of each milestone after the foundation,** by using it
-   ([workflow.md](workflow.md#milestones-and-gates)).
-4. **What goes beyond the agreed plan:** a change of scope, sizeable work the plan didn't foresee, a
-   problem, a risk or a blocker, an action on the owner's real data (a migration run on it, moving or
-   deleting it), and what only the owner can do (accounts, money, hardware, settings). Code that may do
-   such things is risky code (below), not this point.
+   ([workflow.md](workflow.md#starting-and-finishing)).
+4. **What goes beyond the agreed plan:** a change of scope (an item of the agreed milestone dropped or
+   moved out of it; one superseded by an item with the same aim is not), sizeable work the plan didn't
+   foresee, a problem, a risk or a blocker, an action on the owner's real data (a migration run on it,
+   moving or deleting it), and what only the owner can do (accounts, money, hardware, settings). Code
+   that may do such things is risky code (below), not this point.
 5. **The rules of the work:** what the owner keeps for themself
-   ([workflow.md](workflow.md#the-owners-ok-and-the-merge)): `CLAUDE.md`, the plan, the settings and the
-   commands of the checks, CI and the process, and any change that loosens the project's checks,
-   whatever file it is in (a test removed or skipped, a lint rule or a threshold eased). The template's
-   files a process update brings exactly as in the template's release are the exception: the owner
-   agreed them in the template.
+   ([workflow.md](workflow.md#the-owners-ok-and-the-merge)).
 
-A pull request for 1, 2, 4 or 5 is labelled `owner-review`; it says in plain words what it decides or
-changes, and for the checks and CI what it loosens or tightens. Everything else is labelled
-`ok-without-reading` and the coordinator merges it on its own: the requirements and the documents of
-the chain inside the agreed scope, studies, code and tests, interfaces between parts that only the
-agents build, the backlog, `docs/now.md`, records of facts, and records of the owner's own decisions
-outside what the owner keeps. A bot's pull request the coordinator labels after its review: a
-dependency bump inside the plan `ok-without-reading`, a release as the plan's Releases section says.
+### The review label
 
-Code `docs/plan.md` names as risky goes as OK without reading only where the plan says so, once
-neither its review nor its review for harm has a "fix" finding left
-([workflow.md](workflow.md#how-a-piece-of-work-goes)).
+- A pull request for 1, 2, 4 or 5 is labelled `owner-review`, and so is one offered to the owner (below)
+  until the owner stops the offers of its kind. It says in plain words what it decides or changes, and
+  for the checks and CI what it loosens or tightens.
+- Everything else is labelled `ok-without-reading`: the requirements and the documents of the chain
+  inside the agreed scope, studies, code and tests, interfaces between parts that only the agents build,
+  the backlog, `docs/now.md`, records of facts, and records of the owner's own decisions outside what
+  the owner keeps.
+- A bot's pull request the coordinator labels after the reviewer's findings and its own check: a
+  dependency bump inside the plan `ok-without-reading`, a release as the plan's Releases section says.
+
+### Reviewed work offered to the owner
+
+Risky code (as `docs/plan.md` names it) and a decision of the kinds in 2 that the plan didn't name: once
+such a pull request's reviews have no "fix" finding left, the coordinator offers it to the owner as one
+item of "Needed from you". The item says what it does, which reviews and checks passed, what exactly is
+worth a look (files or sections) and that the look may be skipped, and asks one question: keep offering
+this kind of pull request, or stop asking until the end of the milestone.
+
+- A kind is what the owner names when stopping; by default risky code is one kind, and each kind of
+  decision in 2 is one.
+- After a stop, the coordinator merges that kind itself after its reviews, labelled
+  `ok-without-reading`, and lists each among the pull requests merged without the owner, unless the
+  pull request also changes what the owner keeps: then it still needs the owner's OK.
+- A stop holds for that kind until the end of the current milestone. The coordinator records it as one
+  line in `docs/now.md`, in a coordinator record ("Until the end of milestone N: architecture pull
+  requests merge after their reviews without asking"), and removes it when the milestone ends.
+- What the milestone's plan names as the owner's is not offered: it comes as an `owner-review` item, and
+  the owner looks at what the item points to. Risky code the plan says goes `ok-without-reading` isn't
+  offered either, nor are interfaces between parts that only the agents
+  build, or code that builds a user interface the owner already agreed.
+
+### When the coordinator isn't sure
 
 When the coordinator isn't sure whether something stays inside the plan, it asks the owner in one line
-in the report, with its recommendation, instead of sending the whole pull request to be read, and holds
-that pull request until the answer; the rest goes on. It never
-moves a kind of work off the owner's list on its own; only the owner can, by a change to the plan.
-
-## Batching
-
-Questions to the owner come in a batch, each with
-the coordinator's recommendation.
+in the report, with its recommendation, and holds that pull request until the answer; the rest goes on.
+The coordinator never moves a kind of work off the owner's list on its own; only the owner can, by a
+change to the plan or by stopping an offer.

@@ -20,7 +20,7 @@ import check_pr  # noqa: E402
 import owned  # noqa: E402
 
 ROOT = HERE.parents[1]
-LABELS = {**check_pr.KIND_DESCRIPTIONS, **check_pr.REVIEW_LABELS}
+LABELS = check_pr.REVIEW_LABELS
 PROJECT_FILES = ["CLAUDE.md", "README.md", "docs/plan.md", "docs/now.md", "docs/backlog.md",
                  "docs/decisions/README.md", check_docs.CONFIG]
 PLACEHOLDER = "<!-- template placeholder -->"
@@ -67,6 +67,56 @@ def approvals(rules):
         return None
     return (max(int(p.get("required_approving_review_count", 0)) for p in found),
             any(bool(p.get("dismiss_stale_reviews_on_push")) for p in found))
+
+
+def rules_allow_squash(rules):
+    """Whether the rulesets' pull request rules on main let a pull request merge by squash: False when one
+    lists allowed merge methods without squash; None when none lists them (no ruleset, or classic
+    protection)."""
+    found = [(rule.get("parameters") or {}).get("allowed_merge_methods") for rule in rules
+             if rule.get("type") == "pull_request"]
+    found = [methods for methods in found if methods is not None]
+    return all("squash" in methods for methods in found) if found else None
+
+
+def binds_everyone(branch, rules):
+    """Whether main's protection lets nobody past it, the owner and admins included: False when classic
+    protection leaves admins out of its required checks; True when it binds everyone and no ruleset is on
+    main; None otherwise, since only an admin can read a ruleset's bypass list. branch: GitHub's answer
+    for the branch; rules: the rules of the rulesets on main."""
+    protection = branch.get("protection") or {}
+    level = (protection.get("required_status_checks") or {}).get("enforcement_level")
+    if protection.get("enabled") and level == "non_admins":
+        return False
+    return True if protection.get("enabled") and level == "everyone" and not rules else None
+
+
+def identity_problem(agents_account, login, owner):
+    """What is wrong with gh's account (login) for agents_account, or None when it fits. Under their own
+    account the agents must not hold the owner's, which GitHub lets approve and merge as the owner; under
+    the owner's, they work as the owner (docs/process/workflow.md, "The owner's OK and the merge")."""
+    same = login.lower() == owner.lower()
+    if agents_account == "own" and same:
+        return (f"gh works as the repository's owner {login}, but agents_account is own: sign gh and git in"
+                " as the agents' account, where the owner's isn't signed in")
+    if agents_account == "owner" and not same:
+        return f"gh works as {login}, but agents_account is owner: the agents work as {owner}, or the setting is own"
+    return None
+
+
+# The repository's merge settings the process needs (docs/process/setup.md, step 8): squash merging only,
+# with the pull request's title as the commit's subject and an empty body.
+MERGE_SETTINGS = {"allow_squash_merge": True, "allow_merge_commit": False, "allow_rebase_merge": False,
+                  "squash_merge_commit_title": "PR_TITLE", "squash_merge_commit_message": "BLANK"}
+
+
+def merge_settings_problem(about):
+    """What is wrong with the merge settings in the repository's API answer (about), None when they fit,
+    or False when the answer doesn't hold them (GitHub shows them only to accounts that can push)."""
+    if any(about.get(key) is None for key in MERGE_SETTINGS):
+        return False
+    wrong = [key for key, value in MERGE_SETTINGS.items() if about[key] != value]
+    return ("these differ: " + ", ".join(f"{key} is {about[key]}" for key in wrong)) if wrong else None
 
 
 def code_owner_review(rules):
@@ -152,12 +202,31 @@ def check_github(report, lock, set_up, fix_labels, agents_account):
         return
     is_template = repo == lock.get("template")
     report.line(True, f"repository {repo}" + (" (the template itself)" if is_template else ""))
-    if agents_account != "owner":
-        code, out = gh("api", f"repos/{repo}", "--jq", ".owner.type")
-        if code == 0:
-            report.line(out.strip() == "User", "the repository belongs to the owner's personal account",
-                        "process-owner counts only the repository owner's approval, and an organisation"
-                        " gives nobody that (docs/process/workflow.md, \"The owner's OK and the merge\")")
+    code, out = gh("api", f"repos/{repo}", "--jq",
+                   "{type: .owner.type, private: .private, " + ", ".join(MERGE_SETTINGS) + "}")
+    about = json.loads(out) if code == 0 else {}
+    if about:
+        problem = merge_settings_problem(about)
+        report.line(None if problem is False else not problem, "squash merging only, titled by the pull request",
+                    "the owner sets it (docs/process/setup.md, step 8)" + (f": {problem}" if problem else ""))
+    if agents_account != "owner" and about:
+        report.line(about.get("type") == "User", "the repository belongs to the owner's personal account",
+                    "process-owner counts only the repository owner's approval, and an organisation"
+                    " gives nobody that (docs/process/workflow.md, \"The owner's OK and the merge\")")
+    # The template's coordinator works as the agents' own account.
+    account = agents_account or ("own" if is_template else None)
+    code, out = gh("api", "user", "--jq", ".login")
+    if account and code == 0 and about.get("type") == "User":
+        problem = identity_problem(account, out.strip(), repo.split("/")[0])
+        report.line(not problem, f"gh works as {out.strip()}, as agents_account {account} asks", problem)
+    elif account:
+        report.line(None, "gh's account fits agents_account", "can't tell gh's account from the repository's owner")
+    if about.get("private") is False:
+        code, out = gh("api", f"repos/{repo}/actions/variables", "--jq", ".variables[].name")
+        report.line(None if code != 0 else "CI_RUNNER" not in out.split(),
+                    "no self-hosted runner for a public repository",
+                    "with CI_RUNNER set, anyone's pull request runs on that runner: the owner deletes the variable"
+                    " (Settings > Secrets and variables > Actions > Variables) or makes the repository private")
     if not is_template:
         report.line(bool(set_up), "the project is set up", "follow docs/process/setup.md")
 
@@ -174,7 +243,7 @@ def check_github(report, lock, set_up, fix_labels, agents_account):
             if failed:
                 report.line(False, "labels created", "couldn't create: " + ", ".join(failed))
         else:
-            report.line(not missing, "labels for kinds and review",
+            report.line(not missing, "the review labels",
                         "missing: " + ", ".join(missing) + " (run with --fix-labels)")
 
     # Readable with read access: the branch (classic protection) and the rules on it (rulesets). Approval
@@ -199,6 +268,8 @@ def check_github(report, lock, set_up, fix_labels, agents_account):
                     "the owner requires them: " + ", ".join(missing_checks))
         # process-owner asks for the owner's approval where it is needed; a required approval on top of it
         # would stop the coordinator from merging what is OK without reading.
+        report.line(rules_allow_squash(rules), "the rulesets for main allow squash merging",
+                    "the owner sets Allowed merge methods to Squash in the ruleset for main (docs/process/setup.md, step 8)")
         reviews = approvals(rules)
         if reviews is None:
             report.line(None, "no required approvals for main",
@@ -221,10 +292,10 @@ def check_github(report, lock, set_up, fix_labels, agents_account):
             report.line(None if reviews is None else reviews[1], "approvals are dismissed by new commits",
                         "the owner ticks \"Dismiss stale pull request approvals when new commits are pushed\""
                         " (docs/process/setup.md, step 8)")
-        if agents_account == "owner":
-            report.line(None, "no bypassing for main",
-                        "the owner checks it is on, or the protection doesn't bind the owner's account"
-                        " (docs/process/setup.md, step 8)")
+        # Bypassing would let the owner's account, or anyone holding it, merge past process-owner.
+        report.line(binds_everyone(branch, rules), "no bypassing for main",
+                    "the owner checks it: an empty bypass list in the ruleset, or \"Do not allow bypassing the"
+                    " above settings\" in classic protection (docs/process/setup.md, step 8)")
 
     template = lock.get("template")
     if template:

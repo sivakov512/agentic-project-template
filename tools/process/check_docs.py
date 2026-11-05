@@ -380,7 +380,7 @@ def project_errors(config):
                           ("agents_account", "own or owner"), ("merged_by", "coordinator or owner")):
             if not str(project.get(key, "")).strip():
                 errors.append(f"{CONFIG}: project.{key} must be set once the project is set up: {what}")
-    for key in ("checks", "ids_ignore"):
+    for key in ("checks", "ids_ignore", "kept"):
         value = config.get(key, [])
         if not isinstance(value, list) or not all(isinstance(item, str) for item in value):
             errors.append(f"{CONFIG}: {key} must be a list of strings")

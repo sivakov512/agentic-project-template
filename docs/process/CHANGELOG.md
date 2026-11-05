@@ -3,6 +3,169 @@
 The newest version first. Each entry says what changed and what projects must do, if anything
 ([updates.md](updates.md#changing-the-process)).
 
+## 0.7.0 — 2026-11-05
+
+From an independent review of 0.6.0 and the owner's decisions on it.
+
+Talking to the owner:
+
+- Anything named by an ID is said to the owner in plain words first, the ID after it in brackets
+  (`rules.md`, "Writing"). The owner didn't know what a coordinator's "test T-013" was.
+
+Merging and pull requests:
+
+- Squash merge. `main` gets one commit per pull request, its subject the pull request's title and
+  " (#N)", its body empty; the coordinator merges with the REST API (`workflow.md`, step 7). On the
+  branch, fixes are plain new commits and nothing pushed is rewritten; a conflict is resolved by
+  merging `main` into the branch, and resolving it is not a review round. A second-round reviewer
+  reads `git diff <reviewed> <new>`, or with a merge of `main` in between, `git log -p --first-parent
+  --remerge-diff`.
+- The title is the future commit subject: `process-commits` checks it against the commit rules, the
+  " (#N)" counted in its 72 characters, instead of the branch's commits. It keeps its name, moves into
+  `process-pr.yml` so a title edit runs it again, and reads the pull request only. `one_line` and
+  `no_co_authors` in `docs/process.json` are still accepted and do nothing.
+- One label: the review label, `owner-review` or `ok-without-reading`; other labels are not read. The
+  kind is in the title: `Plan:`, `Spec:`, `Research:`, `Code:`, or with Conventional Commits
+  `docs(plan): ...`, `docs(spec): ...`, `docs(research): ...`, and `feat`, `fix`, `refactor` and the
+  like for code. `update.py` titles its pull request `chore: ...` there.
+- A pull request whose "Backlog item" is `Coordinator record` or `Process update` needs only "Backlog
+  item", "What changed" and "Owner review"; `update.py` writes just those. `check_pr.py` also takes a
+  bare "None" in "Not done and open questions" and a Coordinator record that names several items.
+- A passing `process-pr` or `process-owner` runs again only the failed jobs of the red runs on the same
+  commit.
+
+Reviews:
+
+- Every review posts one comment of the same shape: its name and the head, its sections, the findings
+  marked fix or drop, and a last line "Ready to merge as is: yes" or "no" (`rules.md`, "Every review").
+- An architecture review for a pull request that changes the architecture or a contract between parts,
+  with the contributor test, and a UI review for one that changes what a person sees and uses
+  (`rules.md`, "If you are the reviewer"). A project with a user interface keeps a design-system
+  document in its chain. `workflow.md` step 5 says which pull requests get which reviews; the
+  coordinator decides, and the plan may name more.
+- Risky code and decisions of the owner's kinds the plan didn't name (an interface a person uses or
+  others program against, the architecture, the stack, the data model) are offered to the owner once their reviews have no "fix" finding left: one item of
+  "Needed from you" with what it does, the reviews and checks passed, what is worth a look and that it
+  may be skipped, and the question whether to stop such offers until the milestone's end; after a stop
+  the coordinator merges that kind and lists it. A stop is a line in `docs/now.md` until the milestone
+  ends; what the plan names as the owner's isn't offered but comes as an `owner-review` item
+  (`reports.md`, "Reviewed work offered to the owner").
+- A reviewer's "fix" for a problem the pull request didn't cause and its item doesn't cover is marked
+  "outside the item": the fixing session lists it under "Not done and open questions", and the
+  coordinator makes it an item. A check loosened without the owner's OK or a too weak review label is
+  a "fix".
+- A pull request with no item has a bar for its reviewer: `setup.md` and the owner's answers for Setup,
+  its description and `updates.md` for a Process change, the owner's words and the documents above for
+  a Coordinator record.
+- `workflow.md` step 5, "Review and checks", opens with the two pull requests that need no reviewer.
+  The coordinator may close a finding of an ordinary review that rests on something untrue or
+  contradicts the item or the plan, with the reason, and reports it as its own decision; findings of
+  the review for harm stay its reviewer's, and the review for harm wins when reviews disagree.
+- The owner's remarks on an open pull request go to a work session as "fix" findings quoting the owner,
+  with one round of the reviews the change needs, outside the two-round cap.
+
+What the owner keeps:
+
+- The owner also keeps `.claude/` folders, `.mcp.json`, and `CLAUDE.md` and `CLAUDE.local.md` in any
+  folder, names compared whatever their case. A new optional key `kept` in `docs/process.json` lists
+  patterns of paths the owner keeps too, read from the base branch: the configuration of the project's
+  checks and anything else the owner names (`config.md`). Two things fail `process-owner` whatever the
+  approvals: a symlink or submodule at a kept path or at a folder on the way to one; and rules Claude
+  Code loads by itself (a `CLAUDE.md` or `CLAUDE.local.md` in any folder, `.claude/rules/`), or the
+  files they import in turn, that import (an `@` before the path) a symlink, a submodule, a path through
+  one, or a file the owner doesn't keep. Commands, skills, agents and other documents may import
+  anything.
+- What the owner keeps is defined once, in `workflow.md`, "The owner's OK and the merge": the files CI
+  holds, with the process update exception, and any change that loosens a check.
+- `process-owner` takes `agents_account` from the pull request itself only while the base has none
+  (setting up), and `owner` there only when the pull request's author is the repository's owner.
+
+Releases of the template and updates:
+
+- The template's releases are made by its workflow `template-release.yml` on merge to `main`, not by
+  hand; it fails red when the version's tag exists already off `main` or without a release. The owner
+  keeps a tag ruleset on `v*`. Projects don't get the workflow, and its copy in a project does nothing.
+- A release counts only when its tag is on the template's `main`: `process-owner` lets in no files of
+  another, and `update.py` stops before running anything of it.
+- "When a release breaks the project" (`updates.md`): the coordinator reverts the update's commit in a
+  pull request for the owner, who removes `process-lock` (and `process-owner`, if it is what broke) as
+  a required check for that one merge.
+- An update `update.py` sends to the owner because of `.github/` says in "Owner review" that an Approve
+  is all it needs, and why GitHub asks.
+- The template's files never write an `@` right before a path, since `process-owner` would read it as
+  an import in every project.
+
+The coordinator, the plan and setup:
+
+- One rule for recording the owner's words, in `workflow.md`: what the owner decides or asks for becomes
+  a record the same day, quoting the owner's words as said; a choice the words didn't make is reported
+  as the coordinator's decision. What holds only for the session (a pause, an answer) stays in the chat.
+- Rules every session keeps live in `CLAUDE.md` only, since work sessions and reviewers read only the
+  parts of `docs/plan.md` their item leads them to. The plan placeholder's section "The owner's rules"
+  becomes "Working with the owner"; a project may keep its own name and anchor.
+- A coordinator session starts no session and no merge before its first report, then starts what
+  it reported unless the owner's opening message called a pause; it takes over drafts whose sessions are gone; `docs/now.md` always holds what a fresh
+  coordinator needs. It starts or messages sessions by the tools it has, or asks the owner, and checks
+  the pull requests it asked the owner about before every reply.
+- While `main` is unprotected or a process check isn't required, the coordinator merges nothing whose
+  `process-owner` run isn't green, and the settings stay first in "Needed from you".
+- Before a merge the checks have run on the current `main`: if `main` moved, the pull request is closed
+  and reopened, which keeps the owner's Approve. A red `main` is fixed first, on an item of its own for
+  code. A wrong merge is reverted in a pull request that names the item, takes its kind and label, and
+  reopens the item; its reviewer checks only the revert.
+- Dropping or moving out an item of the agreed milestone is a change of scope, the owner's.
+- `docs/now.md` gets "Reported up to", the commit the last report covered, so the list of merges without
+  the owner survives a new session.
+- Setup: the account question first, and step 1 only once it is answered; the agents' own account
+  recommended, run where only their account is signed in; no bypassing in both modes; squash-only merge
+  settings; secrets that publish, deploy or mint tokens in an Environment limited to `main`, with
+  publishing on the push to `main`, or also on release tags `v*` where a tag ruleset stops the agents'
+  account from creating, moving or deleting them; a warning on `CI_RUNNER`. The README says what each
+  account choice costs, what the owner will be asked, and that the repository is in English.
+- `doctor.py` fails when gh works as the repository's owner with `agents_account` `own`, or as someone
+  else with `owner`; when the repository is public and `CI_RUNNER` is set; when classic protection
+  lets admins past its checks; and when the merge settings, or a ruleset's allowed merge methods, don't
+  give squash only. With rulesets, whose bypass list only an admin can read, it reminds the owner to
+  check it. `--fix-labels` creates only the review labels.
+- Backlog items stand under a heading per milestone. A work session reads its item and the documents it
+  links, and looks further up the chain only for a question they leave.
+- The process documents say each rule once, in fewer words; what the rules mean doesn't change.
+
+Projects: in this order.
+
+1. Before the update: a symlink or submodule at a kept path (a `CLAUDE.md -> AGENTS.md`, say) becomes a
+   plain `CLAUDE.md` that imports `AGENTS.md` (an `@` before the name), and a `CLAUDE.md`,
+   `CLAUDE.local.md` or `.claude/rules/` file that imports a file the owner doesn't keep gets that file
+   into `kept`, or imports a plain file instead; otherwise every pull request fails `process-owner`
+   after the update. This may also go in the update itself.
+2. Where `docs/process.json` asks for Conventional Commits, the coordinator retitles the update
+   `chore: update the process to 0.7.0`, or its `process-commits` stays red.
+3. In the update: the rules every session must keep move from `docs/plan.md` to `CLAUDE.md` (the plan
+   may keep its section's name and anchor); `docs/now.md` gets a line "Reported up to: <commit>";
+   backlog items go under a heading per milestone; a project that keeps its own architecture or UI
+   review rules in `CLAUDE.md` drops them. These changes make the update go to the owner.
+4. The coordinator asks the owner, in one request with the update's Approve, for Settings > General >
+   Pull Requests: untick "Allow merge commits" and "Allow rebase merging", tick "Allow squash merging",
+   default commit message "Pull request title"; where a ruleset protects `main`, Settings > Rules >
+   Rulesets > the ruleset for `main` > Require a pull request before merging > Allowed merge methods:
+   Squash only; and no bypassing for `main` ("Do not allow bypassing the above settings", or no bypass
+   list), with the agents' own account too. From then on nothing merges by rebase.
+5. Once `doctor.py` shows the settings, the coordinator merges the update first, by squash with the
+   command of `workflow.md`, step 7.
+6. The coordinator deals with what `doctor.py` now fails: the agents sign gh and git in as the account
+   `agents_account` names, or the owner corrects the setting; on `CI_RUNNER` in a public repository the
+   owner deletes the variable or makes the repository private. With the agents' own account, it makes
+   sure the owner's login is not reachable where the agents run (`gh auth status`, the credential
+   helper, the environment) and tells the owner if it is.
+7. The owner moves secrets that publish, deploy or mint tokens into an Environment limited to `main`,
+   together with a pull request in which the jobs that use them name the Environment and publish on the
+   push to `main`, or on release tags `v*` that a tag ruleset keeps from the agents' account
+   (`setup.md`, step 8); one without the other fails the release.
+8. Where the project asks for Conventional Commits, each open pull request is retitled as a
+   Conventional Commits subject, or its `process-commits` turns red on its next event. Their kind
+   labels do no harm; the owner may delete `plan`, `spec`, `research` and `code` (Issues > Labels).
+9. `kept` is optional: a project that already has check configuration proposes its patterns to the
+   owner in the update's pull request; otherwise in the pull request that adds the first of it.
 ## 0.6.0 — 2026-11-05
 
 - A report to the owner fits on a phone's screen, about twelve lines, detail left in the pull requests.

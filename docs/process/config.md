@@ -1,8 +1,7 @@
 # docs/process.json
 
 The settings the process reads from a project. The project owns this file; `docs/plan.md` says in
-words what the IDs mean, this file says it for the checks. JSON so the checks need nothing beyond
-Python's standard library.
+words what the IDs mean, this file says it for the checks.
 
 ```json
 {
@@ -14,8 +13,9 @@ Python's standard library.
     "agents_account": "own",
     "merged_by": "coordinator"
   },
-  "commits": {"one_line": true, "no_co_authors": false, "conventional": true},
+  "commits": {"conventional": true},
   "checks": ["npm test", "npm run lint"],
+  "kept": ["package.json", ".eslintrc.json", "jest.config.js", "src/payments/*"],
   "ids_ignore": ["docs/audit/*.md"],
   "ids": [
     {"kind": "scenario", "prefix": "S", "file": "docs/scenarios.md", "defined_by": "heading"},
@@ -34,12 +34,10 @@ Python's standard library.
 
 ## project
 
-- `set_up`: `false` in the template; setting up sets it to `true` ([setup.md](setup.md)). Agents read it
-  on `main` to know their role.
+- `set_up`: `false` in the template; setting up sets it to `true` ([setup.md](setup.md)).
 - `owner_language`: the language of talk with the owner.
 - `tracker`: the tracker that mirrors the project for the owner, and the project in it, in a few words;
-  or `none`. `doctor.py` shows it at the start of every coordinator session
-  ([coordinator.md](coordinator.md#the-tracker)).
+  or `none` ([coordinator.md](coordinator.md#the-tracker)).
 - `releases`: how the project ships, in a few words; `not yet: <where it is decided>` for a project
   that will ship but hasn't chosen how; or `none`. The full description is in the Releases section of
   `docs/plan.md` ([releases](#releases)).
@@ -47,38 +45,56 @@ Python's standard library.
   the owner's); `merged_by`: `coordinator` or `owner`. What each means:
   [workflow.md](workflow.md#the-owners-ok-and-the-merge).
 
-`owner_language`, `tracker`, `releases`, `agents_account` and `merged_by` must be set once `set_up` is
-`true`, so these choices are always made and written down.
+All five but `set_up` must be set once `set_up` is `true`.
 
 ## commits
 
-Every commit subject is at most 72 characters. Stricter rules the project may ask for:
+The commit rules are checked on the pull request's title (`process-commits`), which becomes the subject
+of its one commit on `main` ([workflow.md](workflow.md#how-a-piece-of-work-goes), step 7); the commits
+on a branch aren't checked.
 
-- `one_line`: a commit message is its subject line only, with no body;
-- `no_co_authors`: no `Co-authored-by` lines;
-- `conventional`: every subject follows Conventional Commits, as release tools that read the history
-  need: one of the types `feat`, `fix`, `perf`, `revert`, `refactor`, `chore`, `docs`, `style`, `test`,
-  `build`, `ci`, in lower case, an optional lower-case scope, an optional `!` (`fix(parser): …`,
-  `docs!: …`). A revert is written `revert: …`, not git's default `Revert "…"`.
+- The title is at most 72 characters together with the " (#N)" the merge adds.
+- `conventional` (default `false`): the title follows Conventional Commits: one of the types `feat`,
+  `fix`, `perf`, `revert`, `refactor`, `chore`, `docs`, `style`, `test`, `build`, `ci`, in lower case,
+  an optional lower-case scope, an optional `!` (`fix(parser): …`, `docs!: …`). A revert is written
+  `revert: …`, not git's default `Revert "…"`. How the title then shows the kind:
+  [pull-requests.md](pull-requests.md#kind-title-and-label).
 
-All default to `false`. Rules beyond these go in the project's own check.
+`one_line` and `no_co_authors`, from versions before 0.7.0, are still accepted and do nothing. Rules
+beyond these go in the project's own check.
 
 ## releases
 
-The process doesn't choose a release tool; it makes the project choose one and write it down. For a
-project that ships, a good default is release-please: it opens release pull requests from the
-Conventional Commits history (set `commits.conventional`), keeps the changelog and tags versions,
-and the project's own workflows build and publish on the release. Run it with a GitHub App's token,
-not the agents' or the owner's: its pull requests are then recognised as a bot's
-([pull-requests.md](pull-requests.md#the-checks-ci-runs)), and the release it creates starts the
-publishing workflows. Its configuration is the project's: it differs with what the project ships.
+The process doesn't choose a release tool; the project chooses one and writes it down. For a project
+that ships, a good default is release-please: it opens release pull requests from the Conventional
+Commits history (set `commits.conventional`), keeps the changelog and tags versions, and the project's
+own workflows build and publish.
+
+- Run it with a GitHub App's token, not the agents' or the owner's
+  ([pull-requests.md](pull-requests.md#pull-requests-from-a-github-app)).
+- Secrets that publish or deploy, and so the job that publishes, are kept as
+  [setup.md](setup.md) step 8 says.
 
 ## checks
 
 Commands `tools/process/check.py` runs after the process checks, from the repository root: the
-project's own tests and linters, so an agent runs one command before pushing. CI runs them in the
-project's own workflows (`.github/workflows/project-*.yml`), not in the process workflow, because they
-need the project's toolchain.
+project's own tests and linters. CI runs them in the project's own workflows
+(`.github/workflows/project-*.yml`), not in the process workflow.
+
+## kept
+
+File patterns (`fnmatch`, from the repository root, where `*` also crosses folders) the owner keeps for
+themself on top of what the process names ([workflow.md](workflow.md#the-owners-ok-and-the-merge)):
+
+- the configuration of the project's checks (the linter's, the test runner's, coverage thresholds, the
+  scripts that run them);
+- anything else the owner names;
+- the files that the rules Claude Code loads by itself import, in turn too, which `process-owner` asks
+  for.
+
+`process-owner` reads the patterns from the base branch, and a pull request that changes a match needs
+the owner's OK. Optional, and left out or empty until the project has such files: the pull request that
+adds the first check adds its patterns.
 
 ## ids_ignore
 
