@@ -86,8 +86,11 @@ item of "Needed from you". The item says what it does, which reviews and checks 
 worth a look (files or sections) and that the look may be skipped, and asks one question: keep offering
 this kind of pull request, or stop asking until the end of the milestone.
 
+- A kind is what the owner names when stopping; by default risky code is one kind, and each kind of
+  decision in 2 is one.
 - After a stop, the coordinator merges that kind itself after its reviews, labelled
-  `ok-without-reading`, and lists each among the pull requests merged without the owner.
+  `ok-without-reading`, and lists each among the pull requests merged without the owner, unless the
+  pull request also changes what the owner keeps: then it still needs the owner's OK.
 - A stop holds for that kind until the end of the current milestone. The coordinator records it as one
   line in `docs/now.md`, in a coordinator record ("Until the end of milestone N: architecture pull
   requests merge after their reviews without asking"), and removes it when the milestone ends.

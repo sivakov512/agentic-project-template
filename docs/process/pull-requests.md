@@ -11,7 +11,7 @@
 
   | Kind | Title starts with | With Conventional Commits | For |
   |---|---|---|---|
-  | `plan` | `Plan:` | `docs(plan):` | the plan, rules for agents, the process, the commands of the checks, and CI |
+  | `plan` | `Plan:` | `docs(plan):`, or `ci:` and `build:` for CI and the checks | the plan, rules for agents, the process, the commands of the checks, and CI |
   | `spec` | `Spec:` | `docs(spec):` | what the product must do and how it looks: the documents of the chain above the code |
   | `research` | `Research:` | `docs(research):` | studies, facts found by experiment |
   | `code` | `Code:` | `feat:`, `fix:`, `refactor:` and the like | the code of the tools (the code the checks run among it) and of the product |

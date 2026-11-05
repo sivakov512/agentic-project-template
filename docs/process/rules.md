@@ -179,11 +179,12 @@ names, written before the first UI work; a UI pull request without one is a "fix
 The pull request gives you:
 
 - images rendered by a command it names (in CI or headless, never by starting an app on the owner's
-  machine without the owner's consent), at 2x, in every theme the project uses, desktop and phone where
-  both apply, before and after for a change;
+  machine without the owner's consent), at 2x, in the themes and screen sizes the design-system
+  document names, before and after for a change;
 - fixture data with the worst cases (empty, long text, extreme values, late, paused, a heavy day with
   many items);
-- a table from each screen to the requirement and scenario step it serves.
+- when it adds a screen or changes what a screen is for, a table from each such screen to the
+  requirement and scenario step it serves.
 
 Check these; each one that fails is a "fix" finding that names it:
 

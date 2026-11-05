@@ -164,8 +164,8 @@ Projects: in this order.
 8. Where the project asks for Conventional Commits, each open pull request is retitled as a
    Conventional Commits subject, or its `process-commits` turns red on its next event. Their kind
    labels do no harm; the owner may delete `plan`, `spec`, `research` and `code` (Issues > Labels).
-9. `kept` is optional: when the project has check configuration, the coordinator proposes its patterns
-   to the owner in the pull request that adds the first of it.
+9. `kept` is optional: a project that already has check configuration proposes its patterns to the
+   owner in the update's pull request; otherwise in the pull request that adds the first of it.
 ## 0.6.0 — 2026-11-05
 
 - A report to the owner fits on a phone's screen, about twelve lines, detail left in the pull requests.
