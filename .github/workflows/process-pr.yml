@@ -30,6 +30,10 @@ jobs:
   # The title becomes the subject of main's squash commit, so it is checked against the commit rules.
   process-commits:
     runs-on: ${{ vars.CI_RUNNER || 'ubuntu-latest' }}
+    # It only reads the pull request; running other runs again is process-pr's.
+    permissions:
+      contents: read
+      pull-requests: read
     steps:
       - uses: actions/checkout@v4
       - run: python3 tools/process/check_commits.py "$GITHUB_EVENT_PATH"

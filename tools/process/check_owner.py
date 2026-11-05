@@ -282,8 +282,10 @@ def api(path, method="GET"):
 def rerun_red(repo, head, this_run, workflow="process-owner.yml"):
     """Runs again the failed runs of a check (its workflow file) on the same commit. Each event (a push, a label, a review)
     starts a run of its own, and a run an earlier event left red keeps blocking the merge after a later
-    one passes; run again, it reads the labels and reviews as they are now. Failures here are ignored:
-    the red run can still be run again by hand (docs/process/pull-requests.md)."""
+    one passes; run again, it reads the labels and reviews as they are now. Only a run's failed jobs run
+    again: in process-pr.yml a red run may hold a green process-pr next to a red process-commits, and
+    running that process-pr again would run the other red runs again, and they this one, in a loop.
+    Failures here are ignored: the red run can still be run again by hand (docs/process/pull-requests.md)."""
     try:
         runs = api(f"repos/{repo}/actions/workflows/{workflow}/runs?head_sha={head}&status=failure&per_page=100")
         red = [run["id"] for run in runs.get("workflow_runs", []) if str(run["id"]) != this_run]
@@ -291,7 +293,7 @@ def rerun_red(repo, head, this_run, workflow="process-owner.yml"):
         return
     for run_id in red:
         try:  # one already running again, or too old, doesn't stop the others
-            api(f"repos/{repo}/actions/runs/{run_id}/rerun", method="POST")
+            api(f"repos/{repo}/actions/runs/{run_id}/rerun-failed-jobs", method="POST")
         except (OSError, ValueError):
             pass
 

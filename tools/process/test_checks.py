@@ -786,7 +786,7 @@ class OwnerCheck(unittest.TestCase):
             calls.append((method, path))
             if method == "GET":
                 return {"workflow_runs": [{"id": 1}, {"id": 2}, {"id": 3}]}
-            if path.endswith("/1/rerun"):
+            if path.endswith("/1/rerun-failed-jobs"):
                 raise OSError("already running")
             return None
         saved, check_owner.api = check_owner.api, api
@@ -795,8 +795,11 @@ class OwnerCheck(unittest.TestCase):
             check_owner.rerun_red("someone/project", self.HEAD, "2", "process-pr.yml")
         finally:
             check_owner.api = saved
+        # Only the failed jobs: a green process-pr beside a red process-commits doesn't run again, so it
+        # can't run the other red runs again in a loop.
         self.assertEqual([path for method, path in calls if method == "POST"][:2],
-                         ["repos/someone/project/actions/runs/1/rerun", "repos/someone/project/actions/runs/3/rerun"])
+                         ["repos/someone/project/actions/runs/1/rerun-failed-jobs",
+                          "repos/someone/project/actions/runs/3/rerun-failed-jobs"])
         self.assertEqual([path.split("?")[0] for method, path in calls if method == "GET"],
                          ["repos/someone/project/actions/workflows/process-owner.yml/runs",
                           "repos/someone/project/actions/workflows/process-pr.yml/runs"])
