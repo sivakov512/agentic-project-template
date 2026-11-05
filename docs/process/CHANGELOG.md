@@ -128,6 +128,7 @@ The coordinator, the plan and setup:
   check it. `--fix-labels` creates only the review labels.
 - Backlog items stand under a heading per milestone. A work session reads its item and the documents it
   links, and looks further up the chain only for a question they leave.
+- The process documents say each rule once, in fewer words; what the rules mean doesn't change.
 
 Projects: in this order.
 

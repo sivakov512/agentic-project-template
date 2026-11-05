@@ -2,9 +2,9 @@
 
 ## Changes
 
-- The coordinator records the owner's requests and decisions in a pull request marked "Coordinator
-  record", as [workflow.md](workflow.md#how-the-repository-works) says. Nobody acts on a requirement
-  that exists only in a chat.
+- The coordinator records the owner's requests and decisions in a "Coordinator record" pull request
+  ([workflow.md](workflow.md#how-the-repository-works)). Nobody acts on a requirement that exists only
+  in a chat.
 - A change is made in the highest document of the chain it touches first, then carried down to the
   backlog. A new need starts where it comes from in the chain.
 - Backlog items a change affects are updated, or closed as superseded with a pointer to the new item.
@@ -25,26 +25,24 @@
   item belongs to the milestone it stands under;
 - items are never deleted: an item that is no longer needed is ticked and marked "Superseded by B-###"
   or "Dropped", with the reason;
-- the section "Later" at the end holds what is left out of the milestones so far, a plain line each
-  ([workflow.md](workflow.md#milestones-and-gates)).
+- the section "Later" at the end holds what is left out of the milestones so far
+  ([workflow.md](workflow.md#the-list-for-later)).
 
 ## Decision records
 
 A decision that is hard to reverse gets a record: one per file in `docs/decisions/`,
 `NNNN-kebab-case.md`, with its status and date, then Context, Decision, Consequences, and a line in
-`docs/decisions/README.md`. Records are never rewritten: if we change our mind, a new record supersedes
-the old one and the old one's status becomes "superseded by NNNN".
+`docs/decisions/README.md`. Records are never rewritten: a new record supersedes the old one, whose
+status becomes "superseded by NNNN".
 
 ## Traceability
 
-Every ID is defined in exactly one place, and every reference must lead to a definition. CI checks both,
-and rejects IDs in the wrong form.
+Every ID is defined in exactly one place, and every reference leads to a definition; CI checks both,
+and the form of each ID.
 
 - **Built in:** backlog items `B-###`, defined by a line in `docs/backlog.md`. Decision records are
   checked by their files: the name `NNNN-kebab-case.md`, a number used once, a line in
   `docs/decisions/README.md`; references to them are links, which the link check covers.
-- **The project's own kinds** (requirements, scenarios, cases…) and where each is defined are in
-  `docs/process.json`, with the coverage rules between them: for example, every requirement names its
-  source, every scenario has steps. [config.md](config.md) says how to write them; `docs/plan.md` says
-  in words what they mean.
-- Text that looks like an ID but isn't one is written as code (`` `S3` ``), which the check skips.
+- **The project's own kinds** (requirements, scenarios, cases…), where each is defined and the coverage
+  rules between them are in `docs/process.json` ([config.md](config.md)); `docs/plan.md` says in words
+  what they mean.

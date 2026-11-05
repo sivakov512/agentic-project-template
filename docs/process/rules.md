@@ -1,8 +1,8 @@
 # Rules for agents
 
 These rules come from the template and hold in every project made from it. The project's own rules are
-in `CLAUDE.md` around the line that imports this file; they may add to these rules and make them
-stricter, never looser. How the whole process works: [README.md](README.md).
+in `CLAUDE.md` around the line that imports this file; they may make these stricter, never looser. How
+the whole process works: [README.md](README.md).
 
 ## Which role you are
 
@@ -17,8 +17,7 @@ The first of these that fits is your role:
    `.process-lock.json`): you are the template's coordinator. Run `doctor.py` at the start of a
    session. Changes to the process go as [updates.md](updates.md#changing-the-process) says, reviewed
    and merged as in [workflow.md](workflow.md#how-a-piece-of-work-goes), steps 5 to 7. The template has
-   no milestones, backlog, `docs/now.md` or tracker of its own, so what those steps say of them doesn't
-   apply.
+   no milestones, backlog, `docs/now.md` or tracker, so what those steps say of them doesn't apply.
 5. **The project is not set up yet** (`docs/process.json` on `main` says `"set_up": false`): you are
    setting it up. Follow [setup.md](setup.md).
 6. **Anything else, from the owner:** you are the coordinator. Follow [coordinator.md](coordinator.md),
@@ -37,22 +36,21 @@ Whatever your role: a question from the owner is a question. Answer it and propo
     to do.
 - If something you need is not here, stop and say so in your report; don't fill the gap from memory or
   guesswork.
-- The spec is the document chain in `docs/plan.md`. Where your item and the documents it links leave a
-  question, look it up from the top of the chain down. A change starts in the highest document it
-  touches ([changes.md](changes.md)).
+- The spec is the document chain in `docs/plan.md`. Where your item and its documents leave a question,
+  look it up from the top of the chain down. A change starts in the highest document it touches
+  ([changes.md](changes.md)).
 
 ## Your work
 
 - You are given one backlog item from `docs/backlog.md` as "Do B-###". Read the item and every document
-  it links before you start. If you continue an interrupted item, find its branch and open pull request
-  and continue there.
+  it links before you start. If you continue an interrupted item, continue on its branch and open pull
+  request.
 - Work on your own branch, named `b-###-short-name`. Never commit to `main`.
 - **Questions first.** Before any work, open a draft pull request with a short plan (what you will
-  change and how you will check it) and your questions about the item, or "no questions". GitHub needs a
-  commit to open one: start the branch with `git commit --allow-empty -m "chore: start B-###"`, which the
-  squash merge leaves out of `main`. With questions, end your turn and say in your last message that you
-  wait for answers in the pull request; the coordinator answers there and tells you to go on (a message
-  to your session). With no questions, go on at once.
+  change and how you will check it) and your questions about the item, or "no questions". Start the
+  branch with `git commit --allow-empty -m "chore: start B-###"`, since GitHub needs a commit to open
+  one. With questions, end your turn and say in your last message that you wait for answers in the pull
+  request; the coordinator answers there and tells you to go on. With no questions, go on at once.
 - **Do only that item, and no more than it needs.** Its "Done when" is the bar. Tools for our own use get
   no options, modes or cases nobody needs yet.
 - If the item is unclear, wrong, or conflicts with a document above it, stop and report; don't widen or
@@ -60,13 +58,13 @@ Whatever your role: a question from the owner is a question. Answer it and propo
 - If your work shows that a document above your item is wrong, report it rather than change it, unless
   your item says so. Facts you find by experiment are the exception: record them where `docs/plan.md`
   says facts go, with the date and how you found them, and report them too if they contradict your item.
-- A bug or gap you find that your item doesn't cover is reported in your pull request's "Not done and
-  open questions", not fixed in it: the coordinator makes it an item of its own.
+- A bug or gap your item doesn't cover goes in your pull request's "Not done and open questions", not
+  into the fix: the coordinator makes it an item of its own.
 - A pull request stays reviewable: about 800 changed lines at most, generated files, data and removed
   files aside. If the item needs more, stop and report; the coordinator splits it.
 - **To stop and report:** push what you have, keep the pull request in draft (its checks may fail then),
-  say what is left and why in its "Not done and open questions", and say the same in your last message.
-  The coordinator decides whether the pull request goes on, split or not, or is closed.
+  and say what is left and why in its "Not done and open questions" and in your last message. The
+  coordinator decides what happens to the pull request.
 - Before you push, run these, and finish only with every one passing:
   - `python3 tools/process/check.py` (the process checks and the project's own);
   - `python3 tools/process/check_pr.py --body <description file> --title "<title>" --labels <review
@@ -75,14 +73,13 @@ Whatever your role: a question from the owner is a question. Answer it and propo
 - Tick your item in the backlog (`- [x]`) in the same pull request. Don't edit `docs/now.md`: the
   coordinator does.
 - Don't edit the template's files ([README.md](README.md#what-lives-where)). If the process is wrong,
-  report it; the coordinator proposes a change to the template.
+  report it.
 
 ## Your pull request is your report
 
 - Fill in every section of `.github/pull_request_template.md`, and name and label it as
-  [pull-requests.md](pull-requests.md) says. CI rejects a pull request that doesn't.
-- "How it was checked" gives commands, output or screenshots someone else can repeat. "It works" is not
-  evidence. A pull request that changes what a person sees gives there what the UI review needs
+  [pull-requests.md](pull-requests.md) says.
+- A pull request that changes what a person sees gives in "How it was checked" what the UI review needs
   ("The UI review" below).
 
 ## If you fix a pull request
@@ -97,12 +94,12 @@ Whatever your role: a question from the owner is a question. Answer it and propo
 - Commit the fixes on top of the branch ("Git and GitHub" below), run the checks as in "Your work", and
   push.
 - Answer with one comment: the new head commit, and for each "fix" finding what you changed and where,
-  or why you couldn't. The coordinator then runs the second rounds on that new head.
+  or why you couldn't.
 
 ## If you are the reviewer
 
 Your brief names one of four reviews. The coordinator gives each pull request the ones it is for
-([workflow.md](workflow.md#how-a-piece-of-work-goes), step 5), each by another reviewer:
+([workflow.md](workflow.md#how-a-piece-of-work-goes), step 5):
 
 | Brief | Review | For |
 |---|---|---|
@@ -120,7 +117,7 @@ Your brief names one of four reviews. The coordinator gives each pull request th
   [updates.md](updates.md#changing-the-process); for a "Coordinator record", the owner's words it quotes
   and the documents above the ones it changes.
 - Check that the evidence in the pull request is real: repeat it where you can.
-- Post one comment on the pull request, the same shape for every review:
+- Post one comment on the pull request:
   1. A first line with the review's name and the head commit you reviewed.
   2. The sections your review asks for below, if any.
   3. The findings, each with the file and line, what is wrong and why it matters, and a mark with a
@@ -132,16 +129,14 @@ Your brief names one of four reviews. The coordinator gives each pull request th
      - **drop:** wording, taste, layout, or no effect on the result or the next steps.
 
      Nothing is put off for later. A problem the pull request didn't cause and its item doesn't cover is
-     marked **fix** and "outside the item": it isn't fixed in this pull request; the fixing session
-     lists it under "Not done and open questions", which settles it, and the coordinator makes it an
-     item.
+     marked **fix** and "outside the item"; the fixing session lists it under "Not done and open
+     questions", which settles it here.
   4. A last line: "Ready to merge as is: yes" when no "fix" finding is left, otherwise "no".
 - A second round comes only if the first had "fix" findings, or, for a review for harm, if a fix changed
-  the code `docs/plan.md` names as risky. Review only the fix, the change from the head you reviewed to
-  the new head the fix comment names: `git diff <reviewed> <new>`, or, where a merge of `main` came in
-  between, `git log -p --first-parent --remerge-diff <reviewed>..<new>`, which shows the fix's commits
-  and, for the merge, only how it resolved conflicts. Check whether each finding the coordinator didn't
-  close is fixed, and whether the fix broke anything nearby. The comment has the same shape.
+  the code `docs/plan.md` names as risky. Review only the change from the head you reviewed to the new
+  head the fix comment names: `git diff <reviewed> <new>`, or, where a merge of `main` came in between,
+  `git log -p --first-parent --remerge-diff <reviewed>..<new>`. Check whether each finding the
+  coordinator didn't close is fixed, and whether the fix broke anything nearby.
 
 ### The review
 
@@ -158,9 +153,8 @@ a section with a verdict on three points, each with what you judged it on; falli
 
 ### The review for harm
 
-A second, independent review of the risky code. Until your findings are posted, read the pull request's
-description, diff and commits, not its comments; in the second round, only your own earlier comment and
-the fix reply besides.
+Until your findings are posted, read the pull request's description, diff and commits, not its
+comments; in the second round, only your own earlier comment and the fix reply besides.
 
 Hunt for concrete ways the change does harm: a secret that leaks or reaches the wrong place, damage to
 the owner's machine, to infrastructure or to data, a state nothing can recover from, a race or an
@@ -203,7 +197,7 @@ Check these; each one that fails is a "fix" finding that names it:
 7. The owner's remarks on looks are solved as design problems, not literally, with nothing nearby worse.
 
 A fix that changes a shared token or component renders every screen again for the second round. The
-owner is shown 6 to 10 chosen images; the final judgement is the owner's use at the end of the milestone.
+owner is shown 6 to 10 chosen images.
 
 ## Writing
 
@@ -213,13 +207,10 @@ owner is shown 6 to 10 chosen images; the final judgement is the owner's use at 
   descriptions. Docs in plain words.
 - Talk is in the owner's language (`owner_language` in `docs/process.json`; before it is set, the
   language the owner writes in): the chat, and every comment and review on pull requests, agents' to
-  each other included, since the owner reads them. Text proposed for the repository is quoted in
-  English.
+  each other included. Text proposed for the repository is quoted in English.
 - To the owner, anything named by an ID (a backlog item, a requirement, a test, a milestone) is said in
   plain words first, the ID after it in brackets: "the test of the cable length with you, about 20
   minutes (T-013)", not "the T-013 test".
-- A pull request's title becomes the subject of its commit on `main` and follows the commit rules
-  ([config.md](config.md#commits)).
 
 ## Code
 
@@ -236,27 +227,27 @@ it without working through the rest.
 - Behaviour the code adds or changes is covered by automated tests where the project has a way to run
   them; a change without them is a "fix" finding.
 - Where the language has a linter for such comments, the project's checks run it
-  ([config.md](config.md#checks)); whether the comments are clear and true is the reviewer's to judge.
+  ([config.md](config.md#checks)).
 - The document the document chain names for the code's design lists its folders: those at the top of
   the repository and those of each part of the code, as deep as the design describes the parts. One
   line each: what it holds and, for a name that isn't plain, where the name comes from.
-- A new folder is a change to the design, so it goes into the list in the same pull request as the work
-  that makes it, or an earlier one. The project's checks include one that fails on a folder missing from
-  the list; the item that adds the first code adds it.
+- A new folder goes into the list in the same pull request as the work that makes it, or an earlier one.
+  The project's checks include one that fails on a folder missing from the list; the item that adds the
+  first code adds it.
 
 ## Git and GitHub
 
 - Commits, pushes and pull requests go out under the account the project chose for agents
   ([workflow.md](workflow.md#the-owners-ok-and-the-merge)). Call `git` and `gh` by name. Agents never
   approve a pull request: an approval is the owner's OK.
-- **A pull request lands on `main` as one commit:** a squash merge, its subject the pull request's
-  title, its body empty ([workflow.md](workflow.md#how-a-piece-of-work-goes), step 7). So the title says
-  what the change is, and the commits on the branch are only its working history.
+- **A pull request lands on `main` as one squash commit,** its subject the pull request's title, which
+  follows the commit rules ([config.md](config.md#commits)). So the title says what the change is, and
+  the commits on the branch are only its working history.
 - A fix from a review or a check is a new commit on top. Take in what others pushed to the branch first
   (`git pull --no-rebase origin <branch>`). Never rewrite what is pushed (no rebase, no force push), so
   the head a reviewer reviewed stays readable. A conflict with `main` is resolved by merging
   `origin/main` into the branch.
 - Open pull requests through the REST API (`gh api repos/{owner}/{repo}/pulls`), so nothing adds text
   to the description you wrote.
-- Nobody but the coordinator merges, and a pull request that needs the owner's OK only after it; or the
-  owner merges those, as the project chose ([workflow.md](workflow.md#the-owners-ok-and-the-merge)).
+- Only the coordinator or the owner merges, as [workflow.md](workflow.md#the-owners-ok-and-the-merge)
+  says.

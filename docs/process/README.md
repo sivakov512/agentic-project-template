@@ -1,8 +1,8 @@
 # The process
 
 How work goes in a repository where agents do the work and the owner decides. This folder comes from
-the template and is the same in every project made from it. A change to the process goes to the
-template ([updates.md](updates.md)); in a project, these files are locked.
+the template and is the same in every project made from it; in a project, these files are locked
+([updates.md](updates.md)).
 
 The process files (this folder, `tools/process/`, `.github/pull_request_template.md` and
 `.github/workflows/process-*.yml`) are from
@@ -33,19 +33,9 @@ branch to be `main`.
 
 ## Who reads what
 
-Every session has [rules.md](rules.md): `CLAUDE.md` imports it, and it tells a session its role.
-
-| Role | Reads |
-|---|---|
-| Work session | its backlog item and every document it links; [pull-requests.md](pull-requests.md) |
-| Reviewer | the pull request's item and the documents it links |
-| Coordinator | [coordinator.md](coordinator.md), which names the rest |
-| Setting up a project | [setup.md](setup.md) |
-| The template's coordinator | [updates.md](updates.md#changing-the-process), [workflow.md](workflow.md#how-a-piece-of-work-goes) steps 5 to 7 |
-
-The rest, for reference: [roles.md](roles.md) (who does what), [workflow.md](workflow.md) (milestones,
-gates, how a piece of work goes, the merge), [pull-requests.md](pull-requests.md),
-[reports.md](reports.md), [changes.md](changes.md) (requests, decisions, the backlog, IDs),
-[defences.md](defences.md) (what could go wrong and what stops it), [config.md](config.md)
-(`docs/process.json`), [updates.md](updates.md) (getting a newer process),
-[CHANGELOG.md](CHANGELOG.md) (what changed between versions).
+Every session has [rules.md](rules.md), which `CLAUDE.md` imports and which tells it its role and what
+to read for it. The rest: [coordinator.md](coordinator.md), [setup.md](setup.md), [roles.md](roles.md),
+[workflow.md](workflow.md) (milestones, gates, how a piece of work goes, the merge),
+[pull-requests.md](pull-requests.md), [reports.md](reports.md), [changes.md](changes.md) (requests,
+decisions, the backlog, IDs), [defences.md](defences.md) (what could go wrong and what stops it),
+[config.md](config.md) (`docs/process.json`), [updates.md](updates.md), [CHANGELOG.md](CHANGELOG.md).
