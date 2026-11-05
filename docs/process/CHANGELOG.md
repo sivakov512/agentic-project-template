@@ -38,8 +38,8 @@ Reviews:
   (`rules.md`, "If you are the reviewer"). A project with a user interface keeps a design-system
   document in its chain. `workflow.md` step 5 says which pull requests get which reviews; the
   coordinator decides, and the plan may name more.
-- Risky code, architecture and contract changes, UI changes, and decisions of the owner's kinds the plan
-  didn't name are offered to the owner once their reviews have no "fix" finding left: one item of
+- Risky code and decisions of the owner's kinds the plan didn't name (an interface a person uses or
+  others program against, the architecture, the stack, the data model) are offered to the owner once their reviews have no "fix" finding left: one item of
   "Needed from you" with what it does, the reviews and checks passed, what is worth a look and that it
   may be skipped, and the question whether to stop such offers until the milestone's end; after a stop
   the coordinator merges that kind and lists it. A stop is a line in `docs/now.md` until the milestone

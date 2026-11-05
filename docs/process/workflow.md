@@ -137,8 +137,8 @@ work back from there as new items.
      itself. Where reviews ask for opposite things, the review for harm wins.
    - **The coordinator's own check:** the diff against "Done when", the running result, and that the
      review label follows [reports.md](reports.md#when-the-owner-looks) and the decisions the
-     milestone's plan gave the owner; it corrects the label if not. Risky code, architecture and UI
-     work is then offered to the owner
+     milestone's plan gave the owner; it corrects the label if not. Risky code and decisions of the
+     owner's kinds are then offered to the owner
      ([reports.md](reports.md#reviewed-work-offered-to-the-owner)).
 6. **The report to the owner** ([reports.md](reports.md)). The owner reviews and discusses the pull
    request in its comments on GitHub, or in the chat when agents work under the owner's account; the

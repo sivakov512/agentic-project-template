@@ -85,9 +85,9 @@ looks at:
 
 ### Reviewed work offered to the owner
 
-Risky code (as `docs/plan.md` names it), a change to the architecture or a contract between parts, a
-change to what a person sees and uses, and a decision of the kinds in 2 that the plan didn't name: once
-such a pull request's reviews have no "fix" finding left
+Risky code (as `docs/plan.md` names it) and a decision of the kinds in 2 that the plan didn't name (an
+interface a person uses or others program against, the architecture, the stack, the model of the data):
+once such a pull request's reviews have no "fix" finding left
 ([workflow.md](workflow.md#how-a-piece-of-work-goes)), the coordinator offers it to the owner as one
 item of "Needed from you". The item says what it does, which reviews and checks passed, what exactly is
 worth a look (files or sections) and that the look may be skipped, and asks one question: keep offering
@@ -100,7 +100,9 @@ this kind of pull request, or stop asking until the end of the milestone.
   requests merge after their reviews without asking"), which every coordinator session follows, and
   removes it when the milestone ends.
 - What the milestone's plan names as the owner's is offered without the stop option. Risky code the plan
-  says goes `ok-without-reading` isn't offered.
+  says goes `ok-without-reading` isn't offered. Interfaces between parts that only the agents build, and
+  code that builds a user interface the owner already agreed, are not offered: they merge after their
+  reviews like any other `ok-without-reading` work.
 
 ### When the coordinator isn't sure
 

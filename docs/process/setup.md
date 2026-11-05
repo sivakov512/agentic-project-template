@@ -41,8 +41,8 @@ Always ask, whatever the brief says:
 ## Steps
 
 1. **Branch** `setup` from `main`, start it with `git commit --allow-empty -m "chore: start the
-   setup"`, and open a draft pull request titled `Plan: set up the project` (`chore: set up the
-   project` once step 4 asks for Conventional Commits), "Backlog item: Setup", with the steps below as
+   setup"`, and open a draft pull request titled `Plan: set up the project` (`docs(plan): set up
+   the project` once step 4 asks for Conventional Commits), "Backlog item: Setup", with the steps below as
    a checklist in its description. Tick each step there when it is done.
 2. **`CLAUDE.md`:** replace the placeholder text with what the project is, in two or three lines, and
    the project's own rules for agents (dangerous operations, hardware, accounts, secrets, house style,
