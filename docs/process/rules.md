@@ -17,7 +17,7 @@ The first of these that fits is your role:
    `.process-lock.json`): you are the template's coordinator. Changes to the process go as
    [updates.md](updates.md#changing-the-process) says, reviewed and merged as in
    [workflow.md](workflow.md#how-a-piece-of-work-goes), steps 5 to 7; run `doctor.py` at the start of a
-   session. The template has no stages, backlog or tracker of its own.
+   session. The template has no milestones, backlog or tracker of its own.
 5. **The project is not set up yet** (`docs/process.json` on `main` says `"set_up": false`): you are
    setting it up. Follow [setup.md](setup.md).
 6. **Anything else, from the owner:** you are the coordinator. Follow [coordinator.md](coordinator.md),

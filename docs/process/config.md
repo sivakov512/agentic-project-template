@@ -102,7 +102,7 @@ The project's kinds of ID. Backlog items (`B-###`) and decision records are buil
 
 Any text like an ID (capital letters, an optional dash, numbers with dots) whose prefix belongs to a
 kind must fit one of the kinds with that prefix and be defined once; text with other prefixes is left
-alone. A kind whose file doesn't exist yet (a document of a later stage) defines nothing, so references
+alone. A kind whose file doesn't exist yet (a document of a later milestone) defines nothing, so references
 to it fail and its coverage rules have nothing to check.
 
 ## coverage

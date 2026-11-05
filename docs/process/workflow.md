@@ -19,62 +19,64 @@
 - **The owner's words become records the same day:** a rule in the plan, a decision record, a change to
   a document, or a backlog item, in a pull request. Until it is merged, the pull request is the record.
 
-## Stages and gates
+## Milestones and gates
 
-The work goes in increments, each ending with something the owner uses: a build, a document, a board,
-whatever the project makes. `docs/plan.md` lists the project's stages, each written out as the rules
-below say:
+The work goes in milestones. `docs/plan.md` lists the project's milestones, each written out as the
+rules below say:
 
-- **The foundation,** the first stage, once and short: what the product is for and for whom, the
+- **The foundation,** the first milestone, once and short: what the product is for and for whom, the
   owner's main scenarios, the limits; research only where a decision can't be made without it; the
-  technologies and the frame of the design only as far as the first increment needs. For a product that
+  technologies and the frame of the design only as far as the next milestone needs. For a product that
   exists already, it also holds an inventory of what the product does and checks that it still does it
-  (tests, for code), for the parts the first increments touch and where these don't exist yet; each
-  later increment adds them for the parts it touches.
-- **Increments,** one stage each, one after another. An increment says what the owner gets from it in
-  their real work: something they can do that they couldn't, or, for a step of a rebuild, a part of the
-  product they use running on the rebuilt part, checked. Everything else goes to the list for later.
-  Inside it: the requirements and research for that scope only, the design and the interfaces for it,
-  and the items that build it. The first increment of a new product is its smallest version the owner
-  can use; for a product that exists, each increment changes the working product, and a rebuild goes as
-  a series of increments, each leaving it working.
+  (tests, for code), for the parts the next milestones touch and where these don't exist yet; each later
+  milestone adds them for the parts it touches.
+- **The milestones after it,** one after another, each ending with something the owner uses: a build, a
+  document, a board, whatever the project makes. Each says what the owner gets from it in their real
+  work: something they can do that they couldn't, or, for a step of a rebuild, a part of the product
+  they use running on the rebuilt part, checked. Everything else goes to the list for later. Inside it:
+  the requirements and research for that scope only, the design and the interfaces for it, and the items
+  that build it. The first milestone after the foundation of a new product is its smallest version the
+  owner can use; for a product that exists, each milestone changes the working product, and a rebuild
+  goes as a series of milestones, each leaving it working.
 
-The process holds the stages to these rules:
+The process holds the milestones to these rules:
 
-- A stage is finished only when every point of its exit list is true. Every exit list includes: every
-  backlog item of the stage is merged, or dropped with a reason. An increment's also includes: the
-  owner has used it in real work, and it is released as `docs/plan.md` says.
-- Each stage is written out at the end of the one before it, from what is known by then, in
-  `docs/plan.md` and concrete enough to write its items from: what it delivers (for an increment, what
-  the owner gets from it, and what is in and out), its big steps, the owner's part and the decisions it
-  will bring to the owner ([reports.md](reports.md#when-the-owner-looks)), its risks, and its exit list.
-  It names everything the stage builds on (documents, interfaces, the technologies it uses), each
-  either decided and written down already or settled at the stage's start, before the work that
-  depends on it. This change to the plan goes to the owner in the same report as the gate.
-- An item starts only when everything it depends on is merged and its stage has started. A stage starts
-  when the previous one is finished and its own written-out plan is merged. Items whose "Depends on"
-  says "any time" are the only exception.
-- An increment ends in this order: the coordinator runs the result end to end and gives it to the
-  owner ready to try, with the steps; the owner uses it in real work and says what came up; what must
-  be fixed for it to do its job is fixed in this increment, the rest goes to the next one or the list
-  for later. While the owner tries it, the coordinator writes out the next increment and adds what
-  comes up.
-- A gate is a stage's end, and every stage ends with one: the owner accepts what the stage delivered
-  and agrees the next increment. Agreeing it lets the coordinator start the work sessions and reviewers
-  for its items on its own, without asking again; where its tool starts a session on its own only on
-  the owner's word, the coordinator asks for that word together with the plan. The coordinator does
-  not bring a gate to the owner while any point is open or unchecked, and prepares it as [coordinator.md](coordinator.md#before-a-gate) says.
+- A milestone is finished only when every point of its exit list is true. Every exit list includes:
+  every backlog item of the milestone is merged, or dropped with a reason. After the foundation, an exit
+  list also includes: the owner has used the milestone in real work, and it is released as
+  `docs/plan.md` says.
+- Each milestone is written out at the end of the one before it, from what is known by then, in
+  `docs/plan.md` and concrete enough to write its items from: what it delivers (after the foundation,
+  what the owner gets from it, and what is in and out), its big steps, the owner's part and the
+  decisions it will bring to the owner ([reports.md](reports.md#when-the-owner-looks)), its risks, and
+  its exit list. It names everything the milestone builds on (documents, interfaces, the technologies it
+  uses), each either decided and written down already or settled at the milestone's start, before the
+  work that depends on it. This change to the plan goes to the owner in the same report as the gate.
+- An item starts only when everything it depends on is merged and its milestone has started. A milestone
+  starts when the previous one is finished and its own written-out plan is merged. Items whose "Depends
+  on" says "any time" are the only exception.
+- A milestone after the foundation ends in this order: the coordinator runs the result end to end and
+  gives it to the owner ready to try, with the steps; the owner uses it in real work and says what came
+  up; what must be fixed for it to do its job is fixed in this milestone, the rest goes to the next one
+  or the list for later. While the owner tries it, the coordinator writes out the next milestone and
+  adds what comes up.
+- A gate is a milestone's end, and every milestone ends with one: the owner accepts what the milestone
+  delivered and agrees the next one. Agreeing it lets the coordinator start the work sessions and
+  reviewers for its items on its own, without asking again; where its tool starts a session on its own
+  only on the owner's word, the coordinator asks for that word together with the plan. The coordinator
+  does not bring a gate to the owner while any point is open or unchecked, and prepares it as
+  [coordinator.md](coordinator.md#before-a-gate) says.
 - A project already under way (adopting the process, or taking this shape in an update) brings its plan
-  into it: stages done stay as they are; a current stage that already ends with something the owner
-  uses is an increment and stays; one that doesn't is cut to what the first increment needs and closes
-  the foundation; the stages after it become increments, a line each, with the rest in the list for
-  later. Backlog items left outside go to the list for later (below); an open pull request left outside
-  is the owner's to keep or close.
-- The list for later, the section "Later" at the end of `docs/backlog.md`, holds what is left out of
-  the increments so far, a line each, so nothing is lost; the coordinator adds to it as a record of its
-  own. Moving work of the agreed increment there is a change of scope
-  ([reports.md](reports.md#when-the-owner-looks), 4). A backlog item moved there is dropped with the reason "moved to the list for later"; an
-  increment takes its work back from there as new items.
+  into it: what of the old plan is done stays as it is; a current part that already ends with something
+  the owner uses becomes a milestone and stays; one that doesn't is cut to what the next milestone needs
+  and closes the foundation; the parts after it become milestones, a line each, with the rest in the
+  list for later. Backlog items left outside go to the list for later (below); an open pull request left
+  outside is the owner's to keep or close.
+- The list for later, the section "Later" at the end of `docs/backlog.md`, holds what is left out of the
+  milestones so far, a line each, so nothing is lost; the coordinator adds to it as a record of its own.
+  Moving work of the agreed milestone there is a change of scope
+  ([reports.md](reports.md#when-the-owner-looks), 4). A backlog item moved there is dropped with the
+  reason "moved to the list for later"; a milestone takes its work back from there as new items.
 
 ## How a piece of work goes
 
@@ -109,7 +111,7 @@ The process holds the stages to these rules:
    a third round. The pull request merges only when neither review has a "fix" finding left.
    The coordinator then checks the result personally: the diff against "Done when", the running result,
    that the commits read as the steps they are ([rules.md](rules.md#git-and-github)), and that the
-   review label follows [reports.md](reports.md#when-the-owner-looks) and the decisions the increment's
+   review label follows [reports.md](reports.md#when-the-owner-looks) and the decisions the milestone's
    plan gave the owner; it corrects the label if not. A reviewer is needed for every pull request but a
    coordinator record of `docs/now.md` or the backlog (its section "Later" included) and a process
    update that only brings the template's release; a record that changes a document of the chain or

@@ -17,12 +17,12 @@ The project's documents from the top down to the backlog and the code, each with
 IDs it defines (they are also in `docs/process.json`), where the interfaces between parts are
 written, and, with code, which document describes the code's design and lists its folders. A change starts in the highest one it touches.
 
-## Stages
+## Milestones
 
-The foundation, then increments, each stage written out as [the process's rules for
-stages](process/workflow.md#stages-and-gates) say. The increments not started yet are a line each until
-they are written out. What is left out of the increments waits in the list for later at the end of the
-backlog.
+The foundation, then the milestones that each end with something the owner uses, all written out as
+[the process's rules for milestones](process/workflow.md#milestones-and-gates) say. The milestones not
+started yet are a line each until they are written out. What is left out of them waits in the list for
+later at the end of the backlog.
 
 ## Facts
 
