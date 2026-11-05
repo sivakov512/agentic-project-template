@@ -38,7 +38,8 @@ Always ask, whatever the brief says:
 ## Steps
 
 1. **Branch** `setup` from `main`, start it with `git commit --allow-empty -m "chore: start the setup"`, and
-   open a draft pull request titled `Plan: set up the project`, "Backlog item: Setup", with the steps
+   open a draft pull request titled `Plan: set up the project` (`chore: set up the project` once step 4
+   asks for Conventional Commits), "Backlog item: Setup", with the steps
    below as a checklist in its description. Tick each step there when it is done.
 2. **`CLAUDE.md`:** replace the placeholder text with what the project is, in two or three lines, and
    the project's own rules for agents (dangerous operations, hardware, accounts, secrets, house style,
@@ -63,9 +64,11 @@ Always ask, whatever the brief says:
 7. **`README.md`:** what the project is, for a visitor; one paragraph is enough. **`LICENSE`** is the
    template's: replace it with the project's license, or remove it if the owner wants none. The
    process files keep their own notice in `docs/process/README.md`.
-8. **GitHub:** `python3 tools/process/doctor.py --fix-labels` creates the labels. The repository's
+8. **GitHub:** `python3 tools/process/doctor.py --fix-labels` creates the two review labels. The repository's
    settings are the owner's: list them in the pull request as paths of clicks.
-   - Settings → General: allow only "Rebase merging".
+   - Settings → General → Pull Requests: untick "Allow merge commits" and "Allow rebase merging", tick
+     "Allow squash merging" and set its default commit message to "Default to pull request title"
+     ([workflow.md](workflow.md#how-a-piece-of-work-goes), step 7).
    - Settings → Branches (or Rules): protect `main`, with changes only through pull requests and the
      checks `process-docs`, `process-pr`, `process-lock`, `process-commits` and `process-owner` required
      (the project's own jobs too, once they exist), and no required approvals (untick "Require
@@ -94,7 +97,7 @@ Always ask, whatever the brief says:
 9. **Finish:** remove the `<!-- template placeholder -->` lines, set `"set_up": true`, run
    `python3 tools/process/check.py` and `python3 tools/process/doctor.py`, and go on only when both pass,
    apart from what waits on the owner.
-10. **Review and report:** the pull request leaves draft, labelled `plan` and `owner-review`; a reviewer
+10. **Review and report:** the pull request leaves draft, labelled `owner-review`; a reviewer
     checks it against the steps above and the owner's answers, as it would an item's "Done when"; its
     "Owner review" asks the owner to read the plan and `CLAUDE.md` and to do the list from step 8.
 11. **Merge** as the project chose ([workflow.md](workflow.md#the-owners-ok-and-the-merge)). The next
@@ -106,10 +109,10 @@ Always ask, whatever the brief says:
 For a project that already runs a process of its own and moves onto the template. Its coordinator does
 it when the owner asks, under the project's current rules, reading the template at its latest release.
 It asks the questions of "What the owner gives" that the project's files don't answer yet, and works on
-a branch `setup`, continued as above. One pull request, kind `plan`, `owner-review`, "Backlog item:
-Setup"; the copied template files count as generated, and if the rest would pass the size limit
+a branch `setup`, continued as above. One pull request, kind `plan`, labelled `owner-review`, "Backlog
+item: Setup"; the copied template files count as generated, and if the rest would pass the size limit
 ([rules.md](rules.md#your-work)), the renumbering of the backlog goes first in a pull request of its
-own (kind `plan`, `ok-without-reading`, "Backlog item: Setup"). Work pull requests open at the move
+own (kind `plan`, labelled `ok-without-reading`, "Backlog item: Setup"). Work pull requests open at the move
 stay open: once it is merged, their descriptions get the template's sections they lack.
 
 1. With the template checked out at its latest release tag, run `python3 <template>/tools/process/sync.py

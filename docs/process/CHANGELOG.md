@@ -3,6 +3,37 @@
 The newest version first. Each entry says what changed and what projects must do, if anything
 ([updates.md](updates.md#changing-the-process)).
 
+## 0.8.0 — 2026-11-05
+
+Three simplifications an independent review proposed and the owner accepted:
+
+- Squash merge. `main` gets one commit per pull request, its subject the pull request's title, its
+  body empty; the coordinator merges with the REST API (`merge_method=squash`, with the last commit's
+  `sha`). On the branch, fixes are plain new commits and nothing pushed is rewritten: no fixup,
+  autosquash or force push. A conflict is resolved by merging `main` into the branch. A second-round
+  reviewer reads `git diff <reviewed> <new>`, or with a merge of `main` in between, `git log -p
+  --first-parent --remerge-diff`. The coordinator's check that commits read as steps goes.
+- The title is the future commit subject, so `process-commits` checks the title against the commit
+  rules instead of the branch's commits. It keeps its name and moves into `process-pr.yml`, so a title
+  edit runs it again. `one_line` and `no_co_authors` in `docs/process.json` are still accepted and do
+  nothing.
+- One label. A pull request carries only its review label, `owner-review` or `ok-without-reading`;
+  other labels are not read. The kind stays in the title: its prefix (`Plan:`, `Spec:`, `Research:`,
+  `Code:`), or, where the project asks for Conventional Commits, the type. `update.py` titles its pull
+  request `chore: ...` there. `doctor.py --fix-labels` creates only the review labels.
+- Short records. A pull request whose "Backlog item" is `Coordinator record` or `Process update` needs
+  only "Backlog item", "What changed" and "Owner review". `update.py` writes just those.
+- `doctor.py` checks the repository's merge settings: squash merging only, titled by the pull request,
+  with an empty message.
+
+Projects: the owner sets Settings > General > Pull Requests: untick "Allow merge commits" and "Allow
+rebase merging", tick "Allow squash merging", and set its default commit message to "Default to pull
+request title"; the coordinator merges this update by squash already, so the owner does it first, and
+`doctor.py` reports it until then. The labels `plan`, `spec`, `research` and `code` can be deleted
+(Issues > Labels). Open pull requests keep their kind labels harmlessly. Where the project asks for
+Conventional Commits, the coordinator retitles this update (`chore: update the process to 0.8.0`) and
+each open pull request as a Conventional Commits subject, or its `process-commits` turns red.
+
 ## 0.7.1 — 2026-11-05
 
 Gaps an independent review of 0.6.0 found in the process documents:

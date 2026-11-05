@@ -20,7 +20,7 @@ import check_pr  # noqa: E402
 import owned  # noqa: E402
 
 ROOT = HERE.parents[1]
-LABELS = {**check_pr.KIND_DESCRIPTIONS, **check_pr.REVIEW_LABELS}
+LABELS = check_pr.REVIEW_LABELS
 PROJECT_FILES = ["CLAUDE.md", "README.md", "docs/plan.md", "docs/now.md", "docs/backlog.md",
                  "docs/decisions/README.md", check_docs.CONFIG]
 PLACEHOLDER = "<!-- template placeholder -->"
@@ -92,6 +92,21 @@ def identity_problem(agents_account, login, owner):
     if agents_account == "owner" and not same:
         return f"gh works as {login}, but agents_account is owner: the agents work as {owner}, or the setting is own"
     return None
+
+
+# The repository's merge settings the process needs (docs/process/setup.md, step 8): squash merging only,
+# with the pull request's title as the commit's subject and an empty body.
+MERGE_SETTINGS = {"allow_squash_merge": True, "allow_merge_commit": False, "allow_rebase_merge": False,
+                  "squash_merge_commit_title": "PR_TITLE", "squash_merge_commit_message": "BLANK"}
+
+
+def merge_settings_problem(about):
+    """What is wrong with the merge settings in the repository's API answer (about), None when they fit,
+    or False when the answer doesn't hold them (GitHub shows them only to accounts that can push)."""
+    if any(about.get(key) is None for key in MERGE_SETTINGS):
+        return False
+    wrong = [key for key, value in MERGE_SETTINGS.items() if about[key] != value]
+    return ("these differ: " + ", ".join(f"{key} is {about[key]}" for key in wrong)) if wrong else None
 
 
 def code_owner_review(rules):
@@ -177,8 +192,13 @@ def check_github(report, lock, set_up, fix_labels, agents_account):
         return
     is_template = repo == lock.get("template")
     report.line(True, f"repository {repo}" + (" (the template itself)" if is_template else ""))
-    code, out = gh("api", f"repos/{repo}", "--jq", "{type: .owner.type, private: .private}")
+    code, out = gh("api", f"repos/{repo}", "--jq",
+                   "{type: .owner.type, private: .private, " + ", ".join(MERGE_SETTINGS) + "}")
     about = json.loads(out) if code == 0 else {}
+    if about:
+        problem = merge_settings_problem(about)
+        report.line(None if problem is False else not problem, "squash merging only, titled by the pull request",
+                    "the owner sets it (docs/process/setup.md, step 8)" + (f": {problem}" if problem else ""))
     if agents_account != "owner" and about:
         report.line(about.get("type") == "User", "the repository belongs to the owner's personal account",
                     "process-owner counts only the repository owner's approval, and an organisation"
@@ -213,7 +233,7 @@ def check_github(report, lock, set_up, fix_labels, agents_account):
             if failed:
                 report.line(False, "labels created", "couldn't create: " + ", ".join(failed))
         else:
-            report.line(not missing, "labels for kinds and review",
+            report.line(not missing, "the review labels",
                         "missing: " + ", ".join(missing) + " (run with --fix-labels)")
 
     # Readable with read access: the branch (classic protection) and the rules on it (rulesets). Approval

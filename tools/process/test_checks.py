@@ -413,23 +413,33 @@ class PullRequestCheck(unittest.TestCase):
         body = GOOD_BODY.replace("Milestone two needs it.", "None.")
         self.assertIn("section \"Why\" says next to nothing", self.errors(body))
 
-    def meta(self, title, labels):
-        with Repo({}) as root:
+    def meta(self, title, labels, config=CONFIG):
+        with Repo({}, config) as root:
             return check_pr.check(GOOD_BODY, root, title, labels)
 
-    def test_title_and_labels_that_agree_pass(self):
-        self.assertEqual(self.meta("Spec: walkthroughs", ["spec", "ok-without-reading"]), [])
+    def test_a_kind_in_the_title_and_one_review_label_pass(self):
+        self.assertEqual(self.meta("Spec: walkthroughs", ["ok-without-reading"]), [])
+        self.assertEqual(self.meta("Spec: walkthroughs", ["code", "ok-without-reading"]), [], "other labels aside")
 
-    def test_title_without_kind_fails(self):
-        self.assertTrue(any("title must start" in e for e in self.meta("Walkthroughs", ["spec", "ok-without-reading"])))
+    def test_title_without_kind_fails_unless_titles_are_conventional(self):
+        self.assertTrue(any("title must start" in e for e in self.meta("Walkthroughs", ["ok-without-reading"])))
+        conventional = {**CONFIG, "commits": {"conventional": True}}
+        self.assertEqual(self.meta("docs: walkthroughs", ["ok-without-reading"], conventional), [])
 
-    def test_title_not_matching_label_fails(self):
-        self.assertTrue(any("to match the label" in e for e in self.meta("Code: walkthroughs", ["spec", "ok-without-reading"])))
+    def test_missing_or_double_review_labels_fail(self):
+        for labels in ([], ["spec"], ["owner-review", "ok-without-reading"]):
+            with self.subTest(labels=labels):
+                self.assertTrue(any("one review label" in e for e in self.meta("Spec: x y", labels)))
 
-    def test_missing_or_double_labels_fail(self):
-        self.assertTrue(any("one kind label" in e for e in self.meta("Spec: x y", ["ok-without-reading"])))
-        self.assertTrue(any("one kind label" in e for e in self.meta("Spec: x y", ["spec", "code", "ok-without-reading"])))
-        self.assertTrue(any("one review label" in e for e in self.meta("Spec: x y", ["spec"])))
+    def test_a_coordinator_record_or_process_update_needs_only_three_sections(self):
+        short = ("## Backlog item\n\n{}\n\n## What changed\n\nThe backlog's order.\n\n"
+                 "## Owner review\n\nNot needed: the order only.\n")
+        for item in ("Coordinator record: the owner's order of Nov 5.", "Process update: 0.7.1 to 0.8.0."):
+            with self.subTest(item=item):
+                self.assertEqual(self.errors(short.format(item)), [])
+        self.assertIn("section \"Why\" is missing", self.errors(short.format("B-002 Second.")))
+        self.assertIn("section \"Owner review\" is missing",
+                      self.errors(short.format("Coordinator record: x.").split("## Owner review")[0]))
 
     def test_owner_review_with_next_to_nothing_fails(self):
         body = GOOD_BODY.replace("Not needed: text for machines.", "No.")
@@ -467,13 +477,13 @@ class PullRequestEvent(unittest.TestCase):
                                                           "labels": []},
                                          "repository": {"full_name": "someone/project"}}))
             now = {"number": 5, "draft": False, "title": "Plan: the work", "body": GOOD_BODY,
-                   "labels": [{"name": "plan"}, {"name": "ok-without-reading"}], "user": {"type": "User"},
+                   "labels": [{"name": "ok-without-reading"}], "user": {"type": "User"},
                    "head": {"sha": "h"}}
             reran = []
             saved = check_owner.api, check_owner.rerun_red, check_pr.check
             check_owner.api = lambda path, method="GET": now
             check_owner.rerun_red = lambda repo, head, run, workflow: reran.append((head, run, workflow))
-            check_pr.check = lambda body, root, title, labels: [] if labels == ["plan", "ok-without-reading"] else ["x"]
+            check_pr.check = lambda body, root, title, labels: [] if labels == ["ok-without-reading"] else ["x"]
             try:
                 with mock.patch.dict("os.environ", {"GH_TOKEN": "t", "GITHUB_RUN_ID": "9"}):
                     with contextlib.redirect_stdout(io.StringIO()):
@@ -838,43 +848,51 @@ class OwnerCheck(unittest.TestCase):
         self.assertEqual(len(self.errors(["ok-without-reading"], changed=["docs/plan.md"], account="owner")), 1)
 
 
-class CommitsCheck(unittest.TestCase):
-    STRICT = {"one_line": True, "no_co_authors": True}
+class TitleAgainstCommitRules(unittest.TestCase):
+    def test_a_short_title_passes_and_a_long_or_empty_one_fails(self):
+        self.assertEqual(check_commits.check("Spec: the walkthroughs", {}), [])
+        self.assertEqual(check_commits.check("x" * 72, {}), [])
+        self.assertTrue(check_commits.check("x" * 73, {}))
+        self.assertTrue(check_commits.check(" ", {}))
 
-    def test_one_short_subject_passes(self):
-        self.assertEqual(check_commits.check([("a" * 40, "Add the walkthroughs\n")], self.STRICT), [])
-
-    def test_long_subject_fails(self):
-        self.assertTrue(check_commits.check([("a" * 40, "x" * 73)], {}))
-
-    def test_body_and_co_author_pass_by_default(self):
-        message = "Subject\n\nA body.\n\nCo-authored-by: Someone <a@b.c>\n"
-        self.assertEqual(check_commits.check([("a" * 40, message)], {}), [])
-
-    def test_body_fails_when_one_line_is_asked(self):
-        self.assertTrue(check_commits.check([("a" * 40, "Subject\n\nA body.\n")], self.STRICT))
-
-    def test_co_author_fails_when_asked(self):
-        errors = check_commits.check([("a" * 40, "Subject\n\nCo-authored-by: Someone <a@b.c>\n")], self.STRICT)
-        self.assertTrue(any("Co-authored-by" in error for error in errors))
-
-    def test_conventional_subjects(self):
+    def test_conventional_titles(self):
         rules = {"conventional": True}
-        for subject in ("feat: export to CSV", "fix(parser): keep empty lines", "docs!: drop the old guide",
-                        "chore(main): release 1.2.0"):
-            with self.subTest(subject=subject):
-                self.assertEqual(check_commits.check([("a" * 40, subject)], rules), [])
-        for subject in ("Add export", "feat:no space", "Feat: capital", "feat (x): space before scope",
-                        "fx: typo in the type", 'Revert "feat: export"'):
-            with self.subTest(subject=subject):
-                self.assertTrue(check_commits.check([("a" * 40, subject)], rules))
-        self.assertEqual(check_commits.check([("a" * 40, "Add export")], {}), [])
+        for title in ("feat: export to CSV", "fix(parser): keep empty lines", "docs!: drop the old guide",
+                      "chore(main): release 1.2.0"):
+            with self.subTest(title=title):
+                self.assertEqual(check_commits.check(title, rules), [])
+        for title in ("Add export", "Code: add export", "feat:no space", "Feat: capital",
+                      "feat (x): space before scope", "fx: typo in the type", 'Revert "feat: export"'):
+            with self.subTest(title=title):
+                self.assertTrue(check_commits.check(title, rules))
+        self.assertEqual(check_commits.check("Add export", {}), [])
 
-    def test_unknown_commits_give_a_message(self):
+    def test_in_ci_the_title_is_read_now(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            event = Path(tmp) / "event.json"
+            event.write_text(json.dumps({"pull_request": {"number": 5, "title": "x" * 80},
+                                         "repository": {"full_name": "someone/project"}}))
+            saved = check_owner.api
+            check_owner.api = lambda path, method="GET": {"number": 5, "title": "Plan: a short title"}
+            try:
+                with mock.patch.dict("os.environ", {"GH_TOKEN": "t"}):
+                    with contextlib.redirect_stdout(io.StringIO()):
+                        self.assertEqual(check_commits.main(["check_commits.py", str(event)]), 0)
+            finally:
+                check_owner.api = saved
+
+    def test_neither_or_both_inputs_are_refused(self):
         script = Path(__file__).resolve().parent / "check_commits.py"
-        result = subprocess.run([sys.executable, str(script), "0" * 40, "1" * 40], capture_output=True, text=True)
-        self.assertEqual(result.returncode, 2)
-        self.assertNotIn("Traceback", result.stderr)
+        for args in ([], ["event.json", "--title", "x"]):
+            with self.subTest(args=args):
+                result = subprocess.run([sys.executable, str(script), *args], capture_output=True, text=True)
+                self.assertEqual(result.returncode, 2)
+                self.assertNotIn("Traceback", result.stderr)
+
+    def test_a_title_edit_runs_it_again(self):
+        workflow = (TEMPLATE.parent / "workflows/process-pr.yml").read_text(encoding="utf-8")
+        self.assertIn("edited", workflow)
+        self.assertIn("  process-commits:", workflow)
 
 
 def template_tree(root, version, files):
@@ -1026,6 +1044,19 @@ class DoctorRulesets(unittest.TestCase):
         self.assertIsNone(doctor.binds_everyone({}, []))
 
 
+class DoctorMergeSettings(unittest.TestCase):
+    def test_squash_only_with_the_title_and_a_blank_message_fits(self):
+        self.assertIsNone(doctor.merge_settings_problem(dict(doctor.MERGE_SETTINGS)))
+        wrong = {**doctor.MERGE_SETTINGS, "allow_rebase_merge": True, "squash_merge_commit_message": "PR_BODY"}
+        problem = doctor.merge_settings_problem(wrong)
+        self.assertIn("allow_rebase_merge is True", problem)
+        self.assertIn("squash_merge_commit_message is PR_BODY", problem)
+        self.assertNotIn("allow_squash_merge", problem)
+
+    def test_an_answer_without_the_settings_cant_tell(self):
+        self.assertIs(doctor.merge_settings_problem({"type": "User", "allow_squash_merge": None}), False)
+
+
 class DoctorIdentity(unittest.TestCase):
     def test_the_account_must_fit_agents_account(self):
         self.assertIsNone(doctor.identity_problem("own", "agents-bot", "Owner"))
@@ -1064,6 +1095,16 @@ class Update(unittest.TestCase):
             finally:
                 update.run, update.gh_json, owned.TEMPLATE_SOURCE = saved
         self.assertFalse([args for args in calls if "checkout" in args or any("sync.py" in a for a in args)], calls)
+
+    def test_the_title_follows_the_commit_rules(self):
+        self.assertEqual(update.title_for("update the process to 0.9.0", False), "Plan: update the process to 0.9.0")
+        self.assertEqual(update.title_for("update the process to 0.9.0", True), "chore: update the process to 0.9.0")
+
+    def test_the_description_is_a_short_record_that_passes(self):
+        body = update.BODY.format(old="0.7.1", new="0.8.0", template="someone/template", tag="v0.8.0",
+                                  changelog="### 0.8.0\n\nA change.", owner_review=update.NO_REVIEW)
+        with Repo({}) as root:
+            self.assertEqual(check_pr.check(body, root, "Plan: update the process to 0.8.0", ["ok-without-reading"]), [])
 
     def test_the_owner_review_text_fits_why_the_owner_is_asked(self):
         self.assertEqual(update.review(True, False), ("ok-without-reading", update.NO_REVIEW))

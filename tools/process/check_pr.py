@@ -3,19 +3,21 @@
 Standard library only.
 
 Fails when a section of the template is missing or says next to nothing (a bare "None" is enough for "Not
-done and open questions"); when "Backlog item" doesn't name exactly one item that exists in
-docs/backlog.md (or say what else it is: "Coordinator record", which may name several, "Setup",
-"Process update" or "Process change"); when "Behaviour change" doesn't start with "None" and why, or with
-"Yes" and at least three steps to try it; when the title doesn't start with its kind; or when the
-labels aren't one kind and one review label that agree with the title (docs/process/pull-requests.md).
-Pull requests opened by a GitHub App (a release or dependency bot) are not checked.
+done and open questions"; a coordinator record or a process update needs only the sections in SHORT);
+when "Backlog item" doesn't name exactly one item that exists in docs/backlog.md (or say what else it
+is: "Coordinator record", which may name several, "Setup", "Process update" or "Process change"); when
+"Behaviour change" doesn't start with "None" and why, or with "Yes" and at least three steps to try it;
+when the title doesn't start with its kind, where docs/process.json doesn't ask for Conventional Commits
+(check_commits.py checks the title against the commit rules); or when the labels don't hold exactly one
+review label, other labels aside (docs/process/pull-requests.md). Pull requests opened by a GitHub App
+(a release or dependency bot) are not checked.
 
 In CI, with GH_TOKEN set (.github/workflows/process-pr.yml); the pull request is read from the API when
 the check runs, since the event's copy is how it was when the event fired, and a passing run runs again
 the red runs earlier events left on the same commit:
     python3 tools/process/check_pr.py "$GITHUB_EVENT_PATH"
 Locally, on a draft:
-    python3 tools/process/check_pr.py --body description.md [--title "Code: …" --labels code,owner-review]
+    python3 tools/process/check_pr.py --body description.md [--title "Code: …" --labels owner-review]
 """
 
 import argparse
@@ -27,6 +29,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
+import check_commits  # noqa: E402
 import check_owner  # noqa: E402
 
 SECTIONS = [
@@ -40,17 +43,16 @@ SECTIONS = [
     "Not done and open questions",
 ]
 COMMENT = re.compile(r"<!--.*?-->", re.DOTALL)
-KINDS = {"plan": "Plan:", "spec": "Spec:", "research": "Research:", "code": "Code:"}
-KIND_DESCRIPTIONS = {
-    "plan": "The plan, rules for agents, the process, checks and CI",
-    "spec": "What the product must do and how it looks",
-    "research": "Studies, facts found by experiment",
-    "code": "The code of the tools and of the product",
-}
+# The title prefixes of the kinds, where titles are not Conventional Commits subjects.
+KINDS = ("Plan:", "Spec:", "Research:", "Code:")
+# The one label a pull request carries, and its description for doctor.py --fix-labels.
 REVIEW_LABELS = {"owner-review": "The owner reads it before saying yes",
                  "ok-without-reading": "The coordinator merges it; the owner sees it in the report"}
 # What a pull request that is no backlog item says instead (docs/process/pull-requests.md).
 NOT_AN_ITEM = re.compile(r"^(coordinator record|setup|process update|process change)\b", re.IGNORECASE)
+# The sections a coordinator record or a process update needs; it may leave out the rest.
+SHORT = ["Backlog item", "What changed", "Owner review"]
+SHORT_RECORD = re.compile(r"^(coordinator record|process update)\b", re.IGNORECASE)
 # A section where the template's own comment asks for a bare "None" when there is nothing to say.
 NOTHING_OPEN = ("Not done and open questions", re.compile(r"^none\.?$", re.IGNORECASE))
 
@@ -76,7 +78,8 @@ def words(text):
 def check(body, root, title=None, labels=None):
     errors = []
     found = sections(body)
-    for name in SECTIONS:
+    short = SHORT_RECORD.match(found.get("Backlog item", ""))
+    for name in SHORT if short else SECTIONS:
         if name not in found:
             errors.append(f"section \"{name}\" is missing")
         elif not found[name]:
@@ -100,7 +103,7 @@ def check(body, root, title=None, labels=None):
                 errors.append(f"\"Backlog item\": {item_id} is not in docs/backlog.md")
 
     behaviour = found.get("Behaviour change", "")
-    if behaviour:
+    if behaviour and not short:
         answer = re.match(r"^(none|yes)\b(.*)", behaviour, re.IGNORECASE | re.DOTALL)
         if not answer:
             errors.append("\"Behaviour change\" must start with \"None\" or \"Yes\"")
@@ -111,19 +114,12 @@ def check(body, root, title=None, labels=None):
             if len(steps) < 3:
                 errors.append("\"Behaviour change: Yes\" needs at least three steps to try it, as a list")
 
-    if title is not None:
-        kinds = [k for k, prefix in KINDS.items() if title.startswith(prefix + " ")]
-        if not kinds:
-            errors.append("the title must start with one of: " + ", ".join(KINDS.values()))
-    if labels is not None:
-        kind_labels = [label for label in labels if label in KINDS]
-        review_labels = [label for label in labels if label in REVIEW_LABELS]
-        if len(kind_labels) != 1:
-            errors.append("it needs exactly one kind label: " + ", ".join(KINDS))
-        elif title is not None and not title.startswith(KINDS[kind_labels[0]] + " "):
-            errors.append(f"the title must start with \"{KINDS[kind_labels[0]]}\" to match the label")
-        if len(review_labels) != 1:
-            errors.append("it needs exactly one review label: " + ", ".join(REVIEW_LABELS))
+    # With Conventional Commits the type stands in for the kind, and check_commits.py checks it.
+    if title is not None and not check_commits.rules(root).get("conventional"):
+        if not any(title.startswith(prefix + " ") for prefix in KINDS):
+            errors.append("the title must start with one of: " + ", ".join(KINDS))
+    if labels is not None and len([label for label in labels if label in REVIEW_LABELS]) != 1:
+        errors.append("it needs exactly one review label: " + ", ".join(REVIEW_LABELS))
     return errors
 
 

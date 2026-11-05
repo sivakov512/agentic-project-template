@@ -2,10 +2,14 @@
 
 So the owner can see from the list what each pull request is and whether to read it.
 
-## Kind and labels
+## Kind, title and label
 
 - **Its kind is its purpose,** not every file it touches: changes that follow from the work (the backlog
   tick or the split of its own item, `docs/now.md`, links) don't count. A pull request with two purposes is two pull requests.
+  The title shows the kind and becomes the subject of the one commit the pull request puts on `main`
+  ([workflow.md](workflow.md#how-a-piece-of-work-goes), step 7), so it follows the commit rules
+  ([config.md](config.md#commits)). Where they ask for Conventional Commits, the title is such a subject
+  and its type stands in for the kind; otherwise it starts with the kind's prefix:
 
   | Kind | Title starts with | For |
   |---|---|---|
@@ -16,12 +20,13 @@ So the owner can see from the list what each pull request is and whether to read
 
   A coordinator record takes the kind of what it records: `plan` for `docs/now.md`, the backlog and the
   plan, `spec` for a document of the chain, and a decision record the kind of what it decides.
-- **Two labels:** its kind, and `owner-review` or `ok-without-reading` ([reports.md](reports.md)). The
-  review label follows the strictest part of the pull request.
+- **One label:** `owner-review` or `ok-without-reading` ([reports.md](reports.md)), which follows the
+  strictest part of the pull request. Other labels are not read.
 
 ## The description
 
-Every section of `.github/pull_request_template.md`, filled in.
+Every section of `.github/pull_request_template.md`, filled in. A `Coordinator record` or a `Process
+update` needs only "Backlog item", "What changed" and "Owner review", and may leave out the rest.
 
 - **Backlog item** names the one item the pull request does, or one of these for a pull request that is
   not product work:
@@ -47,13 +52,14 @@ clash with the project's own.
 | Job | Runs | Checks |
 |---|---|---|
 | `process-docs` | `tools/process/check.py --process-only` | the documents (links, the backlog, IDs and coverage, decision records), the template's files against the lock, the checks' own tests |
-| `process-pr` | `tools/process/check_pr.py` | the sections of the description, the title and the labels, read when it runs; a draft is checked when it leaves draft; a passing run runs again the red ones earlier events left on the same commit; if one stays red, `gh run list --workflow process-pr.yml --commit <the pull request's last commit>`, then `gh run rerun <id>` |
+| `process-pr` | `tools/process/check_pr.py` | the sections of the description, the kind in the title and the review label, read when it runs; a draft is checked when it leaves draft; a passing run runs again the red ones earlier events left on the same commit; if one stays red, `gh run list --workflow process-pr.yml --commit <the pull request's last commit>`, then `gh run rerun <id>` |
 | `process-lock` | `tools/process/check_lock.py` | a pull request that changes the template's files moves to a newer version ([updates.md](updates.md#the-lock)) |
-| `process-commits` | `tools/process/check_commits.py` | the commit messages ([config.md](config.md#commits)) |
+| `process-commits` | `tools/process/check_commits.py` | the title, which becomes `main`'s commit, against the commit rules ([config.md](config.md#commits)), read when it runs; it is a job of `process-pr.yml`, so it runs again on the same events, and a passing `process-pr` runs its red runs again too |
 | `process-owner` | `tools/process/check_owner.py` | a pull request that needs the owner's OK has the owner's approval of its last commit, and one labelled `ok-without-reading` changes none of the files CI holds for the owner, a process update that is exactly the template's newer release, tagged on its `main`, aside ([workflow.md](workflow.md#the-owners-ok-and-the-merge)); it runs again on every review and reads the labels and reviews as they are when it runs; a passing run runs again the red ones earlier events left on the same commit, which would block the merge; if one stays red, `gh run list --workflow process-owner.yml --commit <the pull request's last commit>`, then `gh run rerun <id>` |
 
 Pull requests opened by a GitHub App (a release bot, a dependency bot) skip `process-pr`: they don't
-follow the template. Their other checks run; with no review label they need the owner's OK, and the coordinator labels
+follow the template. Their other checks run, `process-commits` among them, since their titles land on
+`main` too; with no review label they need the owner's OK, and the coordinator labels
 them after the reviewer's findings and its own check ([reports.md](reports.md#when-the-owner-looks)). So automation whose pull requests don't follow the template (a release tool run in CI, say)
 opens them with a GitHub App's token, not with the agents' or the owner's; a process update follows the
 template, and the coordinator opens it under the agents' account. One that changes the template's files (a dependency bot

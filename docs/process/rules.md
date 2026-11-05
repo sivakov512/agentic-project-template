@@ -48,7 +48,7 @@ Whatever your role: a question from the owner is a question. Answer it and propo
 - **Questions first.** Before any work, open a draft pull request with a short plan (what you will
   change and how you will check it) and your questions about the item, or "no questions". GitHub needs a
   commit to open one: start the branch with an empty commit (`git commit --allow-empty -m "chore: start
-  B-###"`, which passes the commit check with or without Conventional Commits). With questions, end your turn and say
+  B-###"`), which the squash merge leaves out of `main`. With questions, end your turn and say
   in your last message that you wait for answers in the pull request; the coordinator answers there and
   tells you to go on (a message to your session). With no questions, go on at once.
 - **Do only that item, and no more than it needs.** Its "Done when" is the bar. Tools for our own use get
@@ -66,8 +66,8 @@ Whatever your role: a question from the owner is a question. Answer it and propo
   say what is left and why in its "Not done and open questions", and say the same in your last message.
   The coordinator decides whether the pull request goes on, split or not, or is closed.
 - Before you push, run `python3 tools/process/check.py` (the process checks and the project's own) and
-  `python3 tools/process/check_pr.py --body <description file> --title "<title>" --labels
-  <kind>,<review label>`. Finish only with every check passing.
+  `python3 tools/process/check_pr.py --body <description file> --title "<title>" --labels <review label>`
+  and `python3 tools/process/check_commits.py --title "<title>"`. Finish only with every check passing.
 - Tick your item in the backlog (`- [x]`) in the same pull request. Don't edit `docs/now.md`: the
   coordinator does.
 - Don't edit the template's files ([README.md](README.md#what-lives-where)). If the process is wrong,
@@ -88,7 +88,7 @@ Whatever your role: a question from the owner is a question. Answer it and propo
   in all of them, on the pull request's branch, except those marked "outside the item", which you list
   under "Not done and open questions" instead, and those the coordinator closed in a comment; leave the
   **drop** ones.
-- Fold each fix into the commit it corrects ("Git and GitHub" below), run the checks as in "Your
+- Commit the fixes on top of the branch ("Git and GitHub" below), run the checks as in "Your
   work", push, and answer with one comment: the new head commit, and for each "fix" finding what you
   changed and where, or why you couldn't. The coordinator then runs the second rounds on that new head.
 
@@ -122,10 +122,10 @@ Whatever your role: a question from the owner is a question. Answer it and propo
   yourself.
 - A second round comes only if the first had "fix" findings, or, for a review for harm, if a fix
   changed the code `docs/plan.md` names as risky: review only the fix, the change from the
-  head you reviewed to the new head the fix comment names (`git range-diff --creation-factor=100
-  origin/main <reviewed> <new>`; a head that is gone from the branch comes back with
-  `git fetch origin <sha>`): whether each finding the coordinator didn't close is fixed, and whether
-  the fix broke anything nearby.
+  head you reviewed to the new head the fix comment names (`git diff <reviewed> <new>`; where a merge of
+  `main` came in between, `git log -p --first-parent --remerge-diff <reviewed>..<new>`, which shows the
+  fix's commits and, for the merge, only how it resolved conflicts): whether each finding the
+  coordinator didn't close is fixed, and whether the fix broke anything nearby.
 - **A review for harm** ("Review pull request #N for harm") is a second, independent review of code
   that `docs/plan.md` names as risky ([workflow.md](workflow.md#how-a-piece-of-work-goes)). Until your
   findings are posted, read the pull request's description, diff and commits, not its comments; in the
@@ -147,8 +147,8 @@ Whatever your role: a question from the owner is a question. Answer it and propo
   language the owner writes in): the chat, and every comment and review on pull requests, agents' to
   each other included, since the owner reads them. Text proposed for the repository is quoted in
   English.
-- A commit subject is at most 72 characters; `docs/process.json` may add stricter rules
-  ([config.md](config.md#commits)).
+- A pull request's title becomes the subject of its commit on `main`: at most 72 characters, and
+  `docs/process.json` may add stricter rules ([config.md](config.md#commits)).
 
 ## Code
 
@@ -178,14 +178,13 @@ written.
 - Commits, pushes and pull requests go out under the account the project chose for agents
   ([workflow.md](workflow.md#the-owners-ok-and-the-merge)). Call `git` and `gh` by name. Agents never
   approve a pull request: an approval is the owner's OK.
-- **A pull request's history is what lands on `main`.** Each commit is one step a reader of `main`
-  wants to see, with a subject that says that step. A fix from a review or a check, or any later change
-  to a step already committed, goes into that commit, not into a commit of its own: commit it with
-  `git commit --fixup <commit>`, take in what others pushed to the branch (`git pull --rebase origin <branch>`), run
-  `git rebase --autosquash --no-keep-empty origin/main` (with git older than 2.44,
-  `GIT_SEQUENCE_EDITOR=: git rebase -i --autosquash --no-keep-empty origin/main`), and push with
-  `git push --force-with-lease`. That also drops the empty start commit once a real one is there.
+- **A pull request lands on `main` as one commit:** a squash merge, its subject the pull request's
+  title, its body empty ([workflow.md](workflow.md#how-a-piece-of-work-goes), step 7). So the title says
+  what the change is, and the commits on the branch are only its working history: a fix from a review or
+  a check is a new commit on top. Take in what others pushed to the branch first (`git pull --no-rebase
+  origin <branch>`), and never rewrite what is pushed (no rebase, no force push), so the head a reviewer
+  reviewed stays readable. A conflict with `main` is resolved by merging `origin/main` into the branch.
 - Open pull requests through the REST API (`gh api repos/{owner}/{repo}/pulls`), so nothing adds text
   to the description you wrote.
-- Nobody but the coordinator merges, by rebase, and a pull request that needs the owner's OK only after
-  it; or the owner merges those, as the project chose ([workflow.md](workflow.md#the-owners-ok-and-the-merge)).
+- Nobody but the coordinator merges, and a pull request that needs the owner's OK only after it; or the
+  owner merges those, as the project chose ([workflow.md](workflow.md#the-owners-ok-and-the-merge)).

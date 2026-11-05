@@ -31,7 +31,7 @@ This template puts the whole process into the repository, as rules the agents re
 - **You decide, briefly.** Each report says what needs your review and lists what was merged without
   it. Settings come to you as clicks, questions in a batch with a recommendation.
 - **Checked, not trusted.** CI checks links, the backlog, IDs and their coverage (every requirement has
-  a source, every scenario has steps), pull request descriptions and commit messages.
+  a source, every scenario has steps), pull request descriptions and titles.
 
 ## How work goes
 

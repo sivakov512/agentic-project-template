@@ -1,3 +1,5 @@
+<!-- A Coordinator record or a Process update needs only "Backlog item", "What changed" and "Owner review" and may leave out the other sections (docs/process/pull-requests.md#the-description). -->
+
 ## Backlog item
 
 <!-- B-### and its title: every pull request belongs to one item in docs/backlog.md. A pull request that is not product work says what it is instead: Coordinator record, Setup, Process update or Process change (docs/process/pull-requests.md). -->

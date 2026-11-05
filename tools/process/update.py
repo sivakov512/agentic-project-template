@@ -22,6 +22,7 @@ import owned  # noqa: E402
 
 ROOT = HERE.parents[1]
 
+# A process update needs only these sections (docs/process/pull-requests.md, "The description").
 BODY = """\
 ## Backlog item
 
@@ -29,34 +30,14 @@ Process update: {old} to {new}, from {template}.
 
 ## What changed
 
-The template's files at release {tag}, and the lock. The changelog entries since {old}:
+The template's files at release {tag}, and the lock. What the changelog asks of the project, if
+anything, the coordinator does in this pull request and adds here. The changelog entries since {old}:
 
 {changelog}
-
-## Behaviour change
-
-None: only the process files change; the product is not touched.
-
-## Why
-
-The process lives in the template; projects take its releases (docs/process/updates.md).
-
-## How it was checked
-
-Opened by tools/process/update.py; the checks of this pull request are the evidence.
-
-## Docs updated
-
-The template's files only. The coordinator adds here what the changelog asks of the project, if
-anything.
 
 ## Owner review
 
 {owner_review}
-
-## Not done and open questions
-
-What the changelog asks of the project, if anything, is the coordinator's to do in this pull request.
 """
 # The "Owner review" section, as the update goes without the owner or to the owner because of .github/.
 NO_REVIEW = """\
@@ -94,6 +75,12 @@ def review(own_account, touches_github):
     if own_account and touches_github:
         return "owner-review", APPROVE_ONLY
     return "ok-without-reading", NO_REVIEW
+
+
+def title_for(what, conventional):
+    """The pull request's title, which becomes main's commit: a Conventional Commits subject where the
+    project asks for them, otherwise the kind's prefix (docs/process/pull-requests.md)."""
+    return f"chore: {what}" if conventional else f"Plan: {what}"
 
 
 def main():
@@ -159,16 +146,16 @@ def main():
     touches_github = any(name.startswith(".github/") for name in
                          run("git", "diff", "--cached", "--name-only").splitlines())
     label, owner_review = review(own_account, touches_github)
-    run("git", "commit", "--quiet", "-m", f"chore: update the process to {new}")
+    title = title_for(f"update the process to {new}", (config.get("commits") or {}).get("conventional"))
+    run("git", "commit", "--quiet", "-m", title)
     # The branch is this script's own: one left from a run that couldn't open its pull request is replaced.
     run("git", "push", "--quiet", "--force", "origin", branch)
 
     body = BODY.format(old=old, new=new, template=template, tag=tag, changelog=changelog or "(none)",
                        owner_review=owner_review.format(tag=tag, template=template))
-    pull = gh_json("api", f"repos/{repo}/pulls", "-f", f"title=Plan: update the process to {new}",
+    pull = gh_json("api", f"repos/{repo}/pulls", "-f", f"title={title}",
                    "-f", f"head={branch}", "-f", "base=main", "-f", f"body={body}")
-    run("gh", "api", f"repos/{repo}/issues/{pull['number']}/labels",
-        "-f", "labels[]=plan", "-f", f"labels[]={label}")
+    run("gh", "api", f"repos/{repo}/issues/{pull['number']}/labels", "-f", f"labels[]={label}")
     print(f"Opened {pull['html_url']}. The checkout is on {branch}: do there what the changelog asks,"
           " and label it owner-review if that changes what the owner keeps (docs/process/updates.md).")
     return 0

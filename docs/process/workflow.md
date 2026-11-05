@@ -90,7 +90,7 @@ The process holds the milestones to these rules:
    split on that pull request's branch: the coordinator commits the split to `docs/backlog.md` there,
    the first part keeps the ID with a narrower "Done when" and goes on in the same pull request, and the
    other parts get new IDs. The split follows from the work: it changes neither the pull request's kind
-   nor its review label ([pull-requests.md](pull-requests.md#kind-and-labels)), and the report names it
+   nor its review label ([pull-requests.md](pull-requests.md#kind-title-and-label)), and the report names it
    among the coordinator's own decisions.
 2. **The brief** is the item's ID: "Do B-###". Nothing else; everything the session needs is in the
    repository.
@@ -117,9 +117,8 @@ The process holds the milestones to these rules:
    coordinator judges wrong (it contradicts the item or the plan, or rests on something untrue about
    the code, such as a test it calls missing that exists) it may close, with the reason in a comment on
    the pull request, and the next report names it among the decisions it made itself. Where the two reviews ask for opposite things, the review for harm wins.
-   Then **the coordinator's own check:** the diff against "Done when", the running result, that the
-   commits read as the steps they are ([rules.md](rules.md#git-and-github)), and that the review label
-   follows [reports.md](reports.md#when-the-owner-looks) and the decisions the milestone's plan gave the
+   Then **the coordinator's own check:** the diff against "Done when", the running result, and that the
+   review label follows [reports.md](reports.md#when-the-owner-looks) and the decisions the milestone's plan gave the
    owner; it corrects the label if not.
 6. **The report to the owner** ([reports.md](reports.md)). The owner reviews and discusses the pull
    request in its comments on GitHub, or in the chat when agents work under the owner's account; the
@@ -128,30 +127,35 @@ The process holds the milestones to these rules:
    above it ([changes.md](changes.md)), and starts "Fix pull request #N". That round gets one review
    of the fix, and for risky code one review for harm of it; it doesn't count toward the two rounds of
    step 5, and what it still finds goes as in step 5's second round.
-7. **The merge,** by rebase: after the owner's OK where it is needed, by the coordinator on its own
-   where it isn't ("The owner's OK and the merge" below). When merges change where the work stands, the
+7. **The merge,** by squash: `main` gets one commit, its subject the pull request's title, its body
+   empty. After the owner's OK where it is needed, by the coordinator on its own where it isn't ("The
+   owner's OK and the merge" below), with `gh api -X PUT repos/{owner}/{repo}/pulls/<N>/merge -f
+   merge_method=squash -f sha=<the last commit> -f commit_title="<the title>" -f commit_message=`;
+   `sha` makes GitHub refuse the merge if a commit came after the one checked and approved. The owner,
+   merging on GitHub, keeps what GitHub offers: the repository's settings make it the title and an
+   empty message ([setup.md](setup.md), step 8). When merges change where the work stands, the
    coordinator brings `docs/now.md` up to date afterwards in a record of its own, several merges in
    one, before its next report. If the owner says no, the pull request stays open, and the owner's
    remarks are handled as step 6 says.
    **Conflicts and a red `main`.** Before merging, the coordinator makes sure the pull request's checks
    ran on a base that includes the current `main`. If `main` has a commit newer than the checks' last
    runs, the pull request is closed and reopened, which runs the checks on the current `main` without a
-   new commit and keeps the owner's Approve (re-running an old run tests its old base). The branch is
-   rebased only when it conflicts: a new commit needs the owner's OK again where it needed one. A red
+   new commit and keeps the owner's Approve (re-running an old run tests its old base). `main` is merged
+   into the branch only when it conflicts: a new commit needs the owner's OK again where it needed one. A red
    `main` is fixed first: a document by the coordinator in a coordinator record, code by a work session
    on an item the coordinator writes for it. That pull request merges ahead of the rest; the others
    wait until `main` is green, and their sessions don't fix it in their own pull requests. A conflict
-   goes to a work session as a "fix" finding ("rebase onto `main`, conflict in X") with "Fix pull
-   request #N". A rebase that only resolves conflicts doesn't count as a review round: a reviewer, for
-   risky code the reviewer for harm, looks only at its range-diff
+   goes to a work session as a "fix" finding ("merge `main` in, conflict in X") with "Fix pull
+   request #N". A merge of `main` that only resolves conflicts doesn't count as a review round: a
+   reviewer, for risky code the reviewer for harm, looks only at how it resolved them
    ([rules.md](rules.md#if-you-are-the-reviewer)).
 8. **After the merge,** whoever merged, the coordinator records it in the tracker, if the project has
    one.
 
 **A wrong merge** is reverted in a pull request that names the original item in "Backlog item", takes
 its kind and review label, and unticks the item in the backlog, which reopens it. Its reviewer checks
-only that it reverts that merge and nothing else and that its checks pass; its commit subject follows
-the commit rules (`revert: ...` with Conventional Commits, [config.md](config.md#commits)).
+only that it reverts that merge's one commit and nothing else and that its checks pass; its title
+follows the commit rules (`revert: ...` with Conventional Commits, [config.md](config.md#commits)).
 
 ## The owner's OK and the merge
 

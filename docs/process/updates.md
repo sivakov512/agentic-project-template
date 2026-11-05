@@ -24,9 +24,10 @@ coordinator runs at the start of every session, says when a newer version is out
 runs `python3 tools/process/update.py` with a clean working tree. It makes a branch
 `process-update-X.Y.Z` from `main` as it is on GitHub, copies the template's files at the release (a
 release whose tag is not on the template's `main` it refuses before running anything of it),
-writes the new lock, and opens a pull request `Plan: update the process to X.Y.Z` with "Backlog item:
-Process update", labelled `plan` and `ok-without-reading`, or `owner-review` where it goes to the owner
-(below), and the changelog entries since the current version; the checkout stays on that branch. While
+writes the new lock, and opens a pull request `Plan: update the process to X.Y.Z` (`chore: ...` where
+the project asks for Conventional Commits) with "Backlog item: Process update", labelled
+`ok-without-reading`, or `owner-review` where it goes to the owner (below), and the changelog entries
+since the current version; the checkout stays on that branch. While
 any process update pull request is open, it does nothing. A project nobody works on needs no update. A
 release may change `.github/workflows/process-*.yml`, so the agents' account's git credentials must be
 allowed to change workflow files (a classic token's `workflow` scope, or Workflows: write).
@@ -46,8 +47,9 @@ it `owner-review`, and its "Owner review" says that an Approve is all it needs, 
 ## When a release breaks the project
 
 If a merged release breaks the project (a check that blocks every pull request, say), the coordinator
-reverts the commits the update put on `main` (`git revert`) in one pull request, `Plan: roll the process back to
-X.Y.Z`, with "Backlog item: Process update", labelled `plan` and `owner-review`, and tells the owner and
+reverts the update's commit on `main` (`git revert`) in one pull request, `Plan: roll the process back
+to X.Y.Z` (or `chore: ...`, as above), with "Backlog item: Process update", labelled `owner-review`,
+and tells the owner and
 the template's coordinator what broke. `process-lock` refuses a lock going back, so the owner removes
 it as a required check for this one merge, and `process-owner` too when it is what broke (Settings >
 Rules > Rulesets > the ruleset for `main` > Require status checks to pass > remove it > Save changes;

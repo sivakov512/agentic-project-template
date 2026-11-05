@@ -8,7 +8,7 @@ What could go wrong, what stops it, and where that is enforced. `docs/plan.md` a
 | A milestone or item starts before its inputs exist | Exit lists; items start only when their dependencies are merged and their milestone has started | The coordinator, the reviewer |
 | Parts built by different items don't fit, or a milestone finds what it builds on missing | Interfaces written down once, before the items on either side; each milestone written out at the end of the one before, with what it builds on named | The coordinator, the reviewer, the owner at the gate |
 | Code nobody can follow or maintain | Comments on every module and on what it offers; the reviewer's verdict on understood, fits the design, easy to change | The reviewer, the project's lint |
-| `main`'s history fills with review rounds | Fixes are folded into the commits they correct before the merge | The rules, the coordinator |
+| `main`'s history fills with review rounds | Each pull request lands as one squash commit, its subject the pull request's title, its body empty | The repository's merge settings, which `doctor.py` checks; CI (`process-commits`) for the title |
 | Work goes into documents, and nothing reaches the owner to use | Milestones, each after the foundation ending with something the owner uses in real work; requirements and design only for the current milestone | The plan, the coordinator, the owner at the gate |
 | Something is forgotten | IDs and coverage | CI (`process-docs`) |
 | A session does something other than its item, or more | The brief is the item; a reviewer compares the diff with "Done when"; a session stops when its item is unclear | The rules, the reviewer |

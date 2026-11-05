@@ -14,7 +14,7 @@ Python's standard library.
     "agents_account": "own",
     "merged_by": "coordinator"
   },
-  "commits": {"one_line": true, "no_co_authors": false, "conventional": true},
+  "commits": {"conventional": true},
   "checks": ["npm test", "npm run lint"],
   "kept": ["package.json", ".eslintrc.json", "jest.config.js", "src/payments/*"],
   "ids_ignore": ["docs/audit/*.md"],
@@ -53,16 +53,20 @@ Python's standard library.
 
 ## commits
 
-Every commit subject is at most 72 characters. Stricter rules the project may ask for:
+`main` gets one commit per pull request, its subject the pull request's title and its body empty
+([workflow.md](workflow.md#how-a-piece-of-work-goes), step 7), so these rules are checked on the title
+(`process-commits`); the commits on a branch never reach `main` and aren't checked. The title is at
+most 72 characters. The project may also ask for:
 
-- `one_line`: a commit message is its subject line only, with no body;
-- `no_co_authors`: no `Co-authored-by` lines;
-- `conventional`: every subject follows Conventional Commits, as release tools that read the history
+- `conventional`: the title follows Conventional Commits, as release tools that read the history
   need: one of the types `feat`, `fix`, `perf`, `revert`, `refactor`, `chore`, `docs`, `style`, `test`,
   `build`, `ci`, in lower case, an optional lower-case scope, an optional `!` (`fix(parser): …`,
-  `docs!: …`). A revert is written `revert: …`, not git's default `Revert "…"`.
+  `docs!: …`). A revert is written `revert: …`, not git's default `Revert "…"`. The type then stands
+  in for the kind's prefix ([pull-requests.md](pull-requests.md#kind-title-and-label)).
 
-All default to `false`. Rules beyond these go in the project's own check.
+It defaults to `false`. `one_line` and `no_co_authors`, from versions before 0.8.0, are still accepted
+and do nothing: a squash commit with an empty body keeps both. Rules beyond these go in the project's
+own check.
 
 ## releases
 
