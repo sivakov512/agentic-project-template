@@ -67,7 +67,8 @@ Whatever your role: a question from the owner is a question. Answer it and propo
   The coordinator decides whether the pull request goes on, split or not, or is closed.
 - Before you push, run `python3 tools/process/check.py` (the process checks and the project's own) and
   `python3 tools/process/check_pr.py --body <description file> --title "<title>" --labels <review label>`
-  and `python3 tools/process/check_commits.py --title "<title>"`. Finish only with every check passing.
+  and `python3 tools/process/check_commits.py --title "<title>" --number <its number>`. Finish only with
+  every check passing.
 - Tick your item in the backlog (`- [x]`) in the same pull request. Don't edit `docs/now.md`: the
   coordinator does.
 - Don't edit the template's files ([README.md](README.md#what-lives-where)). If the process is wrong,
@@ -147,8 +148,9 @@ Whatever your role: a question from the owner is a question. Answer it and propo
   language the owner writes in): the chat, and every comment and review on pull requests, agents' to
   each other included, since the owner reads them. Text proposed for the repository is quoted in
   English.
-- A pull request's title becomes the subject of its commit on `main`: at most 72 characters, and
-  `docs/process.json` may add stricter rules ([config.md](config.md#commits)).
+- A pull request's title becomes the subject of its commit on `main`: at most 72 characters together
+  with the " (#N)" GitHub adds when the owner merges on its page, and `docs/process.json` may add
+  stricter rules ([config.md](config.md#commits)).
 
 ## Code
 

@@ -56,7 +56,8 @@ Python's standard library.
 `main` gets one commit per pull request, its subject the pull request's title and its body empty
 ([workflow.md](workflow.md#how-a-piece-of-work-goes), step 7), so these rules are checked on the title
 (`process-commits`); the commits on a branch never reach `main` and aren't checked. The title is at
-most 72 characters. The project may also ask for:
+most 72 characters together with the " (#N)" GitHub adds when the owner merges on its page, so the
+subject on `main` stays within 72 however it is merged. The project may also ask for:
 
 - `conventional`: the title follows Conventional Commits, as release tools that read the history
   need: one of the types `feat`, `fix`, `perf`, `revert`, `refactor`, `chore`, `docs`, `style`, `test`,

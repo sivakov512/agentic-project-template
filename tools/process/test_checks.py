@@ -858,6 +858,12 @@ class TitleAgainstCommitRules(unittest.TestCase):
         self.assertTrue(check_commits.check("x" * 73, {}))
         self.assertTrue(check_commits.check(" ", {}))
 
+    def test_with_the_number_the_suffix_github_adds_counts(self):
+        self.assertEqual(check_commits.check("x" * 66, {}, 12), [])  # "x...x (#12)" is 72
+        errors = check_commits.check("x" * 67, {}, 12)
+        self.assertTrue(errors)
+        self.assertIn("at most 66", errors[0])
+
     def test_conventional_titles(self):
         rules = {"conventional": True}
         for title in ("feat: export to CSV", "fix(parser): keep empty lines", "docs!: drop the old guide",
