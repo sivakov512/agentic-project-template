@@ -68,5 +68,5 @@ In the template, the process files are its documents, and its coordinator change
 A fork that becomes a template of its own deletes `.process-lock.json` once and runs `lock.py`, which
 then names the fork.
 
-The template's files describe the process only: they never name a project's stages, documents or tools.
+The template's files describe the process only: they never name a project's milestones, documents or tools.
 A rule that fits only one project belongs in that project's `CLAUDE.md` or `docs/plan.md`.

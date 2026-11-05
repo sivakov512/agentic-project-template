@@ -38,19 +38,19 @@ Always ask, whatever the brief says:
 2. **`CLAUDE.md`:** replace the placeholder text with what the project is, in two or three lines, and
    the project's own rules for agents (dangerous operations, hardware, accounts, secrets, anything every
    session must know). Keep the line `@docs/process/rules.md`.
-3. **`docs/plan.md`:** fill in every section the placeholder lists. The stages are the
-   foundation, then increments ([workflow.md](workflow.md#stages-and-gates)); keep the document chain as
-   short as the project allows, and name in it
-   where the interfaces between parts are written
+3. **`docs/plan.md`:** fill in every section the placeholder lists. The milestones are the foundation,
+   then those that each end with something the owner uses
+   ([workflow.md](workflow.md#milestones-and-gates)); keep the document chain as short as the project
+   allows, and name in it where the interfaces between parts are written
    ([workflow.md](workflow.md#how-the-repository-works)) and, with code, the document of the code's
-   design that lists its folders ([rules.md](rules.md#code)). The foundation is written out in full;
-   the increments after it are a line each, what the owner gets from it.
+   design that lists its folders ([rules.md](rules.md#code)). The foundation is written out in full; the
+   milestones after it are a line each, what the owner gets from it.
 4. **`docs/process.json`:** the owner's language, the tracker, how the project ships, the agents'
    account and who merges, the commit rules, the kinds of ID and coverage rules
    ([config.md](config.md)). `checks` stays empty until
    the project has code; the item that adds the first check also adds
    `.github/workflows/project-checks.yml` that runs it in CI. Leave `set_up` false until step 9.
-5. **`docs/backlog.md`:** the first stage's items ([changes.md](changes.md#the-backlog)).
+5. **`docs/backlog.md`:** the first milestone's items ([changes.md](changes.md#the-backlog)).
 6. **`docs/now.md`:** where the work stands: the foundation, nothing in work, the first items next.
 7. **`README.md`:** what the project is, for a visitor; one paragraph is enough. **`LICENSE`** is the
    template's: replace it with the project's license, or remove it if the owner wants none. The
@@ -100,11 +100,10 @@ template's sections they lack.
    same checkout where the project has no such file yet ([README.md](README.md#what-lives-where)).
 2. Split the project's rules: what the process files now say is removed from the project's `CLAUDE.md`
    and plan; what is the project's own stays, under the sections of the `docs/plan.md` placeholder.
-   The plan's stages take the shape of the foundation and increments
-   ([workflow.md](workflow.md#stages-and-gates)): what is done stays as done, and what is left is
-   brought into that shape as [workflow.md](workflow.md#stages-and-gates) says for a project already
-   under way.
-   `CLAUDE.md` keeps the project's rules and imports `@docs/process/rules.md`.
+   The plan takes the shape of the foundation and the milestones after it
+   ([workflow.md](workflow.md#milestones-and-gates)): what is done stays as done, and what is left is
+   brought into that shape as [workflow.md](workflow.md#milestones-and-gates) says for a project already
+   under way. `CLAUDE.md` keeps the project's rules and imports `@docs/process/rules.md`.
 3. Move the project's documents where the process expects them, and its backlog into the `B-###` form,
    renumbered if it used another prefix; `docs/now.md` keeps a table from old numbers to new, the old
    ones written as code if their prefix is still one of the project's kinds, so the ID check leaves

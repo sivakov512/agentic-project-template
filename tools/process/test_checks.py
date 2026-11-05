@@ -98,7 +98,7 @@ None: only documents change.
 
 ## Why
 
-Stage two needs it.
+Milestone two needs it.
 
 ## How it was checked
 
@@ -368,11 +368,11 @@ class PullRequestCheck(unittest.TestCase):
         self.assertEqual(list(check_pr.sections(TEMPLATE.read_text())), check_pr.SECTIONS)
 
     def test_missing_section_fails(self):
-        body = GOOD_BODY.replace("## Why\n\nStage two needs it.\n", "")
+        body = GOOD_BODY.replace("## Why\n\nMilestone two needs it.\n", "")
         self.assertIn("section \"Why\" is missing", self.errors(body))
 
     def test_section_with_next_to_nothing_fails(self):
-        body = GOOD_BODY.replace("Stage two needs it.", "-")
+        body = GOOD_BODY.replace("Milestone two needs it.", "-")
         self.assertIn("section \"Why\" says next to nothing", self.errors(body))
 
     def test_unknown_backlog_item_fails(self):

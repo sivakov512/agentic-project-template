@@ -5,7 +5,7 @@ merged on its own since the last report, or a gate), the coordinator reports. Th
 phone's screen, about twelve lines; detail stays in the pull requests, which it links. In this order,
 each point left out when it has nothing to say, all but the last:
 
-1. **Where we are,** one line: the stage and the next step.
+1. **Where we are,** one line: the milestone and the next step.
 2. **In work:** what is going on right now, one line per item or pull request and what it does.
 3. **What changed,** one line each, every one saying how it ended: fixed and merged, not fixed and what
    it waits on, checked and how. A fact without its outcome isn't written. Then the pull requests merged
@@ -13,7 +13,7 @@ each point left out when it has nothing to say, all but the last:
 4. **Decisions the coordinator made itself,** so the owner can reverse any of them, **deviations from the
    plan, and risks,** one line each.
 5. **What is needed from the owner,** opening with a call ("Needed from you:"), then a numbered item per
-   action: an approval, a question with a recommendation, an increment to try, a setting to change,
+   action: an approval, a question with a recommendation, a milestone to try, a setting to change,
    anything only the owner can do. Each item gives the action and its link; what it decides, in plain
    words, one line; why it is the owner's and not the coordinator's, by the rule that makes it so
    ("When the owner looks" below, or what [workflow.md](workflow.md#the-owners-ok-and-the-merge) keeps
@@ -45,14 +45,15 @@ Settings the owner must change are given as a path of clicks with links (Setting
 The owner agrees where the work goes and checks what it gives; the agents do the rest. The owner looks
 at:
 
-1. **The plan of each increment,** at the gate before it, written out as
-   [workflow.md](workflow.md#stages-and-gates) says.
+1. **The plan of each milestone after the foundation,** at the gate before it, written out as
+   [workflow.md](workflow.md#milestones-and-gates) says.
 2. **The decisions that plan names as the owner's,** each when it is ready: what a person will use or
    work with (the interface, an API or a driver others program against, a file or data format a person
    reads or writes, a command line, settings), what shapes the whole product (the architecture, the
    stack, the model of the data), and what is hard to reverse. `docs/plan.md` may name more. A decision
    of these kinds that the plan didn't name goes beyond the plan (4).
-3. **The result of each increment,** by using it ([workflow.md](workflow.md#stages-and-gates)).
+3. **The result of each milestone after the foundation,** by using it
+   ([workflow.md](workflow.md#milestones-and-gates)).
 4. **What goes beyond the agreed plan:** a change of scope, sizeable work the plan didn't foresee, a
    problem, a risk or a blocker, an action on the owner's real data (a migration run on it, moving or
    deleting it), and what only the owner can do (accounts, money, hardware, settings). Code that may do

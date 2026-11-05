@@ -24,8 +24,8 @@
   documents it depends on;
 - items are never deleted: an item that is no longer needed is ticked and marked "Superseded by B-###"
   or "Dropped", with the reason;
-- the section "Later" at the end holds what is left out of the increments so far, a plain line each
-  ([workflow.md](workflow.md#stages-and-gates)).
+- the section "Later" at the end holds what is left out of the milestones so far, a plain line each
+  ([workflow.md](workflow.md#milestones-and-gates)).
 
 ## Decision records
 

@@ -34,10 +34,19 @@ The newest version first. Each entry says what changed and what projects must do
   trial the owner asked for the outcome of each point, the reason the owner is needed and what to look
   at, the work in progress, a short report, and the same report when asking for the status; with that,
   the owner had it made a rule.
+- One word for a piece of the plan: milestone. The foundation is the first milestone, and each one after
+  it ends with something the owner uses; "stage" and "increment" are gone from the process, and
+  `workflow.md`'s section is now "Milestones and gates". The owner asked for it: two words confused the
+  coordinators, and "milestone" is the common term in project management. Inside a milestone the work is
+  still backlog items.
 
 Projects: to keep a line on the tracker in reports, the coordinator proposes it to the owner in
 `docs/plan.md`, section Tracker. A release tool that opens pull requests with the agents' token moves to
-a GitHub App the owner makes.
+a GitHub App the owner makes. The project renames "stage" and "increment" to "milestone" in its own
+documents (`docs/plan.md` with its section "Stages", `docs/now.md`, `docs/backlog.md`, `CLAUDE.md`) and
+points its links to `workflow.md#stages-and-gates` at `#milestones-and-gates`, or the docs check fails
+on them; that is in the update's pull request, which then goes to the owner, since `docs/plan.md` is the
+owner's.
 
 ## 0.5.4 — 2026-11-04
 

@@ -60,7 +60,7 @@ The details are in [`docs/process/`](docs/process/README.md).
 3. **Open an agent session** (Claude Code) in the repository, signed in to `git` and `gh` as that
    account, and say in a few lines what the project is.
 4. **The agent sets the project up.** It asks you what it needs to know: the goal, your tracker, how
-   the project ships. Then it brings one pull request with the plan, the stages, the first backlog
+   the project ships. Then it brings one pull request with the plan, the milestones, the first backlog
    items, and a short list of repository settings for you to click.
 
 From then on you talk to the coordinator: give it goals and remarks, answer its questions, approve
@@ -72,7 +72,7 @@ what needs you.
   of work goes, pull requests, reports, decisions and traceability, setting up and updating.
 - `tools/process/`: the checks CI runs; `doctor.py`, which tells the coordinator what the setup is
   missing; `update.py`, which brings a newer version of the process into a project.
-- Placeholders for what is the project's own: `CLAUDE.md`, `docs/plan.md` (goal, stages, releases),
+- Placeholders for what is the project's own: `CLAUDE.md`, `docs/plan.md` (goal, milestones, releases),
   `docs/now.md` (where the work stands), `docs/backlog.md`, `docs/decisions/`, `docs/process.json`
   (settings the checks read).
 

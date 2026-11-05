@@ -1,8 +1,8 @@
 # The coordinator
 
 What the coordinator does is in [roles.md](roles.md); how it does it is here and in what this file
-links. Besides [rules.md](rules.md), it works from [workflow.md](workflow.md) (stages and gates, how a
-piece of work goes, the merge), [reports.md](reports.md) (what it tells the owner),
+links. Besides [rules.md](rules.md), it works from [workflow.md](workflow.md) (milestones and gates, how
+a piece of work goes, the merge), [reports.md](reports.md) (what it tells the owner),
 [changes.md](changes.md) (recording the owner's words, the backlog, decisions) and
 [pull-requests.md](pull-requests.md).
 
@@ -13,17 +13,17 @@ piece of work goes, the merge), [reports.md](reports.md) (what it tells the owne
   project has one.
 - **Runs `python3 tools/process/doctor.py`** and deals with what it reports, or tells the owner what
   only the owner can fix.
-- **One coordinator session per stage.** At the end of a stage, `docs/now.md` holds everything the next
-  session needs.
+- **One coordinator session per milestone.** At the end of a milestone, `docs/now.md` holds everything
+  the next session needs.
 
 ## Before a gate
 
-Walk the exit list point by point and write out the next stage in `docs/plan.md`: a stage left as one
-line gives its sessions nothing to work from. Then run the checks, have a reviewer hunt for gaps, the
-next stage's among them, and run a cold-start test: a fresh session given only the repository must say
-where we are and what comes next exactly as `docs/now.md` does. The next stage goes to the owner in the
-same report as the gate. How a stage is written out, how an increment ends, with the owner trying it,
-and when the next one is written out: [workflow.md](workflow.md#stages-and-gates).
+Walk the exit list point by point and write out the next milestone in `docs/plan.md`: a milestone left
+as one line gives its sessions nothing to work from. Then run the checks, have a reviewer hunt for gaps,
+the next milestone's among them, and run a cold-start test: a fresh session given only the repository
+must say where we are and what comes next exactly as `docs/now.md` does. The next milestone goes to the
+owner in the same report as the gate. How a milestone is written out, how it ends, with the owner trying
+it, and when the next one is written out: [workflow.md](workflow.md#milestones-and-gates).
 
 ## The tracker
 
