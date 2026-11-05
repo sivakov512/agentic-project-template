@@ -15,8 +15,8 @@ Nikita Sivakov, under the MIT License.
 |---|---|---|
 | How the process works | `docs/process/`, `tools/process/`, `.github/pull_request_template.md`, `.github/workflows/process-*.yml` | the template |
 | Which version of the process this is | `.process-lock.json` | written by `lock.py` in the template and copied by the update |
-| What the project is, and its own rules for agents | `CLAUDE.md`, which imports [rules.md](rules.md) | the project |
-| Goal, document chain, milestones, where facts go, the owner's rules for this project | `docs/plan.md` | the project |
+| What the project is, and the rules every session of it keeps | `CLAUDE.md`, which imports [rules.md](rules.md) | the project |
+| Goal, document chain, milestones, where facts go, and the rest the coordinator needs about the project | `docs/plan.md` | the project |
 | Where the work stands | `docs/now.md` | the project |
 | The work | `docs/backlog.md` | the project |
 | Decisions | `docs/decisions/` and its `README.md` | the project |
@@ -40,7 +40,7 @@ Every session has [rules.md](rules.md): `CLAUDE.md` imports it, and it tells a s
 | Reviewer | the pull request's item and the documents it links |
 | Coordinator | [coordinator.md](coordinator.md), which names the rest |
 | Setting up a project | [setup.md](setup.md) |
-| The template's coordinator | [updates.md](updates.md#changing-the-process) |
+| The template's coordinator | [updates.md](updates.md#changing-the-process), [workflow.md](workflow.md#how-a-piece-of-work-goes) steps 5 to 7 |
 
 The rest, for reference: [roles.md](roles.md) (who does what), [workflow.md](workflow.md) (milestones,
 gates, how a piece of work goes, the merge), [pull-requests.md](pull-requests.md),

@@ -24,7 +24,7 @@
 
 ## Owner review
 
-<!-- What the owner should look at and about how many minutes, or why no reading is needed; it matches the review label (docs/process/reports.md). When in doubt, it is needed. -->
+<!-- What the owner should look at and about how many minutes, or why no reading is needed; it matches the review label (docs/process/reports.md). If unsure whether the owner needs to read it, say so here; the coordinator decides (docs/process/reports.md#when-the-owner-looks). -->
 
 ## Not done and open questions
 

@@ -11,15 +11,16 @@ description lists the steps, ticked as they are done, and the owner's answers ar
 
 A brief: what the project is, for whom, and what "done" looks like. A few lines in the first message,
 or a link to a document. Ask what the steps below need and the brief doesn't answer, in the chat, in
-one batch of questions, each with your recommendation; write nothing into the plan until the owner has
-answered. Once the setup pull request is open (step 1), put the brief, the questions and the answers in
-a comment on it, so a session that continues the setup has them.
+one batch of questions, the account question first, each with your recommendation. Step 1 already
+pushes: do it only once the owner has answered the account question and `gh api user` shows that
+account. The other answers may come later, but nothing goes into the plan before them. Once the setup
+pull request is open, put the brief, the questions and the answers in a comment on it, so a session
+that continues the setup has them.
 
 Always ask, whatever the brief says:
 
 - **whose account the agents work under, and who merges**
-  ([workflow.md](workflow.md#the-owners-ok-and-the-merge)). Ask this first: step 1 already pushes, so
-  `git` and `gh` must be signed in as that account before it. With the agents' own account the
+  ([workflow.md](workflow.md#the-owners-ok-and-the-merge)). With the agents' own account the
   repository must belong to the owner's personal account, not an organisation;
 - **which tracker mirrors the project for the owner,** or that there is none; whether the project is in
   it yet; and how agents reach it (a connector, a skill, a token), which the owner grants. If the
@@ -36,8 +37,10 @@ Always ask, whatever the brief says:
    open a draft pull request titled `Plan: set up the project`, "Backlog item: Setup", with the steps
    below as a checklist in its description. Tick each step there when it is done.
 2. **`CLAUDE.md`:** replace the placeholder text with what the project is, in two or three lines, and
-   the project's own rules for agents (dangerous operations, hardware, accounts, secrets, anything every
-   session must know). Keep the line `@docs/process/rules.md`.
+   the project's own rules for agents (dangerous operations, hardware, accounts, secrets, house style,
+   anything every session must know). Such a rule goes here, never only in `docs/plan.md`, of which
+   work sessions and reviewers read only the parts their item leads them to. Keep the line
+   `@docs/process/rules.md`.
 3. **`docs/plan.md`:** fill in every section the placeholder lists. The milestones are the foundation,
    then those that each end with something the owner uses
    ([workflow.md](workflow.md#milestones-and-gates)); keep the document chain as short as the project
@@ -50,7 +53,8 @@ Always ask, whatever the brief says:
    ([config.md](config.md)). `checks` stays empty until
    the project has code; the item that adds the first check also adds
    `.github/workflows/project-checks.yml` that runs it in CI. Leave `set_up` false until step 9.
-5. **`docs/backlog.md`:** the first milestone's items ([changes.md](changes.md#the-backlog)).
+5. **`docs/backlog.md`:** the first milestone's items, under its heading
+   ([changes.md](changes.md#the-backlog)).
 6. **`docs/now.md`:** where the work stands: the foundation, nothing in work, the first items next.
 7. **`README.md`:** what the project is, for a visitor; one paragraph is enough. **`LICENSE`** is the
    template's: replace it with the project's license, or remove it if the owner wants none. The
@@ -92,14 +96,15 @@ It asks the questions of "What the owner gives" that the project's files don't a
 a branch `setup`, continued as above. One pull request, kind `plan`, `owner-review`, "Backlog item:
 Setup"; the copied template files count as generated, and if the rest would pass the size limit
 ([rules.md](rules.md#your-work)), the renumbering of the backlog goes first in a pull request of its
-own. Work pull requests open at the move stay open: once it is merged, their descriptions get the
-template's sections they lack.
+own (kind `plan`, `ok-without-reading`, "Backlog item: Setup"). Work pull requests open at the move
+stay open: once it is merged, their descriptions get the template's sections they lack.
 
 1. With the template checked out at its latest release tag, run `python3 <template>/tools/process/sync.py
    <template> .`: it brings the template's files and the lock. Copy the project placeholders from the
    same checkout where the project has no such file yet ([README.md](README.md#what-lives-where)).
 2. Split the project's rules: what the process files now say is removed from the project's `CLAUDE.md`
-   and plan; what is the project's own stays, under the sections of the `docs/plan.md` placeholder.
+   and plan; what is the project's own stays: rules every session keeps in `CLAUDE.md`, the rest under
+   the sections of the `docs/plan.md` placeholder.
    The plan takes the shape of the foundation and the milestones after it
    ([workflow.md](workflow.md#milestones-and-gates)): what is done stays as done, and what is left is
    brought into that shape as [workflow.md](workflow.md#milestones-and-gates) says for a project already

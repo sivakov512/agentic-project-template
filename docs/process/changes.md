@@ -2,10 +2,9 @@
 
 ## Changes
 
-- An owner request or decision is recorded the same day
-  ([workflow.md](workflow.md#how-the-repository-works)), by the coordinator, in a pull request marked
-  "Coordinator record". Nobody acts on a requirement that
-  exists only in a chat.
+- The coordinator records the owner's requests and decisions in a pull request marked "Coordinator
+  record", as [workflow.md](workflow.md#how-the-repository-works) says. Nobody acts on a requirement
+  that exists only in a chat.
 - A change is made in the highest document of the chain it touches first, then carried down to the
   backlog. A new need starts where it comes from in the chain.
 - Backlog items a change affects are updated, or closed as superseded with a pointer to the new item.
@@ -22,6 +21,8 @@
 - indented lines under it: "Depends on" (items and documents it needs, or "any time") and "Done when"
   (the bar for the work, specific enough for a reviewer to check point by point), with links to the
   documents it depends on;
+- items stand under a heading per milestone (`## <milestone>`), in the order of `docs/plan.md`; an
+  item belongs to the milestone it stands under;
 - items are never deleted: an item that is no longer needed is ticked and marked "Superseded by B-###"
   or "Dropped", with the reason;
 - the section "Later" at the end holds what is left out of the milestones so far, a plain line each

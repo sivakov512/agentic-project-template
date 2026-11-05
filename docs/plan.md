@@ -54,7 +54,8 @@ decided; or "none", with the reason. The short form is `releases` in `docs/proce
 What could go wrong in this project, beyond [the process's list](process/defences.md), and what stops
 it.
 
-## The owner's rules
+## Working with the owner
 
-The owner's standing rules for this project: preferences every session must keep (how much to disturb
-the owner, what to build and not to build, house style), each with its reason.
+How the owner wants the coordinator to work with them: how much to disturb them, what to build and not
+to build, each with its reason. A rule every session must keep (house style, say) goes in `CLAUDE.md`,
+not here: work sessions and reviewers read only the parts of the plan their item leads them to.

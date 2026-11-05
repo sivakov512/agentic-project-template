@@ -16,8 +16,10 @@
   Leaving it to the code holds only when one item builds both sides.
 - **No work without a backlog item.** Pull requests that are not product work say what they are instead
   ([pull-requests.md](pull-requests.md#the-description)).
-- **The owner's words become records the same day:** a rule in the plan, a decision record, a change to
-  a document, or a backlog item, in a pull request. Until it is merged, the pull request is the record.
+- **What the owner decides or asks for becomes a record the same day:** a rule in the plan, a decision
+  record, a change to a document, or a backlog item, in a pull request ([changes.md](changes.md)). Until
+  it is merged, the pull request is the record. What holds only for the session (a pause, an answer to a
+  question) stays in the chat ([coordinator.md](coordinator.md#stop)).
 
 ## Milestones and gates
 
@@ -94,28 +96,26 @@ The process holds the milestones to these rules:
    coordinator answers there, bringing the owner in when a question is the owner's to decide
    ([rules.md](rules.md#your-work)).
 4. **The work,** on the item's branch and pull request. Then the pull request leaves draft.
-5. **The checks.** CI passes, and a reviewer ("Review pull request #N") posts its findings
-   ([rules.md](rules.md#if-you-are-the-reviewer)). A work session ("Fix pull request #N") fixes them.
+5. **Review and checks.** Every pull request gets a reviewer ("Review pull request #N",
+   [rules.md](rules.md#if-you-are-the-reviewer)) but two: a coordinator record that changes only
+   `docs/now.md` or the backlog (its section "Later" included), and a process update that only brings
+   the template's release. CI passes, and a work session ("Fix pull request #N") fixes the findings.
    **At most two rounds:** a full review, then, only if it had "fix" findings, a review of the fix
    alone; small leftovers of the second round (wording, a link) the coordinator fixes itself, anything
    in the product goes back to a work session. If blocking problems remain after that, the coordinator
    stops, rethinks the item (its approach or its size) and tells the owner.
-   A pull request with code that `docs/plan.md` names as risky also gets a review for harm ("Review
-   pull request #N for harm"), run at the same time by another reviewer
-   ([rules.md](rules.md#if-you-are-the-reviewer)). One "Fix pull request #N" fixes the findings of both.
-   Any change to the risky code after the review for harm, from a fix of either review or later, goes
-   back to it before the merge, even when its own first round had no "fix" finding, and the coordinator
-   never makes such a change itself. A finding of the review for harm is closed only when its
-   reviewer says so: if one is still open after its second round, the coordinator neither fixes it
-   itself nor merges, but stops and tells the owner; so does a change to the risky code that would need
-   a third round. The pull request merges only when neither review has a "fix" finding left.
-   The coordinator then checks the result personally: the diff against "Done when", the running result,
-   that the commits read as the steps they are ([rules.md](rules.md#git-and-github)), and that the
-   review label follows [reports.md](reports.md#when-the-owner-looks) and the decisions the milestone's
-   plan gave the owner; it corrects the label if not. A reviewer is needed for every pull request but a
-   coordinator record of `docs/now.md` or the backlog (its section "Later" included) and a process
-   update that only brings the template's release; a record that changes a document of the chain or
-   adds a decision record gets one.
+   Code that `docs/plan.md` names as risky also gets a review for harm ("Review pull request #N for
+   harm") by another reviewer at the same time; one "Fix pull request #N" fixes the findings of both.
+   Any later change to the risky code goes back to the review for harm before the merge, and the
+   coordinator never makes such a change itself. A finding of the review for harm is closed only by its
+   reviewer: if one is still open
+   after its second round, or a change to the risky code would need a third round, the coordinator
+   neither fixes it nor merges, but stops and tells the owner. The pull request merges only when
+   neither review has a "fix" finding left.
+   Then **the coordinator's own check:** the diff against "Done when", the running result, that the
+   commits read as the steps they are ([rules.md](rules.md#git-and-github)), and that the review label
+   follows [reports.md](reports.md#when-the-owner-looks) and the decisions the milestone's plan gave the
+   owner; it corrects the label if not.
 6. **The report to the owner** ([reports.md](reports.md)). The owner reviews and discusses the pull
    request in its comments on GitHub, or in the chat when agents work under the owner's account; the
    coordinator answers where the owner wrote.
@@ -131,20 +131,27 @@ The process holds the milestones to these rules:
 
 ## The owner's OK and the merge
 
+**What the owner keeps for themself** is of two kinds:
+
+- the files CI holds for the owner: `CLAUDE.md` and `CLAUDE.local.md` in any folder, any `.claude/`
+  folder, `.mcp.json`, `docs/plan.md`, `docs/process.json` and the paths its `kept` names
+  ([config.md](config.md#kept)), anything under `.github/`, and the template's files and lock. The one
+  exception is a process update's files that are exactly as in the template's release, which the owner
+  agreed in the template, `.github/` aside with the agents' own account
+  ([updates.md](updates.md#getting-a-newer-process)). A symlink or submodule at any of these paths, or
+  at a folder on the way to one, never goes in, approved or not, and nor do rules Claude Code loads by
+  itself (a `CLAUDE.md` or `CLAUDE.local.md` in any folder, `.claude/rules/`) that import (an `@` before
+  the path) a file the owner doesn't keep, or a symlink or submodule: a `CLAUDE.md` that should say what
+  `AGENTS.md` says is a plain file that imports it, with `AGENTS.md` in `kept`;
+- any change that loosens the project's checks, whatever file it is in (a test removed or skipped, a
+  lint rule or a threshold eased), which only the label and the coordinator hold.
+
 **Which pull requests need the owner's OK:** those labelled `owner-review`, those with no review label
-(a bot's, until the coordinator labels it), and every one that changes what the owner keeps for themself: `CLAUDE.md` and `CLAUDE.local.md` in
-any folder, any `.claude/` folder, `.mcp.json`, `docs/plan.md`,
-`docs/process.json` and the paths its `kept` names ([config.md](config.md#kept)), anything under `.github/`, and the template's files and lock, apart from those a
-process update brings exactly as in the template's release, `.github/` aside with the agents' own
-account ([updates.md](updates.md#getting-a-newer-process)). A symlink or submodule at any of these
-paths, or at a folder on the way to one, never goes in, approved or not, and nor do rules Claude Code
-loads by itself (a `CLAUDE.md` or `CLAUDE.local.md` in any folder, `.claude/rules/`) that import (an `@`
-before the path) a file the owner doesn't keep, or a symlink or submodule: a `CLAUDE.md` that should say
-what `AGENTS.md` says is a plain file that imports it, with `AGENTS.md` in `kept`. One labelled
-`ok-without-reading` that changes none of these the coordinator merges on its own, once its checks are
-green, its reviews have no "fix" finding left and step 5's own check is done; the next report lists it
-([reports.md](reports.md)), and the owner can have any of them reverted. The check `process-owner`
-holds this ([pull-requests.md](pull-requests.md#the-checks-ci-runs)).
+(a bot's, until the coordinator labels it), and every one that changes what the owner keeps. One
+labelled `ok-without-reading` that changes none of it the coordinator merges on its own, once its
+checks are green, its reviews have no "fix" finding left and the coordinator's own check (step 5) is
+done; the next report lists it ([reports.md](reports.md)), and the owner can have any of them reverted.
+The check `process-owner` holds the files ([pull-requests.md](pull-requests.md#the-checks-ci-runs)).
 
 For the pull requests that need it, each project chooses, in `docs/process.json`, how this works for it; the choice is the owner's
 ([config.md](config.md#project)).

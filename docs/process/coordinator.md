@@ -13,8 +13,8 @@ a piece of work goes, the merge), [reports.md](reports.md) (what it tells the ow
   project has one.
 - **Runs `python3 tools/process/doctor.py`** and deals with what it reports, or tells the owner what
   only the owner can fix.
-- **One coordinator session per milestone.** At the end of a milestone, `docs/now.md` holds everything
-  the next session needs.
+- **`docs/now.md` always holds what a fresh coordinator needs:** a handover to a new session
+  mid-milestone is normal.
 
 ## Before a gate
 

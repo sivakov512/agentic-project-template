@@ -57,22 +57,18 @@ at:
 4. **What goes beyond the agreed plan:** a change of scope, sizeable work the plan didn't foresee, a
    problem, a risk or a blocker, an action on the owner's real data (a migration run on it, moving or
    deleting it), and what only the owner can do (accounts, money, hardware, settings). Code that may do
-   such things is risky code (below), not this point.
+   such things is risky code, as `docs/plan.md` names it (below), not this point.
 5. **The rules of the work:** what the owner keeps for themself
-   ([workflow.md](workflow.md#the-owners-ok-and-the-merge)): `CLAUDE.md`, the agents' own settings
-   (`.claude/`, `.mcp.json`), the plan, the settings and the paths they keep, the
-   commands of the checks, CI and the process, and any change that loosens the project's checks,
-   whatever file it is in (a test removed or skipped, a lint rule or a threshold eased). The template's
-   files a process update brings exactly as in the template's release are the exception: the owner
-   agreed them in the template.
+   ([workflow.md](workflow.md#the-owners-ok-and-the-merge)).
 
 A pull request for 1, 2, 4 or 5 is labelled `owner-review`; it says in plain words what it decides or
 changes, and for the checks and CI what it loosens or tightens. Everything else is labelled
 `ok-without-reading` and the coordinator merges it on its own: the requirements and the documents of
 the chain inside the agreed scope, studies, code and tests, interfaces between parts that only the
 agents build, the backlog, `docs/now.md`, records of facts, and records of the owner's own decisions
-outside what the owner keeps. A bot's pull request the coordinator labels after its review: a
-dependency bump inside the plan `ok-without-reading`, a release as the plan's Releases section says.
+outside what the owner keeps. A bot's pull request the coordinator labels after the reviewer's
+findings and its own check: a dependency bump inside the plan `ok-without-reading`, a release as the
+plan's Releases section says.
 
 Code `docs/plan.md` names as risky goes as OK without reading only where the plan says so, once
 neither its review nor its review for harm has a "fix" finding left

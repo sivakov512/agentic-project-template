@@ -17,7 +17,8 @@ The first of these that fits is your role:
    `.process-lock.json`): you are the template's coordinator. Changes to the process go as
    [updates.md](updates.md#changing-the-process) says, reviewed and merged as in
    [workflow.md](workflow.md#how-a-piece-of-work-goes), steps 5 to 7; run `doctor.py` at the start of a
-   session. The template has no milestones, backlog or tracker of its own.
+   session. The template has no milestones, backlog, `docs/now.md` or tracker of its own, so what those
+   steps say of them doesn't apply.
 5. **The project is not set up yet** (`docs/process.json` on `main` says `"set_up": false`): you are
    setting it up. Follow [setup.md](setup.md).
 6. **Anything else, from the owner:** you are the coordinator. Follow [coordinator.md](coordinator.md),
@@ -34,8 +35,9 @@ Whatever your role: a question from the owner is a question. Answer it and propo
   the coordinator reads and writes, to keep it in step, never to learn what to do.
 - If something you need is not here, stop and say so in your report; don't fill the gap from memory or
   guesswork.
-- The spec is the document chain in `docs/plan.md`, read from the top. A change starts in the highest
-  document it touches ([changes.md](changes.md)).
+- The spec is the document chain in `docs/plan.md`. Where your item and the documents it links leave a
+  question, look it up from the top of the chain down. A change starts in the highest document it
+  touches ([changes.md](changes.md)).
 
 ## Your work
 
@@ -82,8 +84,8 @@ Whatever your role: a question from the owner is a question. Answer it and propo
 ## If you fix a pull request
 
 - Read the reviewers' comments on the pull request: the review, and the review for harm where there is
-  one. Fix every finding marked **fix** in all of them, on the pull request's branch; leave the
-  **drop** ones.
+  one. Fix every finding marked **fix** in all of them, on the pull request's branch, and list those
+  marked "outside the item" under "Not done and open questions"; leave the **drop** ones.
 - Fold each fix into the commit it corrects ("Git and GitHub" below), run the checks as in "Your
   work", push, and answer with one comment: the new head commit, and for each "fix" finding what you
   changed and where, or why you couldn't. The coordinator then runs the second rounds on that new head.
@@ -92,6 +94,10 @@ Whatever your role: a question from the owner is a question. Answer it and propo
 
 - Check the pull request against its item's "Done when" and the documents it links. Look for what is
   wrong or missing, not for reasons to approve.
+- A pull request with no item has its bar elsewhere: for "Setup", the steps of [setup.md](setup.md) and
+  the owner's answers in its comments; for "Process change", what its description says it changes and
+  [updates.md](updates.md#changing-the-process); for a "Coordinator record", the owner's words it quotes
+  and the documents above the ones it changes.
 - Check that the evidence in the pull request is real: repeat it where you can.
 - In a pull request that changes the work itself (code, a design, a document of the chain), give a
   verdict on three points, each with what you judged it on:
@@ -106,7 +112,10 @@ Whatever your role: a question from the owner is a question. Answer it and propo
   behaviour, a risk the project's rules name, a wrong or unsupported fact, a red or flaky check,
   documents that contradict each other, a gap the next item would trip on, or falling short on one of
   the three points) or **drop** (wording, taste, layout, or no effect on the result or the next steps)
-  with a one-line reason. Nothing is put off for later. Don't fix things yourself.
+  with a one-line reason. Nothing is put off for later. A problem the pull request didn't cause and its
+  item doesn't cover is marked **fix** and "outside the item": it isn't fixed in this pull request; the
+  fixing session lists it under "Not done and open questions", which settles it, and the coordinator
+  makes it an item. Don't fix things yourself.
 - A second round comes only if the first had "fix" findings, or, for a review for harm, if a fix
   changed the code `docs/plan.md` names as risky: review only the fix, the change from the
   head you reviewed to the new head the fix comment names (`git range-diff --creation-factor=100
@@ -133,7 +142,7 @@ Whatever your role: a question from the owner is a question. Answer it and propo
   language the owner writes in): the chat, and every comment and review on pull requests, agents' to
   each other included, since the owner reads them. Text proposed for the repository is quoted in
   English.
-- A commit subject is at most 72 characters; `docs/process.json` may ask for more
+- A commit subject is at most 72 characters; `docs/process.json` may add stricter rules
   ([config.md](config.md#commits)).
 
 ## Code
@@ -155,8 +164,8 @@ written.
 - The document the document chain names for the code's design lists its folders: those at the top of
   the repository and those of each part of the code, as deep as the design describes the parts. One
   line each: what it holds and, for a name that isn't plain, where the name comes from. A new folder is
-  a change to the design, so it goes into the list before the work that makes it, usually with the item
-  that needs it. The project's checks include one that fails on a folder missing from the list; the
+  a change to the design, so it goes into the list in the same pull request as the work that makes it,
+  or an earlier one. The project's checks include one that fails on a folder missing from the list; the
   item that adds the first code adds it.
 
 ## Git and GitHub
