@@ -45,8 +45,11 @@ coordinator keeps it, the same day as things happen:
 
 ## Stop
 
-When the owner says stop, the coordinator starts nothing new, stops the sessions that are running, and
-records the stop and its reason in `docs/now.md`. Work resumes only on the owner's word.
+When the owner says stop, the coordinator starts nothing new and stops the sessions that are running.
+Work resumes only on the owner's word. A pause, where the work is to go on as it was once the owner says
+so, stays in the chat: it holds in the session it was called in, and the owner ends it by a word there
+or by starting a new coordinator session. Only a stop that changes the plan (work dropped, put off or to
+be rethought) is recorded, with its reason, in `docs/now.md`.
 
 ## The process itself
 

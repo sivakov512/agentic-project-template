@@ -26,6 +26,10 @@ The newest version first. Each entry says what changed and what projects must do
   for a repeat or for "nothing".
 - `setup.md`: a tool that opens pull requests for releases runs with a GitHub App's token, as
   `pull-requests.md` already required.
+- `coordinator.md`, "Stop": a pause the owner calls, with the work to go on as it was, stays in the chat
+  and holds in the session it was called in, until the owner's word there or a new coordinator session;
+  only a stop that changes the plan is recorded in `docs/now.md`. The owner closed a pull request that
+  recorded a pause: "it's not permanent, just paused for now".
 - Tried on the four projects' coordinators on 2026-11-03 to 2026-11-05 at the owner's request. From the
   trial the owner asked for the outcome of each point, the reason the owner is needed and what to look
   at, the work in progress, a short report, and the same report when asking for the status; with that,
