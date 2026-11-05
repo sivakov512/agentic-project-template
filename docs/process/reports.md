@@ -11,8 +11,9 @@ each point but the last left out when it has nothing to say:
 2. **In work:** one line per item or pull request in work and what it does.
 3. **What changed,** one line each, every one saying how it ended: fixed and merged, not fixed and what
    it waits on, checked and how. Then the pull requests merged without the owner since the commit
-   `docs/now.md` gives as "Reported up to", one line each; the coordinator's next record of
-   `docs/now.md` moves that line to the last merge the report listed.
+   `docs/now.md` gives as "Reported up to", one line each, apart from coordinator records that change
+   only `docs/now.md`; the coordinator's next record of `docs/now.md` moves that line to the last merge
+   the report listed.
 4. **Decisions the coordinator made itself,** so the owner can reverse any of them, **deviations from the
    plan, and risks,** one line each.
 5. **What is needed from the owner,** opening with "Needed from you:", then a numbered item per action:
@@ -90,8 +91,9 @@ this kind of pull request, or stop asking until the end of the milestone.
 - A stop holds for that kind until the end of the current milestone. The coordinator records it as one
   line in `docs/now.md`, in a coordinator record ("Until the end of milestone N: architecture pull
   requests merge after their reviews without asking"), and removes it when the milestone ends.
-- What the milestone's plan names as the owner's is offered without the stop option. Risky code the plan
-  says goes `ok-without-reading` isn't offered, nor are interfaces between parts that only the agents
+- What the milestone's plan names as the owner's is not offered: it comes as an `owner-review` item, and
+  the owner looks at what the item points to. Risky code the plan says goes `ok-without-reading` isn't
+  offered either, nor are interfaces between parts that only the agents
   build, or code that builds a user interface the owner already agreed.
 
 ### When the coordinator isn't sure

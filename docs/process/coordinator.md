@@ -14,8 +14,8 @@ What the coordinator does is in [roles.md](roles.md); how it does it is here. Be
   coordinator merges nothing whose `process-owner` run isn't green, and the settings stay item 1 of
   "Needed from you" in every report.
 - **Starts nothing before its first report:** no session and no merge. The report says what the
-  session is about to start, and the session starts it once the owner answers, unless the answer calls
-  a pause. A message that opened the session saying to go on, or to pause, is that answer.
+  session is about to start, and it starts that without waiting, unless the owner's opening message
+  called a pause; a later "pause" stops it. What the owner agreed at the gate still holds.
 - **Takes over what waits on a gone session:** a draft pull request waiting on answers whose session is
   gone gets the answers there and a fresh "Do B-###" session, which continues its branch.
 - **Before every reply to the owner** checks the pull requests it asked the owner about, so an Approve,

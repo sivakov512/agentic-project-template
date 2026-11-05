@@ -48,11 +48,12 @@ Reviews:
   "Needed from you" with what it does, the reviews and checks passed, what is worth a look and that it
   may be skipped, and the question whether to stop such offers until the milestone's end; after a stop
   the coordinator merges that kind and lists it. A stop is a line in `docs/now.md` until the milestone
-  ends; what the plan names as the owner's has no stop option (`reports.md`, "Reviewed work offered to
-  the owner").
+  ends; what the plan names as the owner's isn't offered but comes as an `owner-review` item
+  (`reports.md`, "Reviewed work offered to the owner").
 - A reviewer's "fix" for a problem the pull request didn't cause and its item doesn't cover is marked
   "outside the item": the fixing session lists it under "Not done and open questions", and the
-  coordinator makes it an item. A loosened check or a too weak review label is a "fix".
+  coordinator makes it an item. A check loosened without the owner's OK or a too weak review label is
+  a "fix".
 - A pull request with no item has a bar for its reviewer: `setup.md` and the owner's answers for Setup,
   its description and `updates.md` for a Process change, the owner's words and the documents above for
   a Coordinator record.
@@ -61,7 +62,7 @@ Reviews:
   contradicts the item or the plan, with the reason, and reports it as its own decision; findings of
   the review for harm stay its reviewer's, and the review for harm wins when reviews disagree.
 - The owner's remarks on an open pull request go to a work session as "fix" findings quoting the owner,
-  with one review of the fix (and one review for harm of it for risky code), outside the two-round cap.
+  with one round of the reviews the change needs, outside the two-round cap.
 
 What the owner keeps:
 
@@ -102,8 +103,8 @@ The coordinator, the plan and setup:
 - Rules every session keeps live in `CLAUDE.md` only, since work sessions and reviewers read only the
   parts of `docs/plan.md` their item leads them to. The plan placeholder's section "The owner's rules"
   becomes "Working with the owner"; a project may keep its own name and anchor.
-- A coordinator session starts no session and no merge before its first report and the owner's
-  answer to it; it takes over drafts whose sessions are gone; `docs/now.md` always holds what a fresh
+- A coordinator session starts no session and no merge before its first report, then starts what
+  it reported unless the owner's opening message called a pause; it takes over drafts whose sessions are gone; `docs/now.md` always holds what a fresh
   coordinator needs. It starts or messages sessions by the tools it has, or asks the owner, and checks
   the pull requests it asked the owner about before every reply.
 - While `main` is unprotected or a process check isn't required, the coordinator merges nothing whose

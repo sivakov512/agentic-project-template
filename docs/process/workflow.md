@@ -61,8 +61,8 @@ This change to the plan goes to the owner in the same report as the gate.
 
 ### Starting and finishing
 
-- An item starts only when everything it depends on is merged and its milestone has started; items whose
-  "Depends on" says "any time" are the only exception. A milestone starts when the previous one is
+- An item starts only when everything it depends on is merged and its milestone has started; an item
+  whose "Depends on" says "any time" may start whatever its dependencies and milestone. A milestone starts when the previous one is
   finished and its own written-out plan is merged.
 - A milestone is finished only when every point of its exit list is true.
 - A milestone after the foundation ends in this order: the coordinator runs the result end to end and
@@ -109,7 +109,9 @@ new items.
 5. **Review and checks.**
    - **Which reviews.** Every pull request gets the review, but two: a coordinator record that changes
      only `docs/now.md` or the backlog (its section "Later" included), and a process update that only
-     brings the template's release. The review for harm, the architecture review and the UI review come
+     brings the template's release. A process update whose step 2 also changes project files
+     ([updates.md](updates.md#getting-a-newer-process)) gets the review of those changes, against the
+     release's "Projects:" steps in the changelog. The review for harm, the architecture review and the UI review come
      on top for the pull requests they are for ([rules.md](rules.md#if-you-are-the-reviewer)), each by
      another reviewer, in the same rounds. The coordinator decides which reviews a pull request gets, by
      these rules and any more `docs/plan.md` names.
@@ -136,9 +138,9 @@ new items.
    comments on GitHub, or in the chat when agents work under the owner's account; the coordinator
    answers where the owner wrote. It posts the owner's remarks on the pull request as "fix" findings,
    quoting the owner, after recording first any that change a document above it
-   ([changes.md](changes.md)), and starts "Fix pull request #N". That round gets one review of the fix,
-   and for risky code one review for harm of it, outside the two rounds of step 5; what it still finds
-   goes as in step 5's second round.
+   ([changes.md](changes.md)), and starts "Fix pull request #N". That round gets one review of the fix by
+   each review the change needs (step 5), outside the two rounds of step 5; what it still finds goes as
+   in step 5's second round.
 7. **The merge,** by squash: `main` gets one commit, its subject the pull request's title and its
    number, its body empty.
    - After the owner's OK where it is needed ("The owner's OK and the merge" below), the coordinator

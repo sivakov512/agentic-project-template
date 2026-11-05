@@ -16,7 +16,8 @@
   | `research` | `Research:` | `docs(research):` | studies, facts found by experiment |
   | `code` | `Code:` | `feat:`, `fix:`, `refactor:` and the like | the code of the tools (the code the checks run among it) and of the product |
 
-  A process update keeps the `chore:` that `update.py` gives it. A coordinator record takes the kind of
+  `update.py` titles a process update by the commit rules: `Plan: ...`, or `chore: ...` under
+  Conventional Commits. A coordinator record takes the kind of
   what it records: `plan` for `docs/now.md`, the backlog and the plan, `spec` for a document of the
   chain, and a decision record the kind of what it decides.
 - **One label:** `owner-review` or `ok-without-reading`, which follows the strictest part of the pull

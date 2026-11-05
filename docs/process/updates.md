@@ -33,7 +33,8 @@ update. `tools/process/doctor.py` says when a newer version is out.
    (a new key in `docs/process.json`, say). If the lines say they break open work pull requests, it posts
    on each what to change, as "fix" findings, then starts "Fix pull request #N".
 3. If that changes nothing the owner keeps, the coordinator merges the update on its own once its checks
-   pass, and the report lists it. If it does (the plan, the settings), the pull request is labelled
+   pass and its review, if it needs one ([workflow.md](workflow.md#how-a-piece-of-work-goes), step 5),
+   has no "fix" finding left, and the report lists it. If it does (the plan, the settings), the pull request is labelled
    `owner-review` and goes to the owner, whose review covers only what the project had to do. With the
    agents' own account, an update that changes files under `.github/` goes to the owner too; `update.py`
    labels it `owner-review`, and its "Owner review" says that an Approve is all it needs.

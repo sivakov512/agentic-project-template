@@ -65,7 +65,8 @@ Whatever your role: a question from the owner is a question. Answer it and propo
 - **To stop and report:** push what you have, keep the pull request in draft (its checks may fail then),
   and say what is left and why in its "Not done and open questions" and in your last message. The
   coordinator decides what happens to the pull request.
-- Before you push, run these, and finish only with every one passing:
+- Once the pull request is open (the empty start commit is pushed to open it), run these before every
+  push, and finish only with every one passing:
   - `python3 tools/process/check.py` (the process checks and the project's own);
   - `python3 tools/process/check_pr.py --body <description file> --title "<title>" --labels <review
     label>`;
@@ -114,8 +115,9 @@ Your brief names one of four reviews. The coordinator gives each pull request th
 - Check the pull request against its item's "Done when" and the documents it links. A pull request with
   no item has its bar elsewhere: for "Setup", the steps of [setup.md](setup.md) and the owner's answers
   in its comments; for "Process change", what its description says it changes and
-  [updates.md](updates.md#changing-the-process); for a "Coordinator record", the owner's words it quotes
-  and the documents above the ones it changes.
+  [updates.md](updates.md#changing-the-process); for "Process update", the "Projects:" steps of the
+  release's changelog entries; for a "Coordinator record", the owner's words it quotes and the documents
+  above the ones it changes.
 - Check that the evidence in the pull request is real: repeat it where you can.
 - Post one comment on the pull request:
   1. A first line with the review's name and the head commit you reviewed.
@@ -123,7 +125,8 @@ Your brief names one of four reviews. The coordinator gives each pull request th
   3. The findings, each with the file and line, what is wrong and why it matters, and a mark with a
      one-line reason:
      - **fix:** wrong behaviour, a risk the project's rules name, a wrong or unsupported fact, a red or
-       flaky check, a check loosened (a test removed or skipped, a threshold eased), a review label
+       flaky check, a check loosened without the owner's OK (a test removed or skipped, a threshold
+       eased), a review label
        weaker than [reports.md](reports.md#when-the-owner-looks) asks, documents that contradict each
        other, a gap the next item would trip on, or what your review below calls a "fix" finding;
      - **drop:** wording, taste, layout, or no effect on the result or the next steps.
