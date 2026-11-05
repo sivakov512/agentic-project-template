@@ -3,6 +3,72 @@
 The newest version first. Each entry says what changed and what projects must do, if anything
 ([updates.md](updates.md#changing-the-process)).
 
+## 0.7.1 — 2026-11-05
+
+Gaps an independent review of 0.6.0 found in the process documents:
+
+- One rule for recording the owner's words, in `workflow.md`: what the owner decides or asks for becomes
+  a record the same day, quoting the owner's words as said; a choice the words didn't make is reported
+  as the coordinator's decision. What holds only for the session (a pause, an answer) stays in the chat.
+  `changes.md` links to it.
+- Rules every session keeps live in `CLAUDE.md` only: work sessions and reviewers read only the parts
+  of `docs/plan.md` their item leads them to. The plan's section "The owner's rules" becomes "Working
+  with the owner", what the coordinator needs.
+- What the owner keeps is defined once, in `workflow.md`, "The owner's OK and the merge": the files CI
+  holds, with the process update exception said there, and any change that loosens a check. `reports.md`
+  and `pull-requests.md` link to it. The reviewer marks a loosened check or a too weak review label
+  "fix".
+- A reviewer's "fix" for a problem the pull request didn't cause and its item doesn't cover is marked
+  "outside the item": the fixing session lists it under "Not done and open questions" instead of fixing
+  it, and the coordinator makes it an item.
+- A pull request with no item has a bar for its reviewer: `setup.md` and the owner's answers for Setup,
+  its description and `updates.md` for a Process change, the owner's words and the documents above for
+  a Coordinator record.
+- `workflow.md` step 5, now "Review and checks", opens with the two pull requests that need no reviewer
+  and leaves the reviewer's side to `rules.md`. The coordinator may close a finding of the ordinary
+  review that rests on something untrue or contradicts the item or the plan, with the reason, and
+  reports it as its own decision; findings of the review for harm stay its reviewer's, and the review
+  for harm wins when the two disagree.
+- The owner's remarks on an open pull request go to a work session as "fix" findings quoting the owner,
+  with one review of the fix (and one review for harm of it for risky code), outside the two-round
+  cap.
+- Before a merge the checks have run on the current `main`: if `main` moved, the pull request is
+  closed and reopened, which keeps the owner's Approve, and rebased only on a conflict. A red `main` is
+  fixed first, on an item of its own for code, and other sessions don't fix it in their pull requests.
+  A conflict goes to a work session as a "fix" finding, and resolving it is not a review round. A wrong
+  merge is reverted in a pull request that names the item, takes its kind and label, and reopens the
+  item; its reviewer checks only the revert.
+- A coordinator session starts no session and no merge before its first report and the owner's
+  answer to it, so a new chat doesn't end a pause silently; it takes over drafts whose sessions are gone; `docs/now.md` always holds what a fresh
+  coordinator needs, and a handover mid-milestone is normal. It starts or messages sessions by the tools
+  it has, or asks the owner. It checks the pull requests it asked the owner about before every reply,
+  so the owner no longer tells the chat about an Approve.
+- While `main` is unprotected or a process check isn't required, the coordinator merges nothing whose
+  `process-owner` run isn't green, and the settings stay first in "Needed from you".
+- Dropping or moving out an item of the agreed milestone is a change of scope, the owner's.
+- `docs/now.md` gets "Reported up to", the commit the last report covered, so the list of merges without
+  the owner survives a new session.
+- Setup: the account question first, and step 1 only once it is answered; the agents' own account
+  recommended, with the agents run where only their account is signed in; no bypassing in both modes;
+  secrets that publish, deploy or mint tokens in an Environment limited to `main`, with publishing on
+  the push to `main`; a warning on
+  `CI_RUNNER`. The README says what each account choice costs, what the owner will be asked, and that
+  the repository is in English.
+- Backlog items stand under a heading per milestone. A work session reads its item and the documents it
+  links, and looks further up the chain only for a question they leave. Smaller wording fixes:
+  "stricter rules" for commits, the design's folder list, the renumbering pull request's kind and label,
+  the template's coordinator's reading.
+
+Projects: move rules every session must keep from `docs/plan.md` (section "The owner's rules") to
+`CLAUDE.md` and rename the section to "Working with the owner"; add a line "Reported up to: <commit>" to
+`docs/now.md`; put backlog items under a heading per milestone. Ask the owner to move secrets that
+publish, deploy or mint tokens into an Environment limited to `main`, together with a change in which
+the jobs that use them name the Environment and publish on the push to `main` (`setup.md`, step 8), or
+the release fails; and to turn on no bypassing for `main` with the agents' own account too. With the
+agents' own account, make sure the owner's login is not reachable where the agents run
+(`gh auth status`, the credential helper, the environment) and tell the owner if it is. The `CLAUDE.md`,
+`docs/plan.md` and `.github/` changes go to the owner.
+
 ## 0.7.0 — 2026-11-05
 
 From an independent review of 0.6.0, the guards in the tools:
