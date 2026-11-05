@@ -132,10 +132,15 @@ The process holds the milestones to these rules:
 ## The owner's OK and the merge
 
 **Which pull requests need the owner's OK:** those labelled `owner-review`, those with no review label
-(a bot's, until the coordinator labels it), and every one that changes what the owner keeps for themself: `CLAUDE.md`, `docs/plan.md`,
-`docs/process.json`, anything under `.github/`, and the template's files and lock, apart from those a
+(a bot's, until the coordinator labels it), and every one that changes what the owner keeps for themself: `CLAUDE.md` and `CLAUDE.local.md` in
+any folder, any `.claude/` folder, `.mcp.json`, `docs/plan.md`,
+`docs/process.json` and the paths its `kept` names ([config.md](config.md#kept)), anything under `.github/`, and the template's files and lock, apart from those a
 process update brings exactly as in the template's release, `.github/` aside with the agents' own
-account ([updates.md](updates.md#getting-a-newer-process)). One labelled
+account ([updates.md](updates.md#getting-a-newer-process)). A symlink or submodule at any of these
+paths, or at a folder on the way to one, never goes in, approved or not, and nor do rules Claude Code
+loads by itself (a `CLAUDE.md` or `CLAUDE.local.md` in any folder, `.claude/rules/`) that import (an `@`
+before the path) a file the owner doesn't keep, or a symlink or submodule: a `CLAUDE.md` that should say
+what `AGENTS.md` says is a plain file that imports it, with `AGENTS.md` in `kept`. One labelled
 `ok-without-reading` that changes none of these the coordinator merges on its own, once its checks are
 green, its reviews have no "fix" finding left and step 5's own check is done; the next report lists it
 ([reports.md](reports.md)), and the owner can have any of them reverted. The check `process-owner`

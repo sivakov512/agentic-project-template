@@ -2,8 +2,9 @@
 """Checks a pull request: its description against .github/pull_request_template.md, its title and its labels.
 Standard library only.
 
-Fails when a section of the template is missing or says next to nothing; when "Backlog item" doesn't name
-exactly one item that exists in docs/backlog.md (or say what else it is: "Coordinator record", "Setup",
+Fails when a section of the template is missing or says next to nothing (a bare "None" is enough for "Not
+done and open questions"); when "Backlog item" doesn't name exactly one item that exists in
+docs/backlog.md (or say what else it is: "Coordinator record", which may name several, "Setup",
 "Process update" or "Process change"); when "Behaviour change" doesn't start with "None" and why, or with
 "Yes" and at least three steps to try it; when the title doesn't start with its kind; or when the
 labels aren't one kind and one review label that agree with the title (docs/process/pull-requests.md).
@@ -50,6 +51,8 @@ REVIEW_LABELS = {"owner-review": "The owner reads it before saying yes",
                  "ok-without-reading": "The coordinator merges it; the owner sees it in the report"}
 # What a pull request that is no backlog item says instead (docs/process/pull-requests.md).
 NOT_AN_ITEM = re.compile(r"^(coordinator record|setup|process update|process change)\b", re.IGNORECASE)
+# A section where the template's own comment asks for a bare "None" when there is nothing to say.
+NOTHING_OPEN = ("Not done and open questions", re.compile(r"^none\.?$", re.IGNORECASE))
 
 
 def sections(body):
@@ -78,7 +81,8 @@ def check(body, root, title=None, labels=None):
             errors.append(f"section \"{name}\" is missing")
         elif not found[name]:
             errors.append(f"section \"{name}\" is empty")
-        elif len(words(found[name])) < 2 and not (name == "Backlog item" and NOT_AN_ITEM.match(found[name])):
+        elif len(words(found[name])) < 2 and not (name == "Backlog item" and NOT_AN_ITEM.match(found[name])
+                                                  or name == NOTHING_OPEN[0] and NOTHING_OPEN[1].match(found[name])):
             errors.append(f"section \"{name}\" says next to nothing")
 
     item = found.get("Backlog item", "")
@@ -89,7 +93,7 @@ def check(body, root, title=None, labels=None):
         backlog = backlog_path.read_text(encoding="utf-8") if backlog_path.exists() else ""
         if not ids and not record:
             errors.append("\"Backlog item\" names no B-### and is not one of: Coordinator record, Setup, Process update, Process change")
-        elif len(ids) > 1:
+        elif len(ids) > 1 and not (record and record.group(1).lower() == "coordinator record"):
             errors.append(f"\"Backlog item\" names {len(ids)} items; a pull request belongs to one")
         for item_id in ids:
             if not re.search(rf"^- \[[ x]\] \*\*{item_id}\*\*", backlog, re.MULTILINE):

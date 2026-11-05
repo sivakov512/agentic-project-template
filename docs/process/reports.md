@@ -59,7 +59,8 @@ at:
    deleting it), and what only the owner can do (accounts, money, hardware, settings). Code that may do
    such things is risky code (below), not this point.
 5. **The rules of the work:** what the owner keeps for themself
-   ([workflow.md](workflow.md#the-owners-ok-and-the-merge)): `CLAUDE.md`, the plan, the settings and the
+   ([workflow.md](workflow.md#the-owners-ok-and-the-merge)): `CLAUDE.md`, the agents' own settings
+   (`.claude/`, `.mcp.json`), the plan, the settings and the paths they keep, the
    commands of the checks, CI and the process, and any change that loosens the project's checks,
    whatever file it is in (a test removed or skipped, a lint rule or a threshold eased). The template's
    files a process update brings exactly as in the template's release are the exception: the owner

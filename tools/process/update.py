@@ -2,7 +2,9 @@
 """The process update (docs/process/updates.md, "Getting a newer process"): when the template has a newer
 release, brings its files in on a branch made from main as it is on GitHub, and opens a pull request.
 The coordinator runs it with a clean working tree, git and gh signed in as the agents' account; it leaves
-the checkout on the update's branch. Standard library, git and gh only.
+the checkout on the update's branch. It takes a release only when its tag is on the template's main
+(owned.fetch_release), and stops before running anything of it otherwise. Standard library, git and gh
+only.
 
     python3 tools/process/update.py
 """
@@ -50,14 +52,23 @@ anything.
 
 ## Owner review
 
-None needed while this pull request only brings the template's release, which the owner agreed in the
-template, and what the changelog asks of the project changes nothing the owner keeps. If it does (the
-plan, the settings), the coordinator labels it owner-review and says here what to look at.
+{owner_review}
 
 ## Not done and open questions
 
 What the changelog asks of the project, if anything, is the coordinator's to do in this pull request.
 """
+# The "Owner review" section, as the update goes without the owner or to the owner because of .github/.
+NO_REVIEW = """\
+None needed while this pull request only brings the template's release, which the owner agreed in the
+template, and what the changelog asks of the project changes nothing the owner keeps. If it does (the
+plan, the settings), the coordinator labels it owner-review and says here what to look at."""
+APPROVE_ONLY = """\
+Approve only, no reading needed: the template's files here are exactly the template's release
+[{tag}](https://github.com/{template}/releases/tag/{tag}), which the owner approved in the template.
+GitHub asks for the owner's review because the release changes files under `.github/`, which
+`.github/CODEOWNERS` keeps for the owner. If what the changelog asks of the project changes something
+else the owner keeps (the plan, the settings), the coordinator says here what to look at."""
 
 
 class Failed(Exception):
@@ -74,6 +85,15 @@ def run(*args, cwd=ROOT):
 
 def gh_json(*args):
     return json.loads(run("gh", *args))
+
+
+def review(own_account, touches_github):
+    """The review label and the "Owner review" text (to format with tag and template) of the pull request:
+    with the agents' own account an update that changes .github/ needs the owner's Approve, since GitHub
+    keeps .github/ for the owner (docs/process/updates.md)."""
+    if own_account and touches_github:
+        return "owner-review", APPROVE_ONLY
+    return "ok-without-reading", NO_REVIEW
 
 
 def main():
@@ -109,15 +129,24 @@ def main():
         print(f"A process update is already open: {open_updates[0]['html_url']}. Merge or close it first")
         return 0
 
-    # The update starts from main as it is on GitHub, whatever was checked out.
-    run("git", "checkout", "--quiet", "-B", branch, "origin/main")
     with tempfile.TemporaryDirectory() as folder:
         checkout = Path(folder) / "template"
-        run("git", "clone", "--quiet", "--depth", "1", "--branch", tag, f"https://github.com/{template}.git",
-            str(checkout))
+        checkout.mkdir()
+        run("git", "init", "--quiet", cwd=checkout)
+        try:
+            release = owned.fetch_release(checkout, template, new)
+        except ValueError as error:
+            raise Failed(f"can't fetch release {tag} of {template}: {error}")
+        # Nothing of a release off the template's main runs here: the owner never approved it.
+        if release is None:
+            raise Failed(f"release {tag} of {template} is not on the template's main, so the owner never"
+                         " approved it there: not taken. Tell the template's coordinator (docs/process/updates.md)")
+        run("git", "checkout", "--quiet", "--detach", release, cwd=checkout)
         released = owned.read_lock(checkout) or {}
         if released.get("version") != new:
             raise Failed(f"release {tag} of {template} carries a lock for version {released.get('version')}")
+        # The update starts from main as it is on GitHub, whatever was checked out.
+        run("git", "checkout", "--quiet", "-B", branch, "origin/main")
         synced = run(sys.executable, str(checkout / "tools/process/sync.py"), str(checkout), str(ROOT))
     # The entries' headings one level down, so they don't read as sections of the description.
     changelog = (synced.split("\n", 1)[1] if "\n" in synced else "").replace("\n## ", "\n### ")
@@ -125,18 +154,17 @@ def main():
         changelog = "#" + changelog
 
     run("git", "add", "-A")
-    # With the agents' own account GitHub keeps .github/ for the owner (docs/process/updates.md), so such an
-    # update waits for the owner.
     config = json.loads((ROOT / "docs/process.json").read_text(encoding="utf-8"))
     own_account = (config.get("project") or {}).get("agents_account") != "owner"
     touches_github = any(name.startswith(".github/") for name in
                          run("git", "diff", "--cached", "--name-only").splitlines())
-    label = "owner-review" if own_account and touches_github else "ok-without-reading"
+    label, owner_review = review(own_account, touches_github)
     run("git", "commit", "--quiet", "-m", f"chore: update the process to {new}")
     # The branch is this script's own: one left from a run that couldn't open its pull request is replaced.
     run("git", "push", "--quiet", "--force", "origin", branch)
 
-    body = BODY.format(old=old, new=new, template=template, tag=tag, changelog=changelog or "(none)")
+    body = BODY.format(old=old, new=new, template=template, tag=tag, changelog=changelog or "(none)",
+                       owner_review=owner_review.format(tag=tag, template=template))
     pull = gh_json("api", f"repos/{repo}/pulls", "-f", f"title=Plan: update the process to {new}",
                    "-f", f"head={branch}", "-f", "base=main", "-f", f"body={body}")
     run("gh", "api", f"repos/{repo}/issues/{pull['number']}/labels",

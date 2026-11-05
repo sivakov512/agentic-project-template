@@ -8,6 +8,7 @@
     "merged_by": ""
   },
   "checks": [],
+  "kept": [],
   "commits": {"one_line": false, "no_co_authors": false, "conventional": false},
   "ids_ignore": [],
   "ids": [],

@@ -3,6 +3,57 @@
 The newest version first. Each entry says what changed and what projects must do, if anything
 ([updates.md](updates.md#changing-the-process)).
 
+## 0.7.0 — 2026-11-05
+
+From an independent review of 0.6.0, the guards in the tools:
+
+- The owner also keeps `.claude/` folders, `.mcp.json`, and `CLAUDE.md` and `CLAUDE.local.md` in any
+  folder, names compared whatever their case: Claude Code takes rules, permissions, hooks and tools
+  from them. A new optional key `kept` in `docs/process.json` lists patterns of paths the owner keeps
+  too, read from the base branch: the configuration of the project's checks, the paths of risky code,
+  and the files the rules import (`config.md`). Two things fail `process-owner` whatever the approvals:
+  a symlink or submodule at a kept path or at a folder on the way to one, since the check can't see
+  what is behind it; and rules Claude Code loads by itself (a `CLAUDE.md` or `CLAUDE.local.md` in any
+  folder, `.claude/rules/`), or the files they import in turn, that import (an `@` before the path) a
+  symlink, a submodule, a path through one, or a file the owner doesn't keep, until that file is in
+  `kept` or under `.claude/`. Commands, skills, agents and other documents may import anything.
+- `process-owner` takes `agents_account` from the pull request itself only while the base has none
+  (setting up), and `owner` there only when the pull request's author is the repository's owner.
+- A release counts only when its tag is on the template's `main`: `process-owner` lets in no files of
+  another, and `update.py` stops before running anything of it. Going back to an older release needs
+  the owner's OK.
+- `updates.md`, "When a release breaks the project": revert the update's merge in a pull request for
+  the owner, who removes `process-lock` (and `process-owner`, if it is what broke) as a required check
+  for that one merge.
+- An update `update.py` sends to the owner because of `.github/` says in "Owner review" that an Approve
+  is all it needs, and why GitHub asks.
+- `doctor.py` fails when gh works as the repository's owner with `agents_account` `own`, or as someone
+  else with `owner`; when the repository is public and the Actions variable `CI_RUNNER` is set; and
+  when classic protection lets admins past its checks, in both account modes. With rulesets, whose
+  bypass list only an admin can read, it reminds the owner to check it.
+- `check_pr.py` takes a bare "None" in "Not done and open questions", as the template asks, and a
+  Coordinator record that names several items.
+- The template's releases are made by its workflow `template-release.yml` on merge to `main`, not by
+  hand; it fails red when the version's tag exists already off `main` or without a release. The owner
+  keeps a tag ruleset on `v*` against moving or deleting them. Projects don't get the workflow by an
+  update, and its copy in a project made from the template does nothing.
+- `updates.md`: the template's files never write an `@` right before a path, since `process-owner`
+  would read it as an import in every project.
+- `config.md`, releases: secrets that publish or deploy live in a GitHub Environment limited to
+  `main`, so the publishing job runs on the push to `main`, not on a release or tag event.
+
+Projects: `kept` is optional; when the project has check configuration or risky code, the coordinator
+proposes its patterns to the owner in the pull request that adds the first of them. A project whose
+`CLAUDE.md`, `CLAUDE.local.md` or `.claude/rules/` files import a file the owner doesn't keep
+(`AGENTS.md`, say), or a symlink, adds that file to `kept`, or imports a plain file instead, before or
+in the update. A project with a symlink or submodule at a kept path (a `CLAUDE.md -> AGENTS.md`, say)
+replaces it before taking 0.7.0 with a plain `CLAUDE.md` that imports `AGENTS.md` (an `@` before the
+name), `AGENTS.md` in `kept`. After the update, every pull request fails `process-owner` while either
+is there. If `doctor.py` now fails on gh's account, the agents sign gh and git in as the account
+`agents_account` names, or the owner corrects the setting; on bypassing, the owner ticks "Do not allow
+bypassing the above settings"; on `CI_RUNNER` in a public repository, the owner deletes the variable
+or makes the repository private.
+
 ## 0.6.0 — 2026-11-05
 
 - A report to the owner fits on a phone's screen, about twelve lines, detail left in the pull requests.
