@@ -10,3 +10,4 @@ records here a stop the owner calls that changes the plan. How it is kept:
 - **Waiting on the owner:** a brief of the project, to set it up.
 - **Next:** setting up.
 - **Stopped:** no.
+- **Reported up to:** nothing yet (the last commit on `main` the owner's last report covered).

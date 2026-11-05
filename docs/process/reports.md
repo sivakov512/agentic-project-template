@@ -9,7 +9,8 @@ each point left out when it has nothing to say, all but the last:
 2. **In work:** what is going on right now, one line per item or pull request and what it does.
 3. **What changed,** one line each, every one saying how it ended: fixed and merged, not fixed and what
    it waits on, checked and how. A fact without its outcome isn't written. Then the pull requests merged
-   without the owner since the last report, one line each.
+   without the owner since the commit `docs/now.md` gives as "Reported up to", one line each; the
+   coordinator's next record of `docs/now.md` moves that line to the last merge the report listed.
 4. **Decisions the coordinator made itself,** so the owner can reverse any of them, **deviations from the
    plan, and risks,** one line each.
 5. **What is needed from the owner,** opening with a call ("Needed from you:"), then a numbered item per
@@ -54,8 +55,9 @@ at:
    of these kinds that the plan didn't name goes beyond the plan (4).
 3. **The result of each milestone after the foundation,** by using it
    ([workflow.md](workflow.md#milestones-and-gates)).
-4. **What goes beyond the agreed plan:** a change of scope, sizeable work the plan didn't foresee, a
-   problem, a risk or a blocker, an action on the owner's real data (a migration run on it, moving or
+4. **What goes beyond the agreed plan:** a change of scope (an item of the agreed milestone dropped or
+   moved out of it; one superseded by an item with the same aim is not), sizeable work the plan didn't
+   foresee, a problem, a risk or a blocker, an action on the owner's real data (a migration run on it, moving or
    deleting it), and what only the owner can do (accounts, money, hardware, settings). Code that may do
    such things is risky code, as `docs/plan.md` names it (below), not this point.
 5. **The rules of the work:** what the owner keeps for themself

@@ -20,15 +20,19 @@ that continues the setup has them.
 Always ask, whatever the brief says:
 
 - **whose account the agents work under, and who merges**
-  ([workflow.md](workflow.md#the-owners-ok-and-the-merge)). With the agents' own account the
-  repository must belong to the owner's personal account, not an organisation;
+  ([workflow.md](workflow.md#the-owners-ok-and-the-merge)), recommending the agents' own account:
+  GitHub then holds the owner's OK, while with the owner's account only the rules do. With the agents'
+  own account the repository must belong to the owner's personal account, not an organisation, and the
+  agents run where only their account is signed in: no owner token in `gh`, the credential helper or
+  the environment they can reach (a separate user on the machine, or a container), or they could act
+  as the owner;
 - **which tracker mirrors the project for the owner,** or that there is none; whether the project is in
   it yet; and how agents reach it (a connector, a skill, a token), which the owner grants. If the
   project isn't in it yet, `tracker` names the tracker and says "project to be created";
 - **how the project ships** (what is released, versions, how it is built and published, who starts
   it), or that it isn't released ([config.md](config.md#releases)); a tool that opens pull requests for
   it (a release tool run in CI) runs with a GitHub App's token, which the owner makes once
-  ([pull-requests.md](pull-requests.md));
+  ([pull-requests.md](pull-requests.md)) and keeps as step 8 says for secrets;
 - the owner's language, and the commit rules, if any ([config.md](config.md#commits)).
 
 ## Steps
@@ -71,13 +75,22 @@ Always ask, whatever the brief says:
      the setting-up session makes `.github/CODEOWNERS` say `/.github/ @<the owner's login>` (the
      template's own names the template's owner): `process-owner` runs the check from `main`'s copy, so
      its workflow under `.github/` is all a pull request could change to get round it, and GitHub keeps
-     that for the owner. With the
-     owner's account, also no bypassing ("Do not allow bypassing the above settings", or no bypass list
-     in a ruleset), because the owner's account is an admin and the protection wouldn't bind it
-     otherwise.
+     that for the owner. In both modes, also no bypassing ("Do not allow bypassing the above
+     settings", or no bypass list in a ruleset): the owner's account is an admin, and the protection
+     wouldn't bind it otherwise.
    - Settings → Secrets and variables → Actions → Variables: `CI_RUNNER`, if the checks should run on a
-     self-hosted runner.
-   - The secrets the project itself needs, if any are known yet.
+     self-hosted runner. Every pull request's code runs there before any review, so only for a private
+     repository, or with approval required for all outside collaborators (Settings → Actions → General
+     → approval for fork pull request workflows); a runner that is fresh for each job is better than
+     one that keeps what a job leaves behind.
+   - The secrets the project itself needs, if any are known yet. Those that publish, deploy or mint
+     tokens (a GitHub App's private key among them) go into a GitHub Environment limited to `main`
+     (Settings → Environments → New environment → Deployment branches and tags: `main` only), which
+     the job that uses them names, so a workflow on another branch can't reach them. A job that
+     publishes therefore runs on the push to `main` (with release-please, on its `release_created`
+     output), not on a release or a tag: those run on the tag, which the Environment refuses, and
+     allowing tags would open the secrets to any tag the agents' account can push. A repository secret
+     is only for what any branch may use.
 9. **Finish:** remove the `<!-- template placeholder -->` lines, set `"set_up": true`, run
    `python3 tools/process/check.py` and `python3 tools/process/doctor.py`, and go on only when both pass,
    apart from what waits on the owner.

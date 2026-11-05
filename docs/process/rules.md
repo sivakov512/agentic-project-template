@@ -111,13 +111,15 @@ Whatever your role: a question from the owner is a question. Answer it and propo
     and tests, where there are any, read as a description of the behaviour.
 - Post your findings as one comment on the pull request, naming the head commit you reviewed: each
   finding with the file and line, what is wrong and why it matters, and marked **fix** (wrong
-  behaviour, a risk the project's rules name, a wrong or unsupported fact, a red or flaky check,
-  documents that contradict each other, a gap the next item would trip on, or falling short on one of
-  the three points) or **drop** (wording, taste, layout, or no effect on the result or the next steps)
-  with a one-line reason. Nothing is put off for later. A problem the pull request didn't cause and its
-  item doesn't cover is marked **fix** and "outside the item": it isn't fixed in this pull request; the
-  fixing session lists it under "Not done and open questions", which settles it, and the coordinator
-  makes it an item. Don't fix things yourself.
+  behaviour, a risk the project's rules name, a wrong or unsupported fact, a red or flaky check, a check
+  loosened (a test removed or skipped, a threshold eased) or a review label weaker than
+  [reports.md](reports.md#when-the-owner-looks) asks, documents that contradict each other, a gap the
+  next item would trip on, or falling short on one of the three points) or **drop** (wording, taste,
+  layout, or no effect on the result or the next steps) with a one-line reason. Nothing is put off for
+  later. A problem the pull request didn't cause and its item doesn't cover is marked **fix** and
+  "outside the item": it isn't fixed in this pull request; the fixing session lists it under "Not done
+  and open questions", which settles it, and the coordinator makes it an item. Don't fix things
+  yourself.
 - A second round comes only if the first had "fix" findings, or, for a review for harm, if a fix
   changed the code `docs/plan.md` names as risky: review only the fix, the change from the
   head you reviewed to the new head the fix comment names (`git range-diff --creation-factor=100

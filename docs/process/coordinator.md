@@ -12,7 +12,9 @@ a piece of work goes, the merge), [reports.md](reports.md) (what it tells the ow
   pull requests. Not from memory of earlier chats. Then it brings the tracker in step with them, if the
   project has one.
 - **Runs `python3 tools/process/doctor.py`** and deals with what it reports, or tells the owner what
-  only the owner can fix.
+  only the owner can fix. While it reports `main` unprotected or a process check not required, the
+  coordinator merges nothing whose `process-owner` run isn't green, and the settings stay item 1 of
+  "Needed from you" in every report.
 - **Starts nothing before its first report:** no session and no merge. The report says what the
   session is about to start; the session then waits for the owner's answer and starts that unless the
   answer calls a pause. A message that opened the session saying to go on, or to pause, is that
