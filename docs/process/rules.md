@@ -79,7 +79,8 @@ Whatever your role: a question from the owner is a question. Answer it and propo
 - Fill in every section of `.github/pull_request_template.md`, and name and label it as
   [pull-requests.md](pull-requests.md) says. CI rejects a pull request that doesn't.
 - "How it was checked" gives commands, output or screenshots someone else can repeat. "It works" is not
-  evidence. A pull request that changes what a person sees shows it there: screenshots, or how to run it.
+  evidence. A pull request that changes what a person sees gives there what the UI review needs ("If
+  you are the reviewer").
 - Your report is not proof: the coordinator checks the diff, the checks and the running result.
 
 ## If you fix a pull request
@@ -144,12 +145,25 @@ Whatever your role: a question from the owner is a question. Answer it and propo
   small implementation of the other side of the contract, outside the repository; every place you had
   to guess is a "fix" finding.
 - **A UI review** ("Review pull request #N for UI") is for a pull request that changes what a person
-  sees and uses (a GUI, web pages and the like), judged from its screenshots or a run it describes:
-  the experience against the owner's scenarios; neatness and consistency; attention (a clear
-  hierarchy, one main action per screen, nothing competing for attention without reason); the empty,
-  loading and error states; basic accessibility; and conformity to the project's design system. A
-  project with a user interface keeps a design-system document in its chain, which `docs/plan.md`
-  names, written before the first UI work; a UI pull request without one is a "fix" finding.
+  sees and uses (a GUI, web pages and the like). A project with a user interface keeps a design-system
+  document in its chain, which `docs/plan.md` names, written before the first UI work; a UI pull
+  request without one is a "fix" finding. The pull request gives you: images rendered by a command it
+  names (in CI or headless, never by starting an app on the owner's machine without the owner's
+  consent), at 2x, in every theme the project uses, desktop and phone where both apply, before and
+  after for a change; fixture data with the worst cases (empty, long text, extreme values, late,
+  paused, a heavy day with many items); a table from each screen to the requirement and scenario step
+  it serves. Check: (1) every scenario step has its control or label on a screen, and every state the
+  requirements or the information design name is drawn, volume and connection loss included;
+  (2) every label, colour, word and number means what the requirements say on the fixture data, and a
+  number is a fact from the repository or marked as an example; (3) the design system point by point:
+  its rules win over prototypes unless the plan says otherwise, and its tokens and components come
+  before screens; (4) the strongest accent goes to what matters most for the user's decision, service
+  elements stay quiet; (5) the layout holds under the worst content; (6) accessibility measured, not
+  judged by eye: contrast, colours a colour-blind user tells apart, nothing said by colour alone,
+  keyboard use; (7) the owner's remarks on looks solved as design problems, not literally, with
+  nothing nearby worse. A fix that changes a shared token or component renders every screen again for
+  the second round. The owner is shown 6 to 10 chosen images; the final judgement is the owner's use
+  at the end of the milestone.
 - Both comments open with the review's name and the head you reviewed; findings, marks and the second
   round are as above.
 
