@@ -75,7 +75,8 @@ looks at:
 - A pull request for 1, 2, 4 or 5 is labelled `owner-review`, and so is one offered to the owner (below)
   until the owner stops the offers of its kind. It says in plain words what it decides or changes, and
   for the checks and CI what it loosens or tightens.
-- Everything else is labelled `ok-without-reading`, and the coordinator merges it on its own: the
+- Everything else is labelled `ok-without-reading`, and the coordinator merges it on its own, apart from
+  what is offered to the owner (below): the
   requirements and the documents of the chain inside the agreed scope, studies, code and tests,
   interfaces between parts that only the agents build, the backlog, `docs/now.md`, records of facts,
   and records of the owner's own decisions outside what the owner keeps.
