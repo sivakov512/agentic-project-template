@@ -38,13 +38,13 @@ Reviews:
   (`rules.md`, "If you are the reviewer"). A project with a user interface keeps a design-system
   document in its chain. `workflow.md` step 5 says which pull requests get which reviews; the
   coordinator decides, and the plan may name more.
-- Reviewed work merges without the owner: risky code, architecture and contract changes and UI changes
-  go `ok-without-reading` once their reviews have no "fix" finding left, and the report lists each with
-  the reviews it passed and, for risky code, what could break. The owner's decisions are those the plan
-  names, none by default; the kinds that used to be the default list are what the coordinator weighs
-  when it proposes a milestone's plan. Where the plan names one as the owner's, it comes as an item of
-  "Needed from you" with a short summary and what to look at, or "just OK" and why (`reports.md`, "When
-  the owner looks"). What the owner keeps is unchanged.
+- Risky code, architecture and contract changes, UI changes, and decisions of the owner's kinds the plan
+  didn't name are offered to the owner once their reviews have no "fix" finding left: one item of
+  "Needed from you" with what it does, the reviews and checks passed, what is worth a look and that it
+  may be skipped, and the question whether to stop such offers until the milestone's end; after a stop
+  the coordinator merges that kind and lists it. A stop is a line in `docs/now.md` until the milestone
+  ends; what the plan names as the owner's has no stop option (`reports.md`, "Reviewed work offered to
+  the owner").
 - A reviewer's "fix" for a problem the pull request didn't cause and its item doesn't cover is marked
   "outside the item": the fixing session lists it under "Not done and open questions", and the
   coordinator makes it an item. A loosened check or a too weak review label is a "fix".
@@ -159,9 +159,6 @@ Projects: in this order.
    labels do no harm; the owner may delete `plan`, `spec`, `research` and `code` (Issues > Labels).
 9. `kept` is optional: when the project has check configuration, the coordinator proposes its patterns
    to the owner in the pull request that adds the first of it.
-10. A project whose `docs/plan.md` names decisions or risky code as the owner's keeps them so; otherwise
-    they merge after their reviews.
-
 ## 0.6.0 — 2026-11-05
 
 - A report to the owner fits on a phone's screen, about twelve lines, detail left in the pull requests.

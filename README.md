@@ -73,8 +73,9 @@ what needs you.
 ## What you will be asked
 
 - At each gate: accept what the milestone delivered and agree the plan of the next one.
-- The decisions you agree in that plan to keep as yours (an interface, a file format, the stack), if
-  any, each when it is ready. The rest merges after the agents' reviews and is listed in reports.
+- The decisions that plan names as yours (an interface, a file format, the stack), each when it is
+  ready. Reviewed risky code, architecture and UI work is offered to you too, and you can stop those
+  offers until the milestone's end.
 - To use each milestone's result in your real work and say what came up: a milestone isn't finished
   without it.
 - Questions in a batch, each with a recommendation; an Approve on GitHub for what needs you; now and

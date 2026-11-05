@@ -50,10 +50,7 @@ Each milestone is written out at the end of the one before it, from what is know
 - what it delivers (after the foundation, what the owner gets from it, and what is in and out);
 - its big steps;
 - the owner's part and the decisions it will bring to the owner
-  ([reports.md](reports.md#when-the-owner-looks)). The coordinator weighs which to propose: what a
-  person will use or work with (the interface, an API or a driver others program against, a file or
-  data format a person reads or writes, a command line, settings), what shapes the whole product (the
-  architecture, the stack, the model of the data), and what is hard to reverse;
+  ([reports.md](reports.md#when-the-owner-looks));
 - its risks;
 - everything it builds on (documents, interfaces, the technologies it uses), each either decided and
   written down already or settled at the milestone's start, before the work that depends on it;
@@ -140,7 +137,9 @@ work back from there as new items.
      itself. Where reviews ask for opposite things, the review for harm wins.
    - **The coordinator's own check:** the diff against "Done when", the running result, and that the
      review label follows [reports.md](reports.md#when-the-owner-looks) and the decisions the
-     milestone's plan gave the owner; it corrects the label if not.
+     milestone's plan gave the owner; it corrects the label if not. Risky code, architecture and UI
+     work is then offered to the owner
+     ([reports.md](reports.md#reviewed-work-offered-to-the-owner)).
 6. **The report to the owner** ([reports.md](reports.md)). The owner reviews and discusses the pull
    request in its comments on GitHub, or in the chat when agents work under the owner's account; the
    coordinator answers where the owner wrote. The owner's remarks on the pull request the coordinator
