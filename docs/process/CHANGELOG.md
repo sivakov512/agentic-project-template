@@ -38,9 +38,13 @@ Reviews:
   (`rules.md`, "If you are the reviewer"). A project with a user interface keeps a design-system
   document in its chain. `workflow.md` step 5 says which pull requests get which reviews; the
   coordinator decides, and the plan may name more.
-- Risky code that needs the owner comes to the owner, once its reviews have no "fix" finding left, as
-  an item of "Needed from you" with a short summary and what to look at, or "just OK" and why
-  (`reports.md`, "When the owner looks").
+- Reviewed work merges without the owner: risky code, architecture and contract changes and UI changes
+  go `ok-without-reading` once their reviews have no "fix" finding left, and the report lists each with
+  the reviews it passed and, for risky code, what could break. The owner's decisions are those the plan
+  names, none by default; the kinds that used to be the default list are what the coordinator weighs
+  when it proposes a milestone's plan. Where the plan names one as the owner's, it comes as an item of
+  "Needed from you" with a short summary and what to look at, or "just OK" and why (`reports.md`, "When
+  the owner looks"). What the owner keeps is unchanged.
 - A reviewer's "fix" for a problem the pull request didn't cause and its item doesn't cover is marked
   "outside the item": the fixing session lists it under "Not done and open questions", and the
   coordinator makes it an item. A loosened check or a too weak review label is a "fix".
@@ -155,6 +159,8 @@ Projects: in this order.
    labels do no harm; the owner may delete `plan`, `spec`, `research` and `code` (Issues > Labels).
 9. `kept` is optional: when the project has check configuration, the coordinator proposes its patterns
    to the owner in the pull request that adds the first of it.
+10. A project whose `docs/plan.md` names decisions or risky code as the owner's keeps them so; otherwise
+    they merge after their reviews.
 
 ## 0.6.0 — 2026-11-05
 

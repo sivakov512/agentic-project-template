@@ -33,7 +33,7 @@ Where facts found by experiment are recorded, and in what form.
 What, beyond [the process's list](process/reports.md#when-the-owner-looks), the owner looks at in
 this project. Which code is risky, if any (it handles a secret, or acts on the owner's
 machine, on infrastructure or on data that can't be restored), so it gets a review for harm, and
-whether it then goes as OK without reading.
+whether it then comes to the owner rather than merging after its reviews.
 
 ## Tracker
 

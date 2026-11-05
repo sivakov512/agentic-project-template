@@ -50,7 +50,10 @@ Each milestone is written out at the end of the one before it, from what is know
 - what it delivers (after the foundation, what the owner gets from it, and what is in and out);
 - its big steps;
 - the owner's part and the decisions it will bring to the owner
-  ([reports.md](reports.md#when-the-owner-looks));
+  ([reports.md](reports.md#when-the-owner-looks)). The coordinator weighs which to propose: what a
+  person will use or work with (the interface, an API or a driver others program against, a file or
+  data format a person reads or writes, a command line, settings), what shapes the whole product (the
+  architecture, the stack, the model of the data), and what is hard to reverse;
 - its risks;
 - everything it builds on (documents, interfaces, the technologies it uses), each either decided and
   written down already or settled at the milestone's start, before the work that depends on it;
