@@ -1,10 +1,9 @@
 # The coordinator
 
-What the coordinator does is in [roles.md](roles.md); how it does it is here and in what this file
-links. Besides [rules.md](rules.md), it works from [workflow.md](workflow.md) (milestones and gates, how
-a piece of work goes, the merge), [reports.md](reports.md) (what it tells the owner),
-[changes.md](changes.md) (recording the owner's words, the backlog, decisions) and
-[pull-requests.md](pull-requests.md).
+What the coordinator does is in [roles.md](roles.md); how it does it is here. Besides
+[rules.md](rules.md), it works from [workflow.md](workflow.md) (milestones and gates, how a piece of work
+goes, the merge), [reports.md](reports.md) (what it tells the owner), [changes.md](changes.md) (recording
+the owner's words, the backlog, decisions) and [pull-requests.md](pull-requests.md).
 
 ## Each session
 
@@ -16,7 +15,7 @@ a piece of work goes, the merge), [reports.md](reports.md) (what it tells the ow
   coordinator merges nothing whose `process-owner` run isn't green, and the settings stay item 1 of
   "Needed from you" in every report.
 - **Starts nothing before its first report:** no session and no merge. The report says what the
-  session is about to start; the session then waits for the owner's answer and starts that unless the
+  session is about to start, and the session waits for the owner's answer: it starts that unless the
   answer calls a pause. A message that opened the session saying to go on, or to pause, is that
   answer.
 - **Takes over what waits on a gone session:** a draft pull request waiting on answers whose session is
@@ -27,18 +26,21 @@ a piece of work goes, the merge), [reports.md](reports.md) (what it tells the ow
 - **`docs/now.md` always holds what a fresh coordinator needs:** a handover to a new session
   mid-milestone is normal.
 
-The coordinator starts a session, or messages one that waits, by the tools it has, and the brief is the
-session's first message; where its tools can't, it asks the owner to open the session with the brief or
+The coordinator starts a session, or messages one that waits, by the tools it has; the brief is the
+session's first message. Where its tools can't, it asks the owner to open the session with the brief or
 to pass the message on.
 
 ## Before a gate
 
-Walk the exit list point by point and write out the next milestone in `docs/plan.md`: a milestone left
-as one line gives its sessions nothing to work from. Then run the checks, have a reviewer hunt for gaps,
-the next milestone's among them, and run a cold-start test: a fresh session given only the repository
-must say where we are and what comes next exactly as `docs/now.md` does. The next milestone goes to the
-owner in the same report as the gate. How a milestone is written out, how it ends, with the owner trying
-it, and when the next one is written out: [workflow.md](workflow.md#milestones-and-gates).
+1. Walk the exit list point by point.
+2. Write out the next milestone in `docs/plan.md`
+   ([workflow.md](workflow.md#writing-a-milestone-out)): a milestone left as one line gives its sessions
+   nothing to work from.
+3. Run the checks, and have a reviewer hunt for gaps, the next milestone's among them.
+4. Run a cold-start test: a fresh session given only the repository must say where we are and what
+   comes next exactly as `docs/now.md` does.
+
+The next milestone goes to the owner in the same report as the gate.
 
 ## The tracker
 
@@ -61,10 +63,13 @@ coordinator keeps it, the same day as things happen:
 ## Stop
 
 When the owner says stop, the coordinator starts nothing new and stops the sessions that are running.
-Work resumes only on the owner's word. A pause, where the work is to go on as it was once the owner says
-so, stays in the chat: it holds in the session it was called in, and the owner ends it by a word there,
-or by letting a new coordinator session go on after its first report. Only a stop that changes the
-plan (work dropped, put off or to be rethought) is recorded, with its reason, in `docs/now.md`.
+Work resumes only on the owner's word.
+
+- **A pause,** where the work is to go on as it was once the owner says so, stays in the chat. It holds
+  in the session it was called in; the owner ends it by a word there, or by letting a new coordinator
+  session go on after its first report.
+- **A stop that changes the plan** (work dropped, put off or to be rethought) is recorded, with its
+  reason, in `docs/now.md`.
 
 ## The process itself
 

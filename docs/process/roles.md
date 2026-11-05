@@ -11,9 +11,9 @@
 
 Work sessions are separate agent sessions that the coordinator starts, each with a one-line brief as
 its first message (in Claude Code, a new session in this repository). A reviewer is an agent the
-coordinator runs with a fresh context, apart from the work session, with the brief "Review pull request
-#N", or "Review pull request #N for harm" for a second, independent review of risky code (a new
-session, or a subagent that starts with no context of its own).
+coordinator runs with a fresh context, apart from the work session (a new session, or a subagent that
+starts with no context of its own), with the brief of one review: "Review pull request #N", or the same
+"for harm", "for architecture" or "for UI" ([rules.md](rules.md#if-you-are-the-reviewer)).
 
 ## Where things are
 

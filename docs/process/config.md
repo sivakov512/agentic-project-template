@@ -54,35 +54,32 @@ Python's standard library.
 ## commits
 
 `main` gets one commit per pull request, its subject the pull request's title and its body empty
-([workflow.md](workflow.md#how-a-piece-of-work-goes), step 7), so these rules are checked on the title
-(`process-commits`); the commits on a branch never reach `main` and aren't checked. The title is at
-most 72 characters together with the " (#N)" GitHub adds when the owner merges on its page, so the
-subject on `main` stays within 72 however it is merged. The project may also ask for:
+([workflow.md](workflow.md#how-a-piece-of-work-goes), step 7), so the commit rules are checked on the
+title (`process-commits`); the commits on a branch never reach `main` and aren't checked.
 
-- `conventional`: the title follows Conventional Commits, as release tools that read the history
-  need: one of the types `feat`, `fix`, `perf`, `revert`, `refactor`, `chore`, `docs`, `style`, `test`,
-  `build`, `ci`, in lower case, an optional lower-case scope, an optional `!` (`fix(parser): …`,
-  `docs!: …`). A revert is written `revert: …`, not git's default `Revert "…"`. The title then shows
-  the kind this way: `docs(plan): …`, `docs(spec): …` and `docs(research): …`, and for code `feat`,
-  `fix`, `refactor` and the like ([pull-requests.md](pull-requests.md#kind-title-and-label)).
+- The title is at most 72 characters together with the " (#N)" GitHub adds when the owner merges on its
+  page, so the subject on `main` stays within 72 however it is merged.
+- `conventional` (default `false`): the title follows Conventional Commits, as release tools that read
+  the history need: one of the types `feat`, `fix`, `perf`, `revert`, `refactor`, `chore`, `docs`,
+  `style`, `test`, `build`, `ci`, in lower case, an optional lower-case scope, an optional `!`
+  (`fix(parser): …`, `docs!: …`). A revert is written `revert: …`, not git's default `Revert "…"`. How
+  the title then shows the kind: [pull-requests.md](pull-requests.md#kind-title-and-label).
 
-It defaults to `false`. `one_line` and `no_co_authors`, from versions before 0.7.0, are still accepted
-and do nothing: a squash commit with an empty body keeps both. Rules beyond these go in the project's
-own check.
+`one_line` and `no_co_authors`, from versions before 0.7.0, are still accepted and do nothing: a squash
+commit with an empty body keeps both. Rules beyond these go in the project's own check.
 
 ## releases
 
 The process doesn't choose a release tool; it makes the project choose one and write it down. For a
 project that ships, a good default is release-please: it opens release pull requests from the
 Conventional Commits history (set `commits.conventional`), keeps the changelog and tags versions,
-and the project's own workflows build and publish. Run it with a GitHub App's token, not the agents'
-or the owner's: its pull requests are then recognised as a bot's
-([pull-requests.md](pull-requests.md#the-checks-ci-runs)). Secrets that publish or deploy live in a
-GitHub Environment limited to `main`, so the publishing job runs in the workflow of the push to `main`
-that makes the release (with release-please, gated on its `release_created` output). The Environment
-may also allow release tags `v*`, and the job publish on the tag, only where a tag ruleset stops the
-agents' account from creating, moving or deleting them. Its configuration is the project's: it
-differs with what the project ships.
+and the project's own workflows build and publish. Its configuration is the project's: it differs with
+what the project ships.
+
+- Run it with a GitHub App's token, not the agents' or the owner's, so its pull requests are recognised
+  as a bot's ([pull-requests.md](pull-requests.md#pull-requests-from-a-github-app)).
+- Secrets that publish or deploy, and so the job that publishes, are kept as
+  [setup.md](setup.md) step 8 says.
 
 ## checks
 
@@ -94,15 +91,18 @@ need the project's toolchain.
 ## kept
 
 File patterns (`fnmatch`, from the repository root, where `*` also crosses folders) the owner keeps for
-themself on top of what the process names ([workflow.md](workflow.md#the-owners-ok-and-the-merge)): the
-configuration of the project's checks (the linter's, the test runner's, coverage thresholds, the
-scripts that run them), anything else the owner names, and the files that the
-rules Claude Code loads by itself (a `CLAUDE.md` or `CLAUDE.local.md` in any folder, `.claude/rules/`)
-import, in turn too, which `process-owner` asks for. `process-owner` reads
-them from the base branch, so a pull request can't change them for itself, and a pull request that
-changes a match needs the owner's OK. Optional, and left out or empty until the project has such
-files: the pull request that adds
-the first check adds its patterns, and goes to the owner since it changes this file.
+themself on top of what the process names ([workflow.md](workflow.md#the-owners-ok-and-the-merge)):
+
+- the configuration of the project's checks (the linter's, the test runner's, coverage thresholds, the
+  scripts that run them);
+- anything else the owner names;
+- the files that the rules Claude Code loads by itself (a `CLAUDE.md` or `CLAUDE.local.md` in any
+  folder, `.claude/rules/`) import, in turn too, which `process-owner` asks for.
+
+`process-owner` reads the patterns from the base branch, so a pull request can't change them for
+itself, and a pull request that changes a match needs the owner's OK. Optional, and left out or empty
+until the project has such files: the pull request that adds the first check adds its patterns, and goes
+to the owner since it changes this file.
 
 ## ids_ignore
 

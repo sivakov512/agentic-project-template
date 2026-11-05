@@ -31,6 +31,8 @@ Merging and pull requests:
 
 Reviews:
 
+- Every review posts one comment of the same shape: its name and the head, its sections, the findings
+  marked fix or drop, and a last line "Ready to merge as is: yes" or "no" (`rules.md`, "Every review").
 - An architecture review for a pull request that changes the architecture or a contract between parts,
   with the contributor test, and a UI review for one that changes what a person sees and uses
   (`rules.md`, "If you are the reviewer"). A project with a user interface keeps a design-system

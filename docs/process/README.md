@@ -15,6 +15,7 @@ Nikita Sivakov, under the MIT License.
 |---|---|---|
 | How the process works | `docs/process/`, `tools/process/`, `.github/pull_request_template.md`, `.github/workflows/process-*.yml` | the template |
 | Which version of the process this is | `.process-lock.json` | written by `lock.py` in the template and copied by the update |
+| The template's own releases; in a project its copy does nothing ([updates.md](updates.md#changing-the-process)) | `.github/workflows/template-release.yml` | the template, not in the lock |
 | What the project is, and the rules every session of it keeps | `CLAUDE.md`, which imports [rules.md](rules.md) | the project |
 | Goal, document chain, milestones, where facts go, and the rest the coordinator needs about the project | `docs/plan.md` | the project |
 | Where the work stands | `docs/now.md` | the project |
