@@ -127,13 +127,14 @@ The process holds the milestones to these rules:
    above it ([changes.md](changes.md)), and starts "Fix pull request #N". That round gets one review
    of the fix, and for risky code one review for harm of it; it doesn't count toward the two rounds of
    step 5, and what it still finds goes as in step 5's second round.
-7. **The merge,** by squash: `main` gets one commit, its subject the pull request's title, its body
-   empty. After the owner's OK where it is needed, by the coordinator on its own where it isn't ("The
-   owner's OK and the merge" below), with `gh api -X PUT repos/{owner}/{repo}/pulls/<N>/merge -f
-   merge_method=squash -f sha=<the last commit> -f commit_title="<the title>" -f commit_message=`;
-   `sha` makes GitHub refuse the merge if a commit came after the one checked and approved. The owner,
-   merging on GitHub, keeps what GitHub offers: the repository's settings make it the title and an
-   empty message ([setup.md](setup.md), step 8). When merges change where the work stands, the
+7. **The merge,** by squash: `main` gets one commit, its subject the pull request's title and its
+   number, its body empty. After the owner's OK where it is needed, by the coordinator on its own where
+   it isn't ("The owner's OK and the merge" below), with `gh api -X PUT repos/{owner}/{repo}/pulls/<N>/merge
+   -f merge_method=squash -f sha=<the last commit> -f commit_title="<the title> (#<N>)" -f
+   commit_message=`; `sha` makes GitHub refuse the merge if a commit came after the one checked and
+   approved, and " (#<N>)" keeps the link release tools read. The owner, merging on GitHub, keeps what
+   GitHub offers: the repository's settings make it the same title and an empty message
+   ([setup.md](setup.md), step 8). When merges change where the work stands, the
    coordinator brings `docs/now.md` up to date afterwards in a record of its own, several merges in
    one, before its next report. If the owner says no, the pull request stays open, and the owner's
    remarks are handled as step 6 says.

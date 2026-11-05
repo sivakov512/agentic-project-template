@@ -67,8 +67,10 @@ Always ask, whatever the brief says:
 8. **GitHub:** `python3 tools/process/doctor.py --fix-labels` creates the two review labels. The repository's
    settings are the owner's: list them in the pull request as paths of clicks.
    - Settings → General → Pull Requests: untick "Allow merge commits" and "Allow rebase merging", tick
-     "Allow squash merging" and set its default commit message to "Default to pull request title"
-     ([workflow.md](workflow.md#how-a-piece-of-work-goes), step 7).
+     "Allow squash merging" and set its default commit message to "Pull request title"
+     ([workflow.md](workflow.md#how-a-piece-of-work-goes), step 7). Where a ruleset protects `main`,
+     also Settings → Rules → Rulesets → the ruleset for `main` → Require a pull request before merging
+     → Allowed merge methods: Squash only.
    - Settings → Branches (or Rules): protect `main`, with changes only through pull requests and the
      checks `process-docs`, `process-pr`, `process-lock`, `process-commits` and `process-owner` required
      (the project's own jobs too, once they exist), and no required approvals (untick "Require
@@ -91,9 +93,9 @@ Always ask, whatever the brief says:
      (Settings → Environments → New environment → Deployment branches and tags: `main` only), which
      the job that uses them names, so a workflow on another branch can't reach them. A job that
      publishes therefore runs on the push to `main` (with release-please, on its `release_created`
-     output), not on a release or a tag: those run on the tag, which the Environment refuses, and
-     allowing tags would open the secrets to any tag the agents' account can push. A repository secret
-     is only for what any branch may use.
+     output); the Environment may also allow release tags `v*` only where a tag ruleset stops the
+     agents' account from creating, moving or deleting them, and then a job may publish on the tag. A
+     repository secret is only for what any branch may use.
 9. **Finish:** remove the `<!-- template placeholder -->` lines, set `"set_up": true`, run
    `python3 tools/process/check.py` and `python3 tools/process/doctor.py`, and go on only when both pass,
    apart from what waits on the owner.

@@ -9,7 +9,7 @@ Three simplifications an independent review proposed and the owner accepted:
 
 - Squash merge. `main` gets one commit per pull request, its subject the pull request's title, its
   body empty; the coordinator merges with the REST API (`merge_method=squash`, with the last commit's
-  `sha`). On the branch, fixes are plain new commits and nothing pushed is rewritten: no fixup,
+  `sha` and the title followed by " (#N)", as GitHub's page does). On the branch, fixes are plain new commits and nothing pushed is rewritten: no fixup,
   autosquash or force push. A conflict is resolved by merging `main` into the branch. A second-round
   reviewer reads `git diff <reviewed> <new>`, or with a merge of `main` in between, `git log -p
   --first-parent --remerge-diff`. The coordinator's check that commits read as steps goes.
@@ -19,12 +19,14 @@ Three simplifications an independent review proposed and the owner accepted:
   nothing.
 - One label. A pull request carries only its review label, `owner-review` or `ok-without-reading`;
   other labels are not read. The kind stays in the title: its prefix (`Plan:`, `Spec:`, `Research:`,
-  `Code:`), or, where the project asks for Conventional Commits, the type. `update.py` titles its pull
-  request `chore: ...` there. `doctor.py --fix-labels` creates only the review labels.
+  `Code:`), or, where the project asks for Conventional Commits, the type and scope: `docs(plan): ...`,
+  `docs(spec): ...`, `docs(research): ...`, and `feat`, `fix`, `refactor` and the like for code.
+  `update.py` titles its pull request `chore: ...` there. `doctor.py --fix-labels` creates only the review labels.
 - Short records. A pull request whose "Backlog item" is `Coordinator record` or `Process update` needs
   only "Backlog item", "What changed" and "Owner review". `update.py` writes just those.
-- `doctor.py` checks the repository's merge settings: squash merging only, titled by the pull request,
-  with an empty message.
+- `doctor.py` checks the repository's merge settings (squash merging only, titled by the pull request,
+  with an empty message) and that the rulesets for `main`, where they list allowed merge methods,
+  allow squash.
 
 Projects: in this order.
 
@@ -32,8 +34,10 @@ Projects: in this order.
    `chore: update the process to 0.8.0`, or its `process-commits` stays red.
 2. The coordinator asks the owner, in one request together with this update's Approve where it needs
    one, for Settings > General > Pull Requests: untick "Allow merge commits" and "Allow rebase
-   merging", tick "Allow squash merging", and set its default commit message to "Default to pull
-   request title". From then on nothing merges by rebase, so nothing else merges before step 3.
+   merging", tick "Allow squash merging", and set its default commit message to "Pull request title";
+   and, where a ruleset protects `main`, Settings > Rules > Rulesets > the ruleset for `main` > Require
+   a pull request before merging > Allowed merge methods: Squash only. From then on nothing merges by
+   rebase, so nothing else merges before step 3.
 3. Once `doctor.py` shows the settings, the coordinator merges this update first, by squash with the
    command of the new `workflow.md`, step 7 (`gh api -X PUT .../merge -f merge_method=squash ...`).
 4. If the owner wants, the labels `plan`, `spec`, `research` and `code` are deleted (Issues > Labels);
@@ -50,8 +54,8 @@ Gaps an independent review of 0.6.0 found in the process documents:
   as the coordinator's decision. What holds only for the session (a pause, an answer) stays in the chat.
   `changes.md` links to it.
 - Rules every session keeps live in `CLAUDE.md` only: work sessions and reviewers read only the parts
-  of `docs/plan.md` their item leads them to. The plan's section "The owner's rules" becomes "Working
-  with the owner", what the coordinator needs.
+  of `docs/plan.md` their item leads them to. The plan placeholder's section "The owner's rules" becomes
+  "Working with the owner", what the coordinator needs; a project may keep its own name and anchor.
 - What the owner keeps is defined once, in `workflow.md`, "The owner's OK and the merge": the files CI
   holds, with the process update exception said there, and any change that loosens a check. `reports.md`
   and `pull-requests.md` link to it. The reviewer marks a loosened check or a too weak review label
@@ -89,7 +93,8 @@ Gaps an independent review of 0.6.0 found in the process documents:
 - Setup: the account question first, and step 1 only once it is answered; the agents' own account
   recommended, with the agents run where only their account is signed in; no bypassing in both modes;
   secrets that publish, deploy or mint tokens in an Environment limited to `main`, with publishing on
-  the push to `main`; a warning on
+  the push to `main`, or also on release tags `v*` where a tag ruleset stops the agents' account from
+  creating, moving or deleting them; a warning on
   `CI_RUNNER`. The README says what each account choice costs, what the owner will be asked, and that
   the repository is in English.
 - Backlog items stand under a heading per milestone. A work session reads its item and the documents it
@@ -97,12 +102,12 @@ Gaps an independent review of 0.6.0 found in the process documents:
   "stricter rules" for commits, the design's folder list, the renumbering pull request's kind and label,
   the template's coordinator's reading.
 
-Projects: move rules every session must keep from `docs/plan.md` (section "The owner's rules") to
-`CLAUDE.md` and rename the section to "Working with the owner"; add a line "Reported up to: <commit>" to
+Projects: move only the rules every session must keep from `docs/plan.md` to `CLAUDE.md`; the plan
+may keep its section "The owner's rules" and its anchor, which other documents may link to; add a line "Reported up to: <commit>" to
 `docs/now.md`; put backlog items under a heading per milestone. Ask the owner to move secrets that
 publish, deploy or mint tokens into an Environment limited to `main`, together with a change in which
-the jobs that use them name the Environment and publish on the push to `main` (`setup.md`, step 8), or
-the release fails; and to turn on no bypassing for `main` with the agents' own account too. With the
+the jobs that use them name the Environment and publish on the push to `main`, or on release tags `v*`
+that a tag ruleset keeps from the agents' account (`setup.md`, step 8), or the release fails; and to turn on no bypassing for `main` with the agents' own account too. With the
 agents' own account, make sure the owner's login is not reachable where the agents run
 (`gh auth status`, the credential helper, the environment) and tell the owner if it is. The `CLAUDE.md`,
 `docs/plan.md` and `.github/` changes go to the owner.
@@ -114,8 +119,8 @@ From an independent review of 0.6.0, the guards in the tools:
 - The owner also keeps `.claude/` folders, `.mcp.json`, and `CLAUDE.md` and `CLAUDE.local.md` in any
   folder, names compared whatever their case: Claude Code takes rules, permissions, hooks and tools
   from them. A new optional key `kept` in `docs/process.json` lists patterns of paths the owner keeps
-  too, read from the base branch: the configuration of the project's checks, the paths of risky code,
-  and the files the rules import (`config.md`). Two things fail `process-owner` whatever the approvals:
+  too, read from the base branch: the configuration of the project's checks, anything else the owner
+  names, and the files the rules import (`config.md`). Two things fail `process-owner` whatever the approvals:
   a symlink or submodule at a kept path or at a folder on the way to one, since the check can't see
   what is behind it; and rules Claude Code loads by itself (a `CLAUDE.md` or `CLAUDE.local.md` in any
   folder, `.claude/rules/`), or the files they import in turn, that import (an `@` before the path) a
@@ -144,10 +149,11 @@ From an independent review of 0.6.0, the guards in the tools:
 - `updates.md`: the template's files never write an `@` right before a path, since `process-owner`
   would read it as an import in every project.
 - `config.md`, releases: secrets that publish or deploy live in a GitHub Environment limited to
-  `main`, so the publishing job runs on the push to `main`, not on a release or tag event.
+  `main`, so the publishing job runs on the push to `main`, or on release tags `v*` only where a tag
+  ruleset stops the agents' account from creating, moving or deleting them.
 
-Projects: `kept` is optional; when the project has check configuration or risky code, the coordinator
-proposes its patterns to the owner in the pull request that adds the first of them. A project whose
+Projects: `kept` is optional; when the project has check configuration, the coordinator proposes its
+patterns to the owner in the pull request that adds the first of it. A project whose
 `CLAUDE.md`, `CLAUDE.local.md` or `.claude/rules/` files import a file the owner doesn't keep
 (`AGENTS.md`, say), or a symlink, adds that file to `kept`, or imports a plain file instead, before or
 in the update. A project with a symlink or submodule at a kept path (a `CLAUDE.md -> AGENTS.md`, say)

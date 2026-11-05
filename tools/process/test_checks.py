@@ -884,7 +884,8 @@ class TitleAgainstCommitRules(unittest.TestCase):
             saved = check_owner.api
             check_owner.api = lambda path, method="GET": {"number": 5, "title": "Plan: a short title"}
             try:
-                with mock.patch.dict("os.environ", {"GH_TOKEN": "t"}):
+                # The project's own commit rules don't count here.
+                with mock.patch.dict("os.environ", {"GH_TOKEN": "t"}), mock.patch.object(check_commits, "rules", lambda root: {}):
                     with contextlib.redirect_stdout(io.StringIO()):
                         self.assertEqual(check_commits.main(["check_commits.py", str(event)]), 0)
             finally:
@@ -1061,6 +1062,14 @@ class DoctorMergeSettings(unittest.TestCase):
         self.assertIn("allow_rebase_merge is True", problem)
         self.assertIn("squash_merge_commit_message is PR_BODY", problem)
         self.assertNotIn("allow_squash_merge", problem)
+
+    def test_a_ruleset_must_allow_squash_where_it_lists_merge_methods(self):
+        def rule(methods):
+            return {"type": "pull_request", "parameters": {"allowed_merge_methods": methods}}
+        self.assertTrue(doctor.rules_allow_squash([rule(["squash"])]))
+        self.assertFalse(doctor.rules_allow_squash([rule(["squash"]), rule(["rebase"])]))
+        self.assertIsNone(doctor.rules_allow_squash([{"type": "pull_request", "parameters": {}}]))
+        self.assertIsNone(doctor.rules_allow_squash([]))
 
     def test_an_answer_without_the_settings_cant_tell(self):
         self.assertIs(doctor.merge_settings_problem({"type": "User", "allow_squash_merge": None}), False)

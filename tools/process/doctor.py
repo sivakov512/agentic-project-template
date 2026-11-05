@@ -69,6 +69,16 @@ def approvals(rules):
             any(bool(p.get("dismiss_stale_reviews_on_push")) for p in found))
 
 
+def rules_allow_squash(rules):
+    """Whether the rulesets' pull request rules on main let a pull request merge by squash: False when one
+    lists allowed merge methods without squash; None when none lists them (no ruleset, or classic
+    protection)."""
+    found = [(rule.get("parameters") or {}).get("allowed_merge_methods") for rule in rules
+             if rule.get("type") == "pull_request"]
+    found = [methods for methods in found if methods is not None]
+    return all("squash" in methods for methods in found) if found else None
+
+
 def binds_everyone(branch, rules):
     """Whether main's protection lets nobody past it, the owner and admins included: False when classic
     protection leaves admins out of its required checks; True when it binds everyone and no ruleset is on
@@ -258,6 +268,8 @@ def check_github(report, lock, set_up, fix_labels, agents_account):
                     "the owner requires them: " + ", ".join(missing_checks))
         # process-owner asks for the owner's approval where it is needed; a required approval on top of it
         # would stop the coordinator from merging what is OK without reading.
+        report.line(rules_allow_squash(rules), "the rulesets for main allow squash merging",
+                    "the owner sets Allowed merge methods to Squash in the ruleset for main (docs/process/setup.md, step 8)")
         reviews = approvals(rules)
         if reviews is None:
             report.line(None, "no required approvals for main",

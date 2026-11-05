@@ -62,8 +62,9 @@ subject on `main` stays within 72 however it is merged. The project may also ask
 - `conventional`: the title follows Conventional Commits, as release tools that read the history
   need: one of the types `feat`, `fix`, `perf`, `revert`, `refactor`, `chore`, `docs`, `style`, `test`,
   `build`, `ci`, in lower case, an optional lower-case scope, an optional `!` (`fix(parser): …`,
-  `docs!: …`). A revert is written `revert: …`, not git's default `Revert "…"`. The type then stands
-  in for the kind's prefix ([pull-requests.md](pull-requests.md#kind-title-and-label)).
+  `docs!: …`). A revert is written `revert: …`, not git's default `Revert "…"`. The title then shows
+  the kind this way: `docs(plan): …`, `docs(spec): …` and `docs(research): …`, and for code `feat`,
+  `fix`, `refactor` and the like ([pull-requests.md](pull-requests.md#kind-title-and-label)).
 
 It defaults to `false`. `one_line` and `no_co_authors`, from versions before 0.8.0, are still accepted
 and do nothing: a squash commit with an empty body keeps both. Rules beyond these go in the project's
@@ -78,9 +79,10 @@ and the project's own workflows build and publish. Run it with a GitHub App's to
 or the owner's: its pull requests are then recognised as a bot's
 ([pull-requests.md](pull-requests.md#the-checks-ci-runs)). Secrets that publish or deploy live in a
 GitHub Environment limited to `main`, so the publishing job runs in the workflow of the push to `main`
-that makes the release (with release-please, gated on its `release_created` output), never on a
-release or tag event: that runs on the tag, and the Environment refuses it. Its configuration is the
-project's: it differs with what the project ships.
+that makes the release (with release-please, gated on its `release_created` output). The Environment
+may also allow release tags `v*`, and the job publish on the tag, only where a tag ruleset stops the
+agents' account from creating, moving or deleting them. Its configuration is the project's: it
+differs with what the project ships.
 
 ## checks
 
@@ -94,14 +96,13 @@ need the project's toolchain.
 File patterns (`fnmatch`, from the repository root, where `*` also crosses folders) the owner keeps for
 themself on top of what the process names ([workflow.md](workflow.md#the-owners-ok-and-the-merge)): the
 configuration of the project's checks (the linter's, the test runner's, coverage thresholds, the
-scripts that run them), the paths of the code `docs/plan.md` names as risky, and the files that the
+scripts that run them), anything else the owner names, and the files that the
 rules Claude Code loads by itself (a `CLAUDE.md` or `CLAUDE.local.md` in any folder, `.claude/rules/`)
 import, in turn too, which `process-owner` asks for. `process-owner` reads
 them from the base branch, so a pull request can't change them for itself, and a pull request that
 changes a match needs the owner's OK. Optional, and left out or empty until the project has such
 files: the pull request that adds
-the first check or the first risky code adds its patterns, and goes to the owner since it changes this
-file.
+the first check adds its patterns, and goes to the owner since it changes this file.
 
 ## ids_ignore
 

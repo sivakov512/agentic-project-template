@@ -8,15 +8,17 @@ So the owner can see from the list what each pull request is and whether to read
   tick or the split of its own item, `docs/now.md`, links) don't count. A pull request with two purposes is two pull requests.
   The title shows the kind and becomes the subject of the one commit the pull request puts on `main`
   ([workflow.md](workflow.md#how-a-piece-of-work-goes), step 7), so it follows the commit rules
-  ([config.md](config.md#commits)). Where they ask for Conventional Commits, the title is such a subject
-  and its type stands in for the kind; otherwise it starts with the kind's prefix:
+  ([config.md](config.md#commits)). It starts with the kind's prefix, or, where they ask for
+  Conventional Commits, with the type and scope that show the kind:
 
-  | Kind | Title starts with | For |
-  |---|---|---|
-  | `plan` | `Plan:` | the plan, rules for agents, the process, the commands of the checks, and CI |
-  | `spec` | `Spec:` | what the product must do and how it looks: the documents of the chain above the code |
-  | `research` | `Research:` | studies, facts found by experiment |
-  | `code` | `Code:` | the code of the tools (the code the checks run among it) and of the product |
+  | Kind | Title starts with | With Conventional Commits | For |
+  |---|---|---|---|
+  | `plan` | `Plan:` | `docs(plan):` | the plan, rules for agents, the process, the commands of the checks, and CI |
+  | `spec` | `Spec:` | `docs(spec):` | what the product must do and how it looks: the documents of the chain above the code |
+  | `research` | `Research:` | `docs(research):` | studies, facts found by experiment |
+  | `code` | `Code:` | `feat:`, `fix:`, `refactor:` and the like | the code of the tools (the code the checks run among it) and of the product |
+
+  A process update keeps the `chore:` that `update.py` gives it.
 
   A coordinator record takes the kind of what it records: `plan` for `docs/now.md`, the backlog and the
   plan, `spec` for a document of the chain, and a decision record the kind of what it decides.
