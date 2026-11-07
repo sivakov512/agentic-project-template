@@ -8,7 +8,8 @@ The newest version first. Each entry says what changed and what projects must do
 - The coordinator names its session `M<n> coordinator: <topic>`, the milestone's number and what the
   session is busy with in two to four English words, and renames it when either changes
   (`coordinator.md`, "Each session"). Coordinators' sessions were named each in its own way, some in
-  the owner's language, and were hard to tell apart in the list.
+  the owner's language, and were hard to tell apart in the list. Naming another project's
+  coordinator, it gives the project first, since the name doesn't.
 
 Projects: nothing to do. A running coordinator renames its session after the update.
 

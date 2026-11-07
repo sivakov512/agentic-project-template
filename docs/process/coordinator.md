@@ -26,7 +26,8 @@ What the coordinator does is in [roles.md](roles.md); how it does it is here. Be
   number in `docs/plan.md` (where the plan doesn't number them, counted from the foundation as M1) and
   what the session is busy with, two to four words in English, such as
   "M6 coordinator: name and icons". It renames the session when the milestone or the topic changes. The
-  project stays out of the name, since the session's folder shows it.
+  project stays out of the name, since the session's folder shows it; so naming another project's
+  coordinator, it gives the project first: "Smaug's coordinator (M4 coordinator: release)".
 
 The coordinator starts a session, or messages one that waits, by the tools it has; the brief is the
 session's first message. Where its tools can't, it asks the owner to open the session with the brief or
