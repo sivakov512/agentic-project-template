@@ -15,7 +15,7 @@ words what the IDs mean, this file says it for the checks.
   },
   "commits": {"conventional": true},
   "checks": ["npm test", "npm run lint"],
-  "kept": ["package.json", ".eslintrc.json", "jest.config.js", "src/payments/*"],
+  "kept": ["AGENTS.md"],
   "ids_ignore": ["docs/audit/*.md"],
   "ids": [
     {"kind": "scenario", "prefix": "S", "file": "docs/scenarios.md", "defined_by": "heading"},
@@ -86,15 +86,14 @@ project's own tests and linters. CI runs them in the project's own workflows
 File patterns (`fnmatch`, from the repository root, where `*` also crosses folders) the owner keeps for
 themself on top of what the process names ([workflow.md](workflow.md#the-owners-ok-and-the-merge)):
 
-- the configuration of the project's checks (the linter's, the test runner's, coverage thresholds, the
-  scripts that run them);
-- anything else the owner names;
+- what the owner names;
 - the files that the rules Claude Code loads by itself import, in turn too, which `process-owner` asks
   for.
 
 `process-owner` reads the patterns from the base branch, and a pull request that changes a match needs
-the owner's OK. Optional, and left out or empty until the project has such files: the pull request that
-adds the first check adds its patterns.
+the owner's OK. Optional, and left out or empty until there is such a file. The configuration of the
+project's checks isn't kept by default: a change that loosens a check needs the owner's OK in whatever
+file it is (workflow.md, same section), and one that doesn't goes as other work.
 
 ## ids_ignore
 

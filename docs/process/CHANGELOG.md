@@ -3,6 +3,17 @@
 The newest version first. Each entry says what changed and what projects must do, if anything
 ([updates.md](updates.md#changing-the-process)).
 
+## 0.9.0 — 2026-11-09
+
+- The configuration of a project's checks (the linter's, the test runner's, coverage thresholds, the
+  scripts that run them) no longer has to be in `kept` (`config.md`, "kept"). A change that loosens a
+  check still needs the owner's OK in whatever file it is, by its label and the review
+  (`workflow.md`, "The owner's OK and the merge"); `kept` only sent the owner every other edit of
+  those files as well.
+
+Projects: nothing to do. A project may drop such patterns from `kept` in `docs/process.json`, in a pull
+request the owner approves since the owner keeps that file.
+
 ## 0.8.0 — 2026-11-07
 
 - The coordinator names its session `M<n> coordinator: <topic>`, the milestone's number and what the
