@@ -100,13 +100,13 @@ Whatever your role: a question from the owner is a question. Answer it and propo
 
 ## If you are the reviewer
 
-Your brief names one of four reviews. The coordinator gives each pull request the ones it is for
+Your brief names one of these reviews. The coordinator gives each pull request the ones it is for
 ([workflow.md](workflow.md#how-a-piece-of-work-goes), step 5):
 
 | Brief | Review | For |
 |---|---|---|
 | "Review pull request #N" | the review | every pull request, but two that step 5 names |
-| "Review pull request #N reading whole <modules>" | the review, on whole modules | the last of a run of pull requests that build or change the same modules, and before each gate ("The review" below) |
+| "Review pull request #N reading whole <modules>" | the review, on whole modules | the last of a run of pull requests that build or change the same modules ("The review" below) |
 | "Review pull request #N for harm" | the review for harm | code `docs/plan.md` names as risky |
 | "Review pull request #N for architecture" | the architecture review | a change to the architecture or to a contract between parts (the design document, an interface, an API, a data or file format) |
 | "Review pull request #N for UI" | the UI review | a change to what a person sees and uses (a GUI, web pages and the like) |
@@ -161,8 +161,8 @@ two names for one thing, one decision taken two ways, styles that differ. So whe
 builds or changes the same modules or sections of the document chain (the parts of a split item, a run
 of their own even where later items change the same modules; items cut from one design; items of a
 milestone in parallel or in waves), a review reads them whole with the
-last pull request of the run, once the coordinator judges the run done and the rest of it has merged; and one before each gate reads
-what the milestone changed that no such review read. It comes on top of the pull request's other
+last pull request of the run, once the coordinator judges the run done and the rest of it has merged; and before each gate a reviewer reads
+what the milestone changed that no such review read ([coordinator.md](coordinator.md#before-a-gate)). It comes on top of the pull request's other
 reviews, by another reviewer, in the same rounds. The coordinator names the modules in the brief: those
 the milestone's plan lists, and any others the diffs show the pull requests met in.
 
