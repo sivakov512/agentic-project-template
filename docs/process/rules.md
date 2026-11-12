@@ -158,8 +158,9 @@ a section with a verdict on three points, each with what you judged it on; falli
 
 **Reading whole.** Each review sees one diff, so code that several pull requests build drifts apart:
 two names for one thing, one decision taken two ways, styles that differ. So when a run of pull requests
-builds or changes the same modules or sections of the document chain (the parts of a split item, items
-cut from one design, items of a milestone in parallel or in waves), a review reads them whole with the
+builds or changes the same modules or sections of the document chain (the parts of a split item, a run
+of their own even where later items change the same modules; items cut from one design; items of a
+milestone in parallel or in waves), a review reads them whole with the
 last pull request of the run, once the coordinator judges the run done and the rest of it has merged; and one before each gate reads
 what the milestone changed that no such review read. It comes on top of the pull request's other
 reviews, by another reviewer, in the same rounds. The coordinator names the modules in the brief: those
