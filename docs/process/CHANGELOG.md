@@ -3,6 +3,25 @@
 The newest version first. Each entry says what changed and what projects must do, if anything
 ([updates.md](updates.md#changing-the-process)).
 
+## 0.10.0 — 2026-11-13
+
+- The review reading whole (`rules.md`, "The review"). When a run of pull requests builds or changes
+  the same modules or sections of the document chain (the parts of a split item, items cut from one
+  design, items of a milestone in parallel or in waves), a review reads them whole with the last pull
+  request of the run, once the coordinator judges the run done and the rest of it has merged: one name for one thing, one way for
+  one decision, one style, and where it got lost; in a large module, the types or sections the run
+  touched. It comes on top of the other reviews, by another reviewer, in the same rounds. Its findings
+  are its own even in code merged earlier; one in a frozen file or too large for the pull request's size becomes an item.
+  A milestone written out lists the modules several of its items will build (`workflow.md`, "Writing
+  a milestone out"); the coordinator names them, and any others the diffs show the run met in, in
+  the brief "Review pull request #N reading whole <modules>" (`workflow.md`, step 5). Before each
+  gate, a reviewer reads whole what the milestone changed that no such review read (`coordinator.md`,
+  "Before a gate"). Reviews of one diff each passed clean while the code spread apart. Proposed by a
+  project's coordinator with the owner's agreement and tried by all four coordinators on their
+  projects.
+
+Projects: nothing to do. A project that keeps such a review in `docs/plan.md` drops it there.
+
 ## 0.9.0 — 2026-11-09
 
 - The configuration of a project's checks (the linter's, the test runner's, coverage thresholds, the

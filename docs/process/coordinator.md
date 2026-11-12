@@ -38,7 +38,8 @@ to pass the message on.
 1. Walk the exit list point by point.
 2. Write out the next milestone in `docs/plan.md`
    ([workflow.md](workflow.md#writing-a-milestone-out)).
-3. Run the checks, and have a reviewer hunt for gaps, the next milestone's among them.
+3. Run the checks, and have a reviewer hunt for gaps, the next milestone's among them, and read whole
+   the modules the milestone changed that no review read whole ([rules.md](rules.md#the-review)).
 4. Run a cold-start test: a fresh session given only the repository must say where we are and what
    comes next exactly as `docs/now.md` does.
 
