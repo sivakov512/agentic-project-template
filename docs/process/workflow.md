@@ -51,8 +51,8 @@ Each milestone is written out at the end of the one before it, from what is know
 - the owner's part and the decisions it will bring to the owner
   ([reports.md](reports.md#when-the-owner-looks));
 - its risks;
-- the modules several of its items will build or change, which a review reads whole once the last of
-  them merges ([rules.md](rules.md#the-review));
+- the modules several of its items will build or change, which a review reads whole when they are done
+  ([rules.md](rules.md#the-review));
 - everything it builds on (documents, interfaces, the technologies it uses), each either decided and
   written down already or settled at the milestone's start, before the work that depends on it;
 - its exit list, which always includes that every backlog item of the milestone is merged or dropped
@@ -115,9 +115,8 @@ new items.
      ([updates.md](updates.md#getting-a-newer-process)) gets the review of those changes, against the
      release's "Projects:" steps in the changelog. The review for harm, the architecture review and the UI review come
      on top for the pull requests they are for ([rules.md](rules.md#if-you-are-the-reviewer)), each by
-     another reviewer, in the same rounds. The last to merge of several pull requests on the same
-     modules gets the review reading those modules whole instead of the plain one
-     ([rules.md](rules.md#the-review)). The coordinator decides which reviews a pull request gets, by
+     another reviewer, in the same rounds. The last of a run of pull requests on the same modules
+     also gets the review reading them whole ([rules.md](rules.md#the-review)). The coordinator decides which reviews a pull request gets, by
      these rules and any more `docs/plan.md` names.
    - **Fixes.** One work session ("Fix pull request #N") fixes the findings of all the reviews. The pull
      request merges only with CI green and no "fix" finding left.

@@ -106,7 +106,7 @@ Your brief names one of four reviews. The coordinator gives each pull request th
 | Brief | Review | For |
 |---|---|---|
 | "Review pull request #N" | the review | every pull request, but two that step 5 names |
-| "Review pull request #N reading whole <modules>" | the review, on whole modules | the last to merge of several pull requests that build or change the same modules, and the gate ("The review" below) |
+| "Review pull request #N reading whole <modules>" | the review, on whole modules | the last of a run of pull requests that build or change the same modules, and before each gate ("The review" below) |
 | "Review pull request #N for harm" | the review for harm | code `docs/plan.md` names as risky |
 | "Review pull request #N for architecture" | the architecture review | a change to the architecture or to a contract between parts (the design document, an interface, an API, a data or file format) |
 | "Review pull request #N for UI" | the UI review | a change to what a person sees and uses (a GUI, web pages and the like) |
@@ -157,19 +157,20 @@ a section with a verdict on three points, each with what you judged it on; falli
   tests, where there are any, read as a description of the behaviour.
 
 **Reading whole.** Each review sees one diff, so code that several pull requests build drifts apart:
-two names for one thing, one decision taken two ways, styles that differ. So when several pull requests
-build or change the same modules (the parts of a split item, items cut from one design, items of a
-milestone in parallel), the review of the one that merges last reads those modules whole, and so does a
-review before each gate for the modules the milestone changed that no such review read. The coordinator
-names the modules in the brief: those the milestone's plan lists, and any others those pull requests'
-diffs show they met in.
+two names for one thing, one decision taken two ways, styles that differ. So when a run of pull requests
+builds or changes the same modules or sections of the document chain (the parts of a split item, items
+cut from one design, items of a milestone in parallel or in waves), a review reads them whole with the
+last pull request of the run, once the coordinator judges the run done and the rest of it has merged; and one before each gate reads
+what the milestone changed that no such review read. It comes on top of the pull request's other
+reviews, by another reviewer, in the same rounds. The coordinator names the modules in the brief: those
+the milestone's plan lists, and any others the diffs show the pull requests met in.
 
 With such a brief, judge the three points on each named module read from the top, as someone new to it
 would: one name for one thing, one way for one decision, one style, and where you got lost. In a large
 module, read whole the types or sections those pull requests touched. Findings in the named modules are
-this review's own, marked as usual, even in code that earlier pull requests merged; the rest of the
-pull request is reviewed on its diff. At a gate the findings become items, as the gate's other gaps
-do.
+this review's own, marked as usual, even in code that earlier pull requests merged; one in a file the
+project's rules forbid changing, or too large to fix within the pull request's size, becomes an item,
+and so do the findings at a gate.
 
 ### The review for harm
 
