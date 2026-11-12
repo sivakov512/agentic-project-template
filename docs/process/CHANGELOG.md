@@ -3,6 +3,17 @@
 The newest version first. Each entry says what changed and what projects must do, if anything
 ([updates.md](updates.md#changing-the-process)).
 
+## 0.10.0 — 2026-11-13
+
+- The review of the last part of a split item reads whole every module the parts made or changed a
+  lot, as someone new to it would, not the diff: the brief is "Review pull request #N, reading whole
+  <modules>" (`rules.md`, "The review"; `workflow.md`, step 1). It says where it got lost, and looks
+  for one thing decided differently in different places and for names that drifted apart. Reviews of
+  each part alone passed clean while the whole spread apart. Proposed by a project's coordinator with
+  the owner's agreement.
+
+Projects: nothing to do. A project that keeps such a review in `docs/plan.md` drops it there.
+
 ## 0.9.0 — 2026-11-09
 
 - The configuration of a project's checks (the linter's, the test runner's, coverage thresholds, the

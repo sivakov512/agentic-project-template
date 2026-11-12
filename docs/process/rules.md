@@ -154,6 +154,12 @@ a section with a verdict on three points, each with what you judged it on; falli
 - **Easy to change:** each piece has one job, nothing is copied where the copies will drift apart, and
   tests, where there are any, read as a description of the behaviour.
 
+A pull request that ends code built over several (the last part of a split item) gets a brief that
+names the modules those parts made or changed a lot: "Review pull request #N, reading whole <modules>".
+Then judge the three points on each of those modules read whole, from the top, as someone new to it
+would, not on the diff: say where you got lost, and look for one thing decided differently in
+different places and for names that drifted apart between the parts.
+
 ### The review for harm
 
 Until your findings are posted, read the pull request's description, diff and commits, not its

@@ -101,7 +101,8 @@ new items.
    large is split before a session starts on it. One found too large once its pull request is open is
    split on its branch: the coordinator commits the split to `docs/backlog.md` there; the first part
    keeps the ID, with a narrower "Done when", and the pull request, its kind and its label; the other
-   parts get new IDs. The report names the split among the coordinator's own decisions.
+   parts get new IDs. The report names the split among the coordinator's own decisions. The review of
+   the last part reads whole what the parts built ([rules.md](rules.md#the-review)).
 2. **The brief** is "Do B-###" and nothing else.
 3. **Questions first** ([rules.md](rules.md#your-work)): the coordinator answers in the draft pull
    request, bringing the owner in when a question is the owner's to decide.
