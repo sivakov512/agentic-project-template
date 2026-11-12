@@ -5,12 +5,18 @@ The newest version first. Each entry says what changed and what projects must do
 
 ## 0.10.0 — 2026-11-13
 
-- The review of the last part of a split item reads whole every module the parts made or changed a
-  lot, as someone new to it would, not the diff: the brief is "Review pull request #N, reading whole
-  <modules>" (`rules.md`, "The review"; `workflow.md`, step 1). It says where it got lost, and looks
-  for one thing decided differently in different places and for names that drifted apart. Reviews of
-  each part alone passed clean while the whole spread apart. Proposed by a project's coordinator with
-  the owner's agreement.
+- The review reading whole (`rules.md`, "The review"). When several pull requests build or change the
+  same modules (the parts of a split item, items cut from one design, items of a milestone in
+  parallel), the review of the one that merges last reads those modules whole, from the top, as
+  someone new to them would: one name for one thing, one way for one decision, one style, and where
+  it got lost. In a large module, the types or sections those pull requests touched. Findings there
+  are its own, even in code merged earlier. A milestone written out lists the modules several of its
+  items will build (`workflow.md`, "Writing a milestone out"); the coordinator names them, and any
+  others the diffs show items met in, in the brief "Review pull request #N reading whole <modules>"
+  (`workflow.md`, step 5). Before each gate, a reviewer
+  reads whole the modules the milestone changed that no such review read (`coordinator.md`, "Before a
+  gate"). Reviews of one diff each passed clean while the code spread apart. Proposed by a project's
+  coordinator with the owner's agreement, and shaped by all four coordinators' views.
 
 Projects: nothing to do. A project that keeps such a review in `docs/plan.md` drops it there.
 
