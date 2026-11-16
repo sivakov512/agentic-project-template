@@ -103,9 +103,9 @@ agreed.
 ### The owner's standing OKs
 
 The owner may give a standing OK for reviewed work, so that it merges without asking them, for a term
-they name. They give it where their OK counts ([workflow.md](workflow.md#the-owners-ok-and-the-merge)),
-in answer to an offer or in their own words. The safety net is that what they skip passed the reviews
-it needs.
+they name. They give it in the chat, or, with the agents' own account, also in a comment on GitHub (with
+the owner's account a comment there could be an agent's), in answer to an offer or in their own words.
+The safety net is that what they skip passed the reviews it needs.
 
 - **What it covers** is what the owner names: a kind (by default risky code is one, architecture and
   contracts one, and each kind of decision in 2 one), or decisions the milestone's plan names as theirs,
