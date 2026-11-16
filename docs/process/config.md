@@ -38,9 +38,9 @@ words what the IDs mean, this file says it for the checks.
 - `owner_language`: the language of talk with the owner.
 - `tracker`: the tracker that mirrors the project for the owner, and the project in it, in a few words;
   or `none` ([coordinator.md](coordinator.md#the-tracker)).
-- `releases`: how the project ships, in a few words; `not yet: <where it is decided>` for a project
-  that will ship but hasn't chosen how, only until the foundation ends; or `none`. The full description is in the Releases section of
-  `docs/plan.md` ([releases](#releases)).
+- `releases`: how the project ships, in a few words; `not yet: <where it is decided>` for a project that
+  will ship but hasn't chosen how, only until the foundation ends; or `none`. The full description is in
+  the Releases section of `docs/plan.md` ([releases](#releases)).
 - `agents_account`: `own` (the agents have a GitHub account of their own) or `owner` (they work under
   the owner's); `merged_by`: `coordinator` or `owner`. What each means:
   [workflow.md](workflow.md#the-owners-ok-and-the-merge).
@@ -66,10 +66,11 @@ beyond these go in the project's own check.
 ## releases
 
 A project that ships decides by the end of the foundation how, and writes it in the Releases section of
-`docs/plan.md`: what is released and where, and how the owner tries work before it is released, with
-the steps. By default that is one command that builds `main`; where an untried build must not touch the owner's real data, it runs on a copy of them;
-where only a release can be tried (a service with one installation, the owner's), the release itself
-is the try, with a way back; documents are read where they will be published.
+`docs/plan.md`: what is released and where, and how the owner tries work before it is released, with the
+steps. By default that is one command that builds `main`; where an untried build must not touch the
+owner's real data, it runs on a copy of them; where only a release can be tried (a service with one
+installation, the owner's), the release itself is the try, with a way back; documents are read where they
+will be published.
 
 The release tool by default, unless that section says otherwise and why, is release-please: it opens
 release pull requests from the Conventional Commits history (set `commits.conventional`), keeps the

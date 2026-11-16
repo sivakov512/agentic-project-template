@@ -16,18 +16,20 @@ What the coordinator does is in [roles.md](roles.md); how it does it is here. Be
 - **Starts nothing before its first report:** no session and no merge. The report says what the
   session is about to start, and it starts that without waiting, unless the owner's opening message
   called a pause; a later "pause" stops it. What the owner agreed at the gate still holds.
-- **Takes over what waits on a gone session:** a draft pull request waiting on answers whose session is
-  gone gets the answers there and a fresh "Do B-###" session, which continues its branch.
+- **Takes over what waits on a gone session:** an open pull request whose session is gone gets a fresh
+  session with the same brief ("Do B-###", or "Fix pull request #N" for unfinished fixes), which
+  continues its branch; open questions are answered in the pull request first. One whose session
+  stopped and reported waits for the coordinator's decision ([rules.md](rules.md#your-work)).
 - **Before every reply to the owner** checks the pull requests it asked the owner about, so an Approve,
   a merge or a comment on GitHub needs no word in the chat.
 - **Keeps in `docs/now.md` what a fresh coordinator needs:** a handover to a new session mid-milestone
   is normal.
 - **Names its session** `M<n> coordinator: <topic>`, where its tools can: the current milestone's
   number in `docs/plan.md` (where the plan doesn't number them, counted from the foundation as M1) and
-  what the session is busy with, two to four words in English, such as
-  "M6 coordinator: name and icons". It renames the session when the milestone or the topic changes. The
-  project stays out of the name, since the session's folder shows it; so naming another project's
-  coordinator, it gives the project first: "Smaug's coordinator (M4 coordinator: release)".
+  what the session is busy with, two to four words in English, such as "M6 coordinator: name and
+  icons". It renames the session when the milestone or the topic changes. The project stays out of the
+  name, since the session's folder shows it; so naming another project's coordinator, it gives the
+  project first: "<project>'s coordinator (M4 coordinator: release)".
 
 The coordinator starts a session, or messages one that waits, by the tools it has; the brief is the
 session's first message. Where its tools can't, it asks the owner to open the session with the brief or
@@ -38,10 +40,9 @@ to pass the message on.
 1. Walk the exit list point by point.
 2. Write out the next milestone in `docs/plan.md`
    ([workflow.md](workflow.md#writing-a-milestone-out)).
-3. Run the checks, and have a reviewer hunt for gaps, the next milestone's among them, and read whole
-   the modules the milestone changed that no review read whole ([rules.md](rules.md#the-review)).
-4. Run a cold-start test: a fresh session given only the repository must say where we are and what
-   comes next exactly as `docs/now.md` does.
+3. Run the checks and the gate review, "Review milestone <n> before its gate", on the pull request of
+   the next milestone's plan, naming in the brief the modules the milestone changed that no review read
+   whole ([rules.md](rules.md#the-gate-review)); its findings outside that pull request become items.
 
 ## The tracker
 

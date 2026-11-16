@@ -4,7 +4,7 @@ What could go wrong, what stops it, and where that is enforced. `docs/plan.md` a
 
 | What goes wrong | What stops it | Enforced by |
 |---|---|---|
-| An agreement is lost between chats | The repository is the only source; same-day records; `docs/now.md` | The rules, the cold-start test |
+| An agreement is lost between chats | The repository is the only source; same-day records; `docs/now.md` | The rules, the gate review's cold-start test |
 | A milestone or item starts before its inputs exist | Exit lists; an item starts only when its dependencies are merged and its milestone has started | The coordinator, the reviewer |
 | Parts built by different items don't fit, or a milestone finds what it builds on missing | Interfaces written down before the items on either side; each milestone written out at the end of the one before | The coordinator, the reviewer, the owner at the gate |
 | Code nobody can follow or maintain | Comments on every module and on what it offers; the reviewer's three-point verdict | The reviewer, the project's lint |
@@ -12,7 +12,7 @@ What could go wrong, what stops it, and where that is enforced. `docs/plan.md` a
 | Work goes into documents, and nothing reaches the owner to use | Milestones that each end with something the owner uses in real work | The plan, the coordinator, the owner at the gate |
 | Something is forgotten | IDs and coverage | `process-docs` |
 | A session does something other than its item, or more | The brief is the item; a reviewer compares the diff with "Done when" | The rules, the reviewer |
-| "Done" without proof | Evidence someone can repeat, which the reviewer repeats; the coordinator checks the result itself | The reviewer, the coordinator |
+| "Done" without proof | Evidence someone can repeat, which the reviewer repeats; the coordinator runs the whole result at the milestone's end | The reviewer, the coordinator |
 | A refactor quietly changes behaviour | "Behaviour change" in every pull request, with steps to try it | The reviewer, the owner |
 | A session loosens the rules or the checks, or widens its own permissions | What the owner keeps needs the owner's OK; the template's files are locked | `process-docs`, `process-lock` and `process-owner` against mistakes, the owner and the coordinator against the rest ([pull-requests.md](pull-requests.md#what-the-checks-cant-stop)) |
 | A tag made or moved off the template's `main` brings an unapproved process into projects | Projects trust a release only when its tag is on the template's `main`; a workflow tags on merge; a tag ruleset stops tags being moved or deleted | `check_owner.py`, `update.py`, the owner's ruleset |

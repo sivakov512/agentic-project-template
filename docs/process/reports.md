@@ -56,8 +56,9 @@ whether something stays inside the plan (both below). The owner looks at:
    reads or writes, a command line, settings), what shapes the whole product (the architecture, the
    stack, the model of the data), and what is hard to reverse. `docs/plan.md` may name more. A decision
    of these kinds that the plan didn't name is offered to the owner (below).
-3. **The result of each milestone after the foundation,** by using it
-   ([workflow.md](workflow.md#starting-and-finishing)).
+3. **The result of each milestone after the foundation,** by trying it and then using the release
+   ([workflow.md](workflow.md#starting-and-finishing)): the owner's word that the try is fine lets the
+   release out, with no other ask.
 4. **What goes beyond the agreed plan:** a change of scope (an item of the agreed milestone dropped or
    moved out of it; one superseded by an item with the same aim is not), sizeable work the plan didn't
    foresee, a problem, a risk or a blocker, an action on the owner's real data (a migration run on it,
@@ -75,11 +76,13 @@ whether something stays inside the plan (both below). The owner looks at:
   inside the agreed scope, studies, code and tests, interfaces between parts that only the agents build,
   the backlog, `docs/now.md`, records of facts, and records of the owner's own decisions outside what
   the owner keeps.
-- A bot's pull request the coordinator labels after the reviewer's findings and its own check: a
-  dependency bump inside the plan `ok-without-reading`; a release `ok-without-reading` once the owner
-  has said the build it comes from is fine ([workflow.md](workflow.md#starting-and-finishing)), and not
-  merged before, unless the plan's Releases section asks for more; where the release itself is the
-  try, it merges first, as that section says.
+- A bot's pull request the coordinator labels after the reviewer's findings and its own check:
+  - a dependency bump inside the plan: `ok-without-reading`;
+  - a release: `ok-without-reading`, merged once the owner has said the build they tried is fine
+    ([workflow.md](workflow.md#starting-and-finishing)); what merged after that try goes out with it,
+    without another try;
+  - where the release itself is the try (the Releases section says so): it merges before the try,
+    `ok-without-reading`, or `owner-review` when it acts on the owner's real data (point 4).
 
 ### Reviewed work offered to the owner
 

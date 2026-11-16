@@ -22,22 +22,24 @@ update. `tools/process/doctor.py` says when a newer version is out.
 
 1. The coordinator runs `python3 tools/process/update.py` with a clean working tree. It makes a branch
    `process-update-X.Y.Z` from `main` as it is on GitHub, copies the template's files at the release
-   (refusing, before running anything of it, a release whose tag is not on the template's `main`),
-   writes the new lock, opens the pull request ("Backlog item: Process update", labelled
-   `ok-without-reading` unless step 3 sends it to the owner) with the changelog entries since the
-   current version, and leaves the checkout on that branch. While any process update pull request is open, it does
-   nothing. A release may change `.github/workflows/process-*.yml`, so the agents' account's git
-   credentials must be allowed to change workflow files (a classic token's `workflow` scope, or
-   Workflows: write).
+   (refusing, before running anything of it, a release whose tag is not on the template's `main`), writes
+   the new lock, opens the pull request ("Backlog item: Process update", labelled `ok-without-reading`
+   unless step 3 sends it to the owner) with the changelog entries since the current version, and leaves
+   the checkout on that branch. While any process update pull request is open, it does nothing. A release
+   may change `.github/workflows/process-*.yml`, so the agents' account's git credentials must be allowed
+   to change workflow files (a classic token's `workflow` scope, or Workflows: write).
 2. In the same pull request the coordinator does what the entries' "Projects:" lines ask of the project
-   (a new key in `docs/process.json`, say). If the lines say they break open work pull requests, it posts
-   on each what to change, as "fix" findings, then starts "Fix pull request #N".
+   (a new key in `docs/process.json`, say). A step that needs a decision of the owner's, not only an OK
+   of what the step says, goes in a pull request of its own after the update merges; the update merges
+   without it. If the lines say they break open work pull requests, it posts on each what to change, as
+   "fix" findings, then starts "Fix pull request #N".
 3. If that changes nothing the owner keeps, the coordinator merges the update on its own once its checks
    pass and its review, if it needs one ([workflow.md](workflow.md#how-a-piece-of-work-goes), step 5),
-   has no "fix" finding left, and the report lists it. If it does (the plan, the settings), the pull request is labelled
-   `owner-review` and goes to the owner, whose review covers only what the project had to do. With the
-   agents' own account, an update that changes files under `.github/` goes to the owner too; `update.py`
-   labels it `owner-review`, and its "Owner review" says that an Approve is all it needs.
+   has no "fix" finding left, and the report lists it. If it does (the plan, the settings), the pull
+   request is labelled `owner-review` and goes to the owner, whose review covers only what the project
+   had to do. With the agents' own account, an update that changes files under `.github/` goes to the
+   owner too; `update.py` labels it `owner-review`, and its "Owner review" says that an Approve is all it
+   needs.
 
 ## When a release breaks the project
 
@@ -45,12 +47,15 @@ If a merged release breaks the project (a check that blocks every pull request, 
 
 1. The coordinator reverts the update's commit on `main` (`git revert`) in one pull request, `Plan: roll
    the process back to X.Y.Z` (or `chore: ...` with Conventional Commits), with "Backlog item: Process
-   update", labelled `owner-review`, and tells the owner and the template's coordinator what broke.
+   update", labelled `owner-review`, and tells the owner and the template's coordinator what broke. The
+   same pull request records in `docs/now.md`: "Process: stays on X.Y.Z; A.B.C broke <what>; take the
+   release after it".
 2. `process-lock` refuses a lock going back, so the owner removes it as a required check for this one
    merge, and `process-owner` too when it is what broke (Settings > Rules > Rulesets > the ruleset for
    `main` > Require status checks to pass > remove it > Save changes; with classic protection, Settings >
    Branches > Edit), merges, and adds them back the same way at once.
-3. The coordinator then waits for the release that fixes it rather than taking the broken one again.
+3. The coordinator then waits for the release that fixes it rather than taking the broken one again,
+   and treats `doctor.py`'s "A.B.C is out" as known while that line is in `docs/now.md`.
 
 ## Changing the process
 

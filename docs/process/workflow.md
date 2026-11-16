@@ -66,8 +66,8 @@ This change to the plan goes to the owner in the same report as the gate.
 ### Starting and finishing
 
 - An item starts only when everything it depends on is merged and its milestone has started; an item
-  whose "Depends on" says "any time" may start whatever its dependencies and milestone. A milestone starts when the previous one is
-  finished and its own written-out plan is merged.
+  whose "Depends on" says "any time" may start whatever its dependencies and milestone. A milestone
+  starts when the previous one is finished and its own written-out plan is merged.
 - A milestone is finished only when every point of its exit list is true.
 - A milestone after the foundation ends in this order; meanwhile the coordinator writes out the next
   one.
@@ -76,14 +76,14 @@ This change to the plan goes to the owner in the same report as the gate.
      serves to try work in progress during the milestone.
   2. What must be fixed for it to do its job is fixed in this milestone and tried again; the rest goes
      to the next milestone or the list for later.
-  3. Once the owner says it is fine (their word; a project may ask for their Approve as well), the
-     release goes out. With release-please, whoever `merged_by` names merges its release pull request.
+  3. Once the owner says in the chat that the result is fine, the release goes out; its release pull
+     request is labelled and merged as [reports.md](reports.md#the-review-label) says for a bot's.
   4. The owner uses the release in real work before the gate; what that finds goes out as a fix
      release or to the next milestone.
 
-  Releases may go out within the milestone as well; the owner's OK closes the milestone, it doesn't
-  open releasing. Where the project doesn't ship (`releases` is `none`), steps 3 and 4 are using the
-  result as the plan says.
+  Releases may go out within the milestone too, each once the owner has said the build they tried is
+  fine, except where the release itself is the try. The gate, not a release, ends the milestone. Where
+  the project doesn't ship (`releases` is `none`), steps 3 and 4 are using the result as the plan says.
 - **A gate** ends every milestone: the owner accepts what the milestone delivered and agrees the next
   one. Agreeing it lets the coordinator start the work sessions and reviewers for its items without
   asking again; where its tool starts a session only on the owner's word, the coordinator asks for that
@@ -120,16 +120,18 @@ new items.
 2. **The brief** is "Do B-###" and nothing else.
 3. **Questions first** ([rules.md](rules.md#your-work)): the coordinator answers in the draft pull
    request, bringing the owner in when a question is the owner's to decide.
-4. **The work,** on the item's branch and pull request. Then the pull request leaves draft.
+4. **The work,** on the item's branch and pull request. The session marks it ready when the work is
+   done ([rules.md](rules.md#your-work)).
 5. **Review and checks.**
    - **Which reviews.** Every pull request gets the review, but two: a coordinator record that changes
      only `docs/now.md` or the backlog (its section "Later" included), and a process update that only
      brings the template's release. A process update whose step 2 also changes project files
      ([updates.md](updates.md#getting-a-newer-process)) gets the review of those changes, against the
-     release's "Projects:" steps in the changelog. The review for harm, the architecture review and the UI review come
-     on top for the pull requests they are for ([rules.md](rules.md#if-you-are-the-reviewer)), each by
-     another reviewer, in the same rounds. The last of a run of pull requests on the same modules
-     also gets the review reading them whole ([rules.md](rules.md#the-review)). The coordinator decides which reviews a pull request gets, by
+     release's "Projects:" steps in the changelog. The review for harm, the architecture review and the
+     UI review come on top for the pull requests they are for
+     ([rules.md](rules.md#if-you-are-the-reviewer)), each by another reviewer, in the same rounds. The
+     last of a run of pull requests on the same modules also gets the review reading them whole
+     ([rules.md](rules.md#the-review)). The coordinator decides which reviews a pull request gets, by
      these rules and any more `docs/plan.md` names.
    - **Fixes.** One work session ("Fix pull request #N") fixes the findings of all the reviews. The pull
      request merges only with CI green and no "fix" finding left.
@@ -146,10 +148,11 @@ new items.
      the coordinator may close, with the reason in a comment on the pull request; the next report names
      it among the coordinator's own decisions. Where reviews ask for opposite things, the review for
      harm wins.
-   - **The coordinator's own check:** the diff against "Done when", the running result, and the review
+   - **The coordinator's own check:** that the reviews covered every point of "Done when", and the review
      label against [reports.md](reports.md#when-the-owner-looks) and the decisions the milestone's plan
-     gave the owner, corrected if needed. Risky code and decisions of the owner's kinds are then offered
-     to the owner ([reports.md](reports.md#reviewed-work-offered-to-the-owner)).
+     gave the owner, corrected if needed. The whole result it runs itself at the milestone's end
+     ("Starting and finishing"). Risky code and decisions of the owner's kinds are then offered to the
+     owner ([reports.md](reports.md#reviewed-work-offered-to-the-owner)).
 6. **The report to the owner** ([reports.md](reports.md)). The owner discusses the pull request in its
    comments on GitHub, or in the chat when agents work under the owner's account; the coordinator
    answers where the owner wrote. It posts the owner's remarks on the pull request as "fix" findings,
@@ -222,7 +225,7 @@ How the OK works is the owner's choice, in `docs/process.json` ([config.md](conf
   merging. `main` still takes changes only through pull requests with green checks, but nothing but the
   rules stops an agent from merging.
 
-**Who merges** (`merged_by`):
+**Who merges** (`merged_by`) a pull request that needs the owner's OK; the coordinator merges the rest:
 
 - `coordinator`: the coordinator merges once the owner's OK is there; the owner only says yes.
 - `owner`: the owner merges. With the agents' own account the owner approves and merges; with the
