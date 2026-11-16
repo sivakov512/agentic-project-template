@@ -69,12 +69,12 @@ whether something stays inside the plan (both below). The owner looks at:
 
 ### The review label
 
-- A pull request for 1, 2, 4 or 5 is labelled `owner-review`, and so is one offered to the owner (below)
-  until the owner stops the offers of its kind. It says in plain words what it decides or changes, and
+- A pull request for 1, 2, 4 or 5 is labelled `owner-review`, and so is one offered to the owner (below),
+  unless a stop of the owner's covers it (below). It says in plain words what it decides or changes, and
   for the checks and CI what it loosens or tightens.
 - Everything else is labelled `ok-without-reading`: the requirements and the documents of the chain
-  inside the agreed scope, studies, code and tests, the backlog, `docs/now.md`, records of facts, and records of the owner's own decisions outside what
-  the owner keeps.
+  inside the agreed scope, studies, code and tests, the backlog, `docs/now.md`, records of facts, and
+  records of the owner's own decisions outside what the owner keeps.
 - A bot's pull request the coordinator labels after the reviewer's findings and its own check:
   - a dependency bump inside the plan: `ok-without-reading`;
   - a release: `ok-without-reading`, merged once the owner has said the build they tried is fine
@@ -91,23 +91,55 @@ and a decision of the kinds in 2 that the plan didn't name: once such a pull req
 "fix" finding left, the coordinator offers it to the owner as one item of "Needed from you". The item
 says what it does, which reviews and checks passed, what exactly is worth a look (files or sections) and
 that the look may be skipped, and asks one question: keep offering this kind of pull request, or stop
-asking until the end of the milestone.
+asking about it, and until when ("The owner's stops" below).
 
-- A kind is what the owner names when stopping; by default risky code is one kind, architecture and
-  contracts one, and each kind of decision in 2 is one.
-- After a stop, the coordinator merges that kind itself after its reviews, labelled
-  `ok-without-reading`, and lists each among the pull requests merged without the owner, unless the
-  pull request also changes what the owner keeps: then it still needs the owner's OK.
-- A stop holds for that kind until the end of the current milestone. The coordinator records it as one
-  line in `docs/now.md`, in a coordinator record ("Until the end of milestone N: architecture pull
-  requests merge after their reviews without asking"), and removes it when the milestone ends.
-- What the milestone's plan names as the owner's is not offered: it comes as an `owner-review` item, and
-  the owner looks at what the item points to. Risky code the plan says goes `ok-without-reading` isn't
-  offered either, nor is code that builds a user interface the owner already agreed.
+What the milestone's plan names as the owner's is not offered: it comes as an `owner-review` item, and
+the owner looks at what the item points to, unless a stop names it. Risky code the plan says goes
+`ok-without-reading` isn't offered either, nor is code that builds a user interface the owner already
+agreed.
+
+### The owner's stops
+
+The owner may stop being asked about reviewed work, in answer to an offer or in their own words anywhere,
+for a term they name. The safety net is that what they skip passed the reviews it needs.
+
+- **What a stop covers** is what the owner names: a kind (by default risky code is one, architecture and
+  contracts one, and each kind of decision in 2 one), or decisions the milestone's plan names as theirs,
+  each named in the stop. Looks (a colour, an icon, a new screen) only where the owner names them. A
+  plan agreed after the stop wins for the decisions it names.
+- **Never covered:** the milestone's plan, the try of its result, and what goes beyond the plan (point 4);
+  what the owner keeps ([workflow.md](workflow.md#the-owners-ok-and-the-merge)); what the project's
+  `CLAUDE.md` leaves to the owner or keeps from stops; code that changes the owner's existing data when
+  it runs (a new way of storing data may be covered); and the owner's earlier explicit instructions,
+  unless the stop names them.
+- **Every reason.** A pull request merges under a stop only if stops in force cover every reason it
+  would go to the owner; otherwise it is `owner-review`.
+- **The safety net.** The reviews the pull request needs
+  ([workflow.md](workflow.md#how-a-piece-of-work-goes), step 5) passed on the head that merges, the last
+  ending "Ready to merge as is: yes". After the reviewed head the coordinator commits nothing; a merge of
+  `main` that only resolves conflicts counts once its reviewer has looked at it. The label
+  `ok-without-reading` and the link to the stop are on the pull request before its last review round,
+  and the reviewer checks them. If the coordinator closed a finding itself, the pull request goes to the
+  owner.
+- **A kind with no review of its own** (the stack, what is hard to reverse, a command line, settings,
+  text a model reads) is covered only once the owner says yes to that weaker net, which the coordinator
+  names when the owner stops it. Each such decision is written down with the options weighed and why
+  this one, as a decision record where the project keeps them or in the pull request's description, and
+  its review checks it against the requirements.
+- **The term** is a date or a gate. Where the owner's words are vaguer, the coordinator confirms one in a
+  line; with none named, it is the end of the current milestone. "Ask again", said anywhere, ends the
+  stop at once: nothing merges under it from then on.
+- **Records.** The coordinator records each stop as one line under "The owner's stops" in `docs/now.md`,
+  in a coordinator record: the owner's words and their date, what it covers, its term and the reviews
+  that stand in for them; and removes the line when the stop ends. A pull request merged under a stop is
+  labelled `ok-without-reading`, links that line, and says in plain words what it decided; the report
+  lists it, as that, among those merged without the owner.
+- Where branch protection or `CODEOWNERS` still asks for the owner's Approve, it comes in "Needed from
+  you" as an approval with no reading needed, under the stop of its date.
 
 ### When the coordinator isn't sure
 
 When the coordinator isn't sure whether something stays inside the plan, it asks the owner in one line
 in the report, with its recommendation, and holds that pull request until the answer; the rest goes on.
 The coordinator never moves a kind of work off the owner's list on its own; only the owner can, by a
-change to the plan or by stopping an offer.
+change to the plan or by a stop.

@@ -58,6 +58,17 @@ From the review:
   interfaces included, is offered to the owner after its reviews, with the option to stop asking until
   the milestone ends, as the owner decided for 0.7.0; 0.7.0 had left agent-only interfaces out
   (`reports.md`, "Reviewed work offered to the owner").
+- The owner's stops (`reports.md`, "The owner's stops"): the owner may stop being asked about any
+  reviewed technical work, decisions the plan names as theirs included when named one by one, for a date
+  or a gate they name. Never covered: the milestone's plan and its try, what goes beyond the plan, what
+  the owner keeps or the project's `CLAUDE.md` leaves to them, code that changes the owner's existing
+  data, and their earlier explicit instructions unless named. A pull request merges under a stop only if
+  stops cover every reason it would go to the owner, after its reviews passed on the head that merges,
+  with no commit of the coordinator's after them; a kind with no review of its own needs the owner's yes
+  to that weaker net and a written decision. One line per stop in `docs/now.md` ("The owner's stops",
+  formerly "Offers stopped until the milestone's end"); each pull request merged under a stop is listed
+  in the report with what it decided. Before, a stop covered only offered kinds and only until the end of
+  the milestone.
 - Smaller: the example in `coordinator.md` names no real project; `pull-requests.md` says the kind in
   the title is checked only without Conventional Commits; a reference in `template-release.yml`.
 
@@ -67,7 +78,9 @@ the coordinator brings the owner a change to the plan in a pull request of its o
 The cycle applies from the end of the milestone in work. The gate review starts with the next gate the
 coordinator prepares; a gate already brought to the owner finishes as it started. A Releases section
 that asks for more than the template (the owner's Approve of the release pull request, say) stays as it
-is. A project in its foundation, or with `releases` set to `none`, has nothing to do.
+is. A project in its foundation, or with `releases` set to `none`, has nothing to do. Every project renames the line
+"Offers stopped until the milestone's end" in its `docs/now.md` to "The owner's stops", keeping a stop
+in force as it is, with the end of the milestone as its term.
 
 ## 0.10.0 — 2026-11-13
 

@@ -10,6 +10,5 @@ records here a stop the owner calls that changes the plan. How it is kept:
 - **Waiting on the owner:** a brief of the project, to set it up.
 - **Next:** setting up.
 - **Stopped:** no.
-- **Offers stopped until the milestone's end:** none
-  ([the process](process/reports.md#reviewed-work-offered-to-the-owner)).
+- **The owner's stops:** none ([the process](process/reports.md#the-owners-stops)).
 - **Reported up to:** nothing yet (the last commit on `main` the owner's last report covered).

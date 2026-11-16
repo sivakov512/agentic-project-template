@@ -132,9 +132,10 @@ Your brief names one of these reviews. The coordinator gives each pull request t
      one-line reason:
      - **fix:** wrong behaviour, a risk the project's rules name, a wrong or unsupported fact, a red or
        flaky check, a check loosened without the owner's OK (a test removed or skipped, a threshold
-       eased), a review label
-       weaker than [reports.md](reports.md#when-the-owner-looks) asks, documents that contradict each
-       other, a gap the next item would trip on, or what your review below calls a "fix" finding;
+       eased), a review label weaker than [reports.md](reports.md#when-the-owner-looks) asks (under a
+       stop of the owner's, one that the stop in `docs/now.md` doesn't cover for every reason the pull
+       request would go to the owner), documents that contradict each other, a gap the next item would
+       trip on, or what your review below calls a "fix" finding;
      - **drop:** wording, taste, layout, or no effect on the result or the next steps.
 
      Nothing is put off for later. A problem the pull request didn't cause and its item doesn't cover is
