@@ -29,7 +29,7 @@ The work goes in milestones, which `docs/plan.md` lists:
 - **The foundation,** the first milestone, once and short: what the product is for and for whom, the
   owner's main scenarios, the limits; research only where a decision can't be made without it; the
   technologies and the frame of the design only as far as the next milestone needs; for a product that
-  ships, how it is released and how the owner gets a build of `main` to try
+  ships, how it is released and how the owner tries work before it is released
   ([config.md](config.md#releases)). For a product that exists already, it also holds an inventory of
   what the product does and checks that it still does it (tests, for code), where these don't exist yet,
   for the parts the next milestone touches; each later milestone adds them for the parts it touches.
