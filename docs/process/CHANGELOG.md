@@ -60,8 +60,10 @@ From the review:
 Projects: a project that ships and is past its foundation checks the Releases section of its
 `docs/plan.md`: if it says "not yet", or doesn't say how the owner tries work before it is released,
 the coordinator brings the owner a change to the plan in a pull request of its own after the update.
-The cycle applies from the end of the milestone in work. A project in its foundation, or with
-`releases` set to `none`, has nothing to do.
+The cycle applies from the end of the milestone in work. The gate review starts with the next gate the
+coordinator prepares; a gate already brought to the owner finishes as it started. A Releases section
+that asks for more than the template (the owner's Approve of the release pull request, say) stays as it
+is. A project in its foundation, or with `releases` set to `none`, has nothing to do.
 
 ## 0.10.0 — 2026-11-13
 
