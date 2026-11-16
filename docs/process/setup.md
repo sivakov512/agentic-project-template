@@ -30,7 +30,7 @@ Always ask, whatever the brief says:
   it yet; and how agents reach it (a connector, a skill, a token), which the owner grants. If the
   project isn't in it yet, `tracker` names the tracker and says "project to be created";
 - **how the project ships** (what is released, versions, how it is built and published, who starts
-  it), or that it isn't released ([config.md](config.md#releases));
+  it, how the owner gets a build to try), or that it isn't released ([config.md](config.md#releases));
 - the owner's language, and the commit rules, if any ([config.md](config.md#commits)).
 
 ## Steps

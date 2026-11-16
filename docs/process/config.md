@@ -39,7 +39,7 @@ words what the IDs mean, this file says it for the checks.
 - `tracker`: the tracker that mirrors the project for the owner, and the project in it, in a few words;
   or `none` ([coordinator.md](coordinator.md#the-tracker)).
 - `releases`: how the project ships, in a few words; `not yet: <where it is decided>` for a project
-  that will ship but hasn't chosen how; or `none`. The full description is in the Releases section of
+  that will ship but hasn't chosen how, only until the foundation ends; or `none`. The full description is in the Releases section of
   `docs/plan.md` ([releases](#releases)).
 - `agents_account`: `own` (the agents have a GitHub account of their own) or `owner` (they work under
   the owner's); `merged_by`: `coordinator` or `owner`. What each means:
@@ -65,10 +65,13 @@ beyond these go in the project's own check.
 
 ## releases
 
-The process doesn't choose a release tool; the project chooses one and writes it down. For a project
-that ships, a good default is release-please: it opens release pull requests from the Conventional
-Commits history (set `commits.conventional`), keeps the changelog and tags versions, and the project's
-own workflows build and publish.
+A project that ships decides by the end of the foundation how, and writes it in the Releases section of
+`docs/plan.md`: what is released and where, and the one command that gives the owner a build of `main`
+to try. The default, unless that section says otherwise and why, is release-please: it opens release
+pull requests from the Conventional Commits history (set `commits.conventional`), keeps the changelog
+and tags versions, and the project's own workflows build and publish once its release pull request
+merges, with no step by hand. That merge comes after the owner's OK on the milestone
+([workflow.md](workflow.md#starting-and-finishing)).
 
 - Run it with a GitHub App's token, not the agents' or the owner's
   ([pull-requests.md](pull-requests.md#pull-requests-from-a-github-app)).

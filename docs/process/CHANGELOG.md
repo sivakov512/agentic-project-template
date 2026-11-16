@@ -3,6 +3,26 @@
 The newest version first. Each entry says what changed and what projects must do, if anything
 ([updates.md](updates.md#changing-the-process)).
 
+## 0.11.0 — 2026-11-16
+
+- How a product that ships is released is decided in the foundation: `releases` and the Releases
+  section of `docs/plan.md` may say "not yet" only until the foundation ends, and "not yet" doesn't
+  meet the exit list after it (`workflow.md`, `config.md`). The first milestone after the foundation
+  comes in the form the owner will use it, an app installed on their machine or a service they reach.
+  Before, a plan could put the installable app off to its last milestone, and the owner had nothing to
+  try at the first gate.
+- Each milestone after the foundation ends with one cycle (`workflow.md`, "Starting and finishing"):
+  the owner tries a build of `main` made by one command the Releases section names; what must be fixed
+  is fixed and tried on a new build; once the owner says it is fine, the release goes out, with
+  release-please by merging its release pull request.
+- release-please on Conventional Commits, building and publishing with no step by hand, is the
+  default for a project that ships, unless the Releases section says otherwise and why (`config.md`,
+  "releases"; the `docs/plan.md` placeholder; `setup.md`).
+
+Projects: a project that ships and is past its foundation checks the Releases section of its
+`docs/plan.md`: if it says "not yet", or names no command that gives the owner a build of `main`, the
+coordinator brings the owner a change to the plan (the owner keeps that file). Nothing else to do.
+
 ## 0.10.0 — 2026-11-13
 
 - The review reading whole (`rules.md`, "The review"). When a run of pull requests builds or changes

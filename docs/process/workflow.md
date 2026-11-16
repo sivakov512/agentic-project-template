@@ -28,18 +28,20 @@ The work goes in milestones, which `docs/plan.md` lists:
 
 - **The foundation,** the first milestone, once and short: what the product is for and for whom, the
   owner's main scenarios, the limits; research only where a decision can't be made without it; the
-  technologies and the frame of the design only as far as the next milestone needs. For a product that
-  exists already, it also holds an inventory of what the product does and checks that it still does it
-  (tests, for code), where these don't exist yet, for the parts the next milestone touches; each later
-  milestone adds them for the parts it touches.
+  technologies and the frame of the design only as far as the next milestone needs; for a product that
+  ships, how it is released and how the owner gets a build of `main` to try
+  ([config.md](config.md#releases)). For a product that exists already, it also holds an inventory of
+  what the product does and checks that it still does it (tests, for code), where these don't exist yet,
+  for the parts the next milestone touches; each later milestone adds them for the parts it touches.
 - **The milestones after it,** one after another, each ending with something the owner uses: a build, a
   document, a board, whatever the project makes. Each says what the owner gets from it in their real
   work: something they can do that they couldn't, or, for a step of a rebuild, a part of the product
   they use running on the rebuilt part, checked. Inside it: the requirements, research, design and
   interfaces for that scope only, and the items that build it; everything else goes to the list for
   later. The first milestone after the foundation of a new product is its smallest version the owner can
-  use. For a product that exists, each milestone changes the working product, and a rebuild goes as a
-  series of milestones, each leaving it working.
+  use, in the form they will use it: an app installed on their machine, a service they reach. For a
+  product that exists, each milestone changes the working product, and a rebuild goes as a series of
+  milestones, each leaving it working.
 
 ### Writing a milestone out
 
@@ -57,7 +59,7 @@ Each milestone is written out at the end of the one before it, from what is know
   written down already or settled at the milestone's start, before the work that depends on it;
 - its exit list, which always includes that every backlog item of the milestone is merged or dropped
   with a reason, and after the foundation that the owner has used the milestone in real work and it is
-  released as `docs/plan.md` says.
+  released as `docs/plan.md` says ("not yet" there doesn't count after the foundation).
 
 This change to the plan goes to the owner in the same report as the gate.
 
@@ -68,9 +70,12 @@ This change to the plan goes to the owner in the same report as the gate.
   finished and its own written-out plan is merged.
 - A milestone is finished only when every point of its exit list is true.
 - A milestone after the foundation ends in this order: the coordinator runs the result end to end and
-  gives it to the owner ready to try, with the steps; the owner uses it in real work and says what came
-  up; what must be fixed for it to do its job is fixed in this milestone, the rest goes to the next one
-  or the list for later. Meanwhile the coordinator writes out the next milestone.
+  gives it to the owner ready to try, as a build of `main` by the one command the Releases section of
+  `docs/plan.md` names, with the steps; the owner uses it in real work and says what came up; what must
+  be fixed for it to do its job is fixed in this milestone and tried again on a new build, the rest goes
+  to the next one or the list for later. Once the owner says it is fine, the release goes out as the
+  Releases section says (with release-please, the coordinator merges its release pull request).
+  Meanwhile the coordinator writes out the next milestone.
 - **A gate** ends every milestone: the owner accepts what the milestone delivered and agrees the next
   one. Agreeing it lets the coordinator start the work sessions and reviewers for its items without
   asking again; where its tool starts a session only on the owner's word, the coordinator asks for that
