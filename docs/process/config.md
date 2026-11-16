@@ -67,8 +67,7 @@ beyond these go in the project's own check.
 
 A project that ships decides by the end of the foundation how, and writes it in the Releases section of
 `docs/plan.md`: what is released and where, and how the owner tries work before it is released, with
-the steps. By default that is one command that builds `main`, and the build shows the commit it was
-built from; where an untried build must not touch the owner's real data, it runs on a copy of them;
+the steps. By default that is one command that builds `main`; where an untried build must not touch the owner's real data, it runs on a copy of them;
 where only a release can be tried (a service with one installation, the owner's), the release itself
 is the try, with a way back; documents are read where they will be published.
 

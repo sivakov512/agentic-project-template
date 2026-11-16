@@ -77,8 +77,7 @@ This change to the plan goes to the owner in the same report as the gate.
   2. What must be fixed for it to do its job is fixed in this milestone and tried again; the rest goes
      to the next milestone or the list for later.
   3. Once the owner says it is fine (their word; a project may ask for their Approve as well), the
-     release goes out from the commit the owner tried: if `main` moved since (the release pull request's
-     own commit and changes to nothing that ships aside), the new commit is built and tried first. With release-please, whoever `merged_by` names merges its release pull request.
+     release goes out. With release-please, whoever `merged_by` names merges its release pull request.
   4. The owner uses the release in real work before the gate; what that finds goes out as a fix
      release or to the next milestone.
 

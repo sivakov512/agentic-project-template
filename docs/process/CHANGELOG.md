@@ -12,13 +12,12 @@ The newest version first. Each entry says what changed and what projects must do
   Before, a plan could put the installable app off to its last milestone, and the owner had nothing to
   try at the first gate.
 - The Releases section says how the owner tries work before it is released, with the steps: by
-  default one command that builds `main`, the build showing its commit; on a copy of the owner's data
+  default one command that builds `main`; on a copy of the owner's data
   where an untried build must not touch the real data; or the release itself with a way back, where
   only a release can be tried (`config.md`, "releases"; the `docs/plan.md` placeholder).
 - A milestone after the foundation ends in one cycle (`workflow.md`, "Starting and finishing"): the
   owner tries the result; fixes are tried again; after the owner's OK (their word, and their Approve
-  where the project asks for it) the release goes out from the commit the owner tried, built and tried
-  again if `main` moved; the owner uses the release in real work before the gate, and what that finds
+  where the project asks for it) the release goes out; the owner uses the release in real work before the gate, and what that finds
   goes out as a fix release or to the next milestone. Releases may also go out within the milestone.
   With release-please, whoever `merged_by` names merges the release pull request, labelled
   `ok-without-reading` once the owner said the build is fine and not merged before (`reports.md`).
