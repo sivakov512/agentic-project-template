@@ -20,7 +20,8 @@ The newest version first. Each entry says what changed and what projects must do
   where the project asks for it) the release goes out; the owner uses the release in real work before the gate, and what that finds
   goes out as a fix release or to the next milestone. Releases may also go out within the milestone.
   With release-please, whoever `merged_by` names merges the release pull request, labelled
-  `ok-without-reading` once the owner said the build is fine and not merged before (`reports.md`).
+  `ok-without-reading` once the owner said the build is fine and not merged before, unless the release
+  itself is the try (`reports.md`).
 - release-please on Conventional Commits, building and publishing with no step by hand for each
   release, is the default for a project that ships, unless the Releases section says otherwise and why.
 

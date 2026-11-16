@@ -78,7 +78,8 @@ whether something stays inside the plan (both below). The owner looks at:
 - A bot's pull request the coordinator labels after the reviewer's findings and its own check: a
   dependency bump inside the plan `ok-without-reading`; a release `ok-without-reading` once the owner
   has said the build it comes from is fine ([workflow.md](workflow.md#starting-and-finishing)), and not
-  merged before, unless the plan's Releases section asks for more.
+  merged before, unless the plan's Releases section asks for more; where the release itself is the
+  try, it merges first, as that section says.
 
 ### Reviewed work offered to the owner
 
