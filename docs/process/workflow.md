@@ -76,7 +76,7 @@ This change to the plan goes to the owner in the same report as the gate.
      serves to try work in progress during the milestone.
   2. What must be fixed for it to do its job is fixed in this milestone and tried again; the rest goes
      to the next milestone or the list for later.
-  3. Once the owner says in the chat that the result is fine, the release goes out; its release pull
+  3. Once the owner says that the result is fine, the release goes out; its release pull
      request is labelled and merged as [reports.md](reports.md#the-review-label) says for a bot's.
      Where the release itself is the try, it went out at step 1, and the owner's word ends the try.
   4. The owner uses the release in real work before the gate; what that finds goes out as a fix

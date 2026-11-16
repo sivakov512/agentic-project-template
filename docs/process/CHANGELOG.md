@@ -21,7 +21,7 @@ Releases:
   documents are read where they will be published (`config.md`, "releases"; the `docs/plan.md`
   placeholder).
 - A milestone after the foundation ends in one cycle (`workflow.md`, "Starting and finishing"): the
-  owner tries the result; fixes are tried again; once the owner says in the chat it is fine, the
+  owner tries the result; fixes are tried again; once the owner says it is fine, the
   release goes out; the owner uses the release in real work before the gate, and what that finds goes
   out as a fix release or to the next milestone. Releases within the milestone go out the same way,
   each after the owner's word on the build they tried. The gate ends the milestone.
