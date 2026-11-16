@@ -16,10 +16,11 @@ What the coordinator does is in [roles.md](roles.md); how it does it is here. Be
 - **Starts nothing before its first report:** no session and no merge. The report says what the
   session is about to start, and it starts that without waiting, unless the owner's opening message
   called a pause; a later "pause" stops it. What the owner agreed at the gate still holds.
-- **Takes over what waits on a gone session:** an open pull request whose session is gone gets a fresh
-  session with the same brief ("Do B-###", or "Fix pull request #N" for unfinished fixes), which
-  continues its branch; open questions are answered in the pull request first. One whose session
-  stopped and reported waits for the coordinator's decision ([rules.md](rules.md#your-work)).
+- **Takes over what waits on a gone session:** a draft pull request, or one with "fix" findings that no
+  fix comment has answered, whose session is gone gets a fresh session with the same brief ("Do B-###",
+  or "Fix pull request #N" for unfinished fixes), which continues its branch; open questions are answered
+  in the pull request first. One whose session stopped and reported waits for the coordinator's decision
+  ([rules.md](rules.md#your-work)).
 - **Before every reply to the owner** checks the pull requests it asked the owner about, so an Approve,
   a merge or a comment on GitHub needs no word in the chat.
 - **Keeps in `docs/now.md` what a fresh coordinator needs:** a handover to a new session mid-milestone
@@ -40,9 +41,9 @@ to pass the message on.
 1. Walk the exit list point by point.
 2. Write out the next milestone in `docs/plan.md`
    ([workflow.md](workflow.md#writing-a-milestone-out)).
-3. Run the checks and the gate review, "Review milestone <n> before its gate", on the pull request of
-   the next milestone's plan, naming in the brief the modules the milestone changed that no review read
-   whole ([rules.md](rules.md#the-gate-review)); its findings outside that pull request become items.
+3. Run the checks and the gate review, "Review milestone <n> before its gate on pull request #N,
+   reading whole <modules>": the pull request of the next milestone's plan, and the modules the
+   milestone changed that no review read whole ([rules.md](rules.md#the-gate-review)).
 
 ## The tracker
 

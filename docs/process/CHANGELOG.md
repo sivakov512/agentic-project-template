@@ -35,18 +35,21 @@ Releases:
 
 From the review:
 
-- The gate review: one brief, "Review milestone <n> before its gate", on the pull request of the next
-  milestone's plan, does the cold-start test, the exit list, the gaps and the reading whole
-  (`rules.md`, "The gate review"; `coordinator.md`, "Before a gate"). Before, the gate's reviewer and
+- The gate review: one brief, "Review milestone <n> before its gate on pull request #N, reading whole
+  <modules>", on the pull request of the next milestone's plan and in place of its plain review, does
+  the cold-start test, checks the exit list the coordinator ticked, judges the plan and its gaps, and
+  reads whole what no review read; the coordinator fixes each finding where it belongs before the gate
+  (`rules.md`, "The gate review"; `coordinator.md`, "Before a gate"; `workflow.md`, step 5). Before, the gate's reviewer and
   the cold-start session had no brief, and a fresh session could take itself for the coordinator.
-- A process update merges without a "Projects:" step that needs the owner's decision; that step goes
-  in a pull request of its own after it (`updates.md`, step 2).
+- A process update merges without a "Projects:" step that needs the owner's decision; the update's
+  description names that step, and it goes in a pull request of its own right after (`updates.md`,
+  step 2; `update.py` says so in the description it writes).
 - A rollback of the process is recorded in `docs/now.md`, so the next coordinator doesn't take the
   broken release again (`updates.md`, "When a release breaks the project").
 - A work session marks its pull request ready when "Done when" is met (`rules.md`, "Your work";
   `check_pr.py` from then on).
-- The coordinator takes over any open pull request whose session is gone, not only one waiting on
-  answers (`coordinator.md`).
+- The coordinator takes over a draft, or a pull request with unanswered "fix" findings, whose session
+  is gone, not only one waiting on answers (`coordinator.md`).
 - The coordinator's own check no longer repeats the reviewer's: it checks that the reviews covered
   "Done when", and the label; it runs the whole result at the milestone's end (`workflow.md`, step 5).
 - Review marks and the last line stay in English in a comment in any language (`rules.md`).

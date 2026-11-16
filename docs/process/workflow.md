@@ -78,6 +78,7 @@ This change to the plan goes to the owner in the same report as the gate.
      to the next milestone or the list for later.
   3. Once the owner says in the chat that the result is fine, the release goes out; its release pull
      request is labelled and merged as [reports.md](reports.md#the-review-label) says for a bot's.
+     Where the release itself is the try, it went out at step 1, and the owner's word ends the try.
   4. The owner uses the release in real work before the gate; what that finds goes out as a fix
      release or to the next milestone.
 
@@ -123,16 +124,16 @@ new items.
 4. **The work,** on the item's branch and pull request. The session marks it ready when the work is
    done ([rules.md](rules.md#your-work)).
 5. **Review and checks.**
-   - **Which reviews.** Every pull request gets the review, but two: a coordinator record that changes
-     only `docs/now.md` or the backlog (its section "Later" included), and a process update that only
-     brings the template's release. A process update whose step 2 also changes project files
-     ([updates.md](updates.md#getting-a-newer-process)) gets the review of those changes, against the
-     release's "Projects:" steps in the changelog. The review for harm, the architecture review and the
-     UI review come on top for the pull requests they are for
-     ([rules.md](rules.md#if-you-are-the-reviewer)), each by another reviewer, in the same rounds. The
-     last of a run of pull requests on the same modules also gets the review reading them whole
-     ([rules.md](rules.md#the-review)). The coordinator decides which reviews a pull request gets, by
-     these rules and any more `docs/plan.md` names.
+   - **Which reviews.** Every pull request gets the review, but three: a coordinator record that changes
+     only `docs/now.md` or the backlog (its section "Later" included), a process update that only brings
+     the template's release, and the next milestone's plan, which the gate review reviews. A process
+     update whose step 2 also changes project files ([updates.md](updates.md#getting-a-newer-process))
+     gets the review of those changes, against the release's "Projects:" steps in the changelog. The
+     review for harm, the architecture review and the UI review come on top for the pull requests they
+     are for ([rules.md](rules.md#if-you-are-the-reviewer)), each by another reviewer, in the same
+     rounds. The last of a run of pull requests on the same modules also gets the review reading them
+     whole ([rules.md](rules.md#the-review)). The coordinator decides which reviews a pull request gets,
+     by these rules and any more `docs/plan.md` names.
    - **Fixes.** One work session ("Fix pull request #N") fixes the findings of all the reviews. The pull
      request merges only with CI green and no "fix" finding left.
    - **At most two rounds:** a full review, then, only if it had "fix" findings, a review of the fix
