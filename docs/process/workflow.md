@@ -137,10 +137,11 @@ new items.
    - **Fixes.** One work session ("Fix pull request #N") fixes the findings of all the reviews. The pull
      request merges only with CI green and no "fix" finding left.
    - **At most two rounds:** a full review, then, only if it had "fix" findings, a review of the fix
-     alone. Small leftovers of the second round (wording, a link) the coordinator fixes itself, except
-     under a stop of the owner's ([reports.md](reports.md#the-owners-stops)); anything in the product
-     goes back to a work session. If blocking problems remain after that, the coordinator stops, rethinks
-     the item (its approach or its size) and tells the owner.
+     alone. Small leftovers of the second round (wording, a link) the coordinator fixes itself; under a
+     standing OK of the owner's, such a fix sends the pull request to the owner
+     ([reports.md](reports.md#the-owners-standing-oks)). Anything in the product goes back to a work
+     session. If blocking problems remain after that, the coordinator stops, rethinks the item (its
+     approach or its size) and tells the owner.
    - **Risky code.** Any later change to it goes back to the review for harm before the merge, and the
      coordinator never makes such a change itself. If a finding of the review for harm is still open
      after its second round, or a change to the risky code would need a third round, the coordinator
@@ -148,14 +149,13 @@ new items.
    - **Closing a finding.** A finding of the review for harm is closed only by its reviewer. A finding of
      another review that contradicts the item or the plan, or rests on something untrue about the code,
      the coordinator may close, with the reason in a comment on the pull request; the next report names
-     it among the coordinator's own decisions; under a stop of the owner's, that pull request then goes
-     to the owner. Where reviews ask for opposite things, the review for harm wins.
+     it among the coordinator's own decisions. Where reviews ask for opposite things, the review for harm
+     wins.
    - **The coordinator's own check:** that the reviews covered every point of "Done when", and the review
      label against [reports.md](reports.md#when-the-owner-looks) and the decisions the milestone's plan
      gave the owner, corrected if needed. The whole result it runs itself at the milestone's end
-     ("Starting and finishing"). Risky code and decisions of the owner's kinds are then offered to the
-     owner, or merged under a stop of the owner's that covers them
-     ([reports.md](reports.md#reviewed-work-offered-to-the-owner)).
+     ("Starting and finishing"). What [reports.md](reports.md#reviewed-work-offered-to-the-owner) names
+     is then offered to the owner, or merged under a standing OK that covers it.
 6. **The report to the owner** ([reports.md](reports.md)). The owner discusses the pull request in its
    comments on GitHub, or in the chat when agents work under the owner's account; the coordinator
    answers where the owner wrote. It posts the owner's remarks on the pull request as "fix" findings,

@@ -38,7 +38,9 @@ to pass the message on.
 
 ## Before a gate
 
-1. Walk the exit list point by point.
+1. Walk the exit list point by point, and tick it in the description of the next milestone's plan
+   pull request, each point with its evidence: a link, or the owner's words with their date. The
+   owner's word that they used the release in real work is asked as an item of "Needed from you".
 2. Write out the next milestone in `docs/plan.md`
    ([workflow.md](workflow.md#writing-a-milestone-out)).
 3. Run the checks and the gate review, "Review milestone <n> before its gate on pull request #N,

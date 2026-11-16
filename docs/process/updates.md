@@ -25,9 +25,11 @@ update. `tools/process/doctor.py` says when a newer version is out.
    (refusing, before running anything of it, a release whose tag is not on the template's `main`), writes
    the new lock, opens the pull request ("Backlog item: Process update", labelled `ok-without-reading`
    unless step 3 sends it to the owner) with the changelog entries since the current version, and leaves
-   the checkout on that branch. While any process update pull request is open, it does nothing. A release
-   may change `.github/workflows/process-*.yml`, so the agents' account's git credentials must be allowed
-   to change workflow files (a classic token's `workflow` scope, or Workflows: write).
+   the checkout on that branch. It force-pushes that branch, its own, to replace one left from a run that
+   couldn't open its pull request, the one exception to "no force push". While any process update pull
+   request is open, it does nothing. A release may change `.github/workflows/process-*.yml`, so the
+   agents' account's git credentials must be allowed to change workflow files (a classic token's
+   `workflow` scope, or Workflows: write).
 2. In the same pull request the coordinator does what the entries' "Projects:" lines ask of the project
    (a new key in `docs/process.json`, say). A step that needs a decision of the owner's, not only an OK
    of what the step says, goes in a pull request of its own, opened right after the update merges; the

@@ -132,10 +132,10 @@ Your brief names one of these reviews. The coordinator gives each pull request t
      one-line reason:
      - **fix:** wrong behaviour, a risk the project's rules name, a wrong or unsupported fact, a red or
        flaky check, a check loosened without the owner's OK (a test removed or skipped, a threshold
-       eased), a review label weaker than [reports.md](reports.md#when-the-owner-looks) asks (under a
-       stop of the owner's, one that the stop in `docs/now.md` doesn't cover for every reason the pull
-       request would go to the owner), documents that contradict each other, a gap the next item would
-       trip on, or what your review below calls a "fix" finding;
+       eased), a review label weaker than [reports.md](reports.md#when-the-owner-looks) asks (a standing
+       OK lowers it only as [reports.md](reports.md#the-owners-standing-oks) says), documents that
+       contradict each other, a gap the next item would trip on, or what your review below calls a "fix"
+       finding;
      - **drop:** wording, taste, layout, or no effect on the result or the next steps.
 
      Nothing is put off for later. A problem the pull request didn't cause and its item doesn't cover is
@@ -189,15 +189,17 @@ alone:
 
 1. Say where the work stands and what comes next, and compare it with `docs/now.md`: a difference is a
    "fix" finding (the cold-start test).
-2. Check that each point of the exit list the coordinator ticked holds.
+2. Check that each point of the exit list the coordinator ticked in that pull request's description
+   holds, by its evidence.
 3. Judge the next milestone's plan as the review judges a pull request, and hunt for gaps in what it
    builds on.
 4. Read whole the modules the brief names, as "Reading whole" above says.
 
-Post one comment on that pull request, in the format of "Every review", naming `main`'s head and the
-pull request's. The coordinator fixes each finding where it belongs before the gate: `docs/now.md` in a
+Post one comment on that pull request, in the format of "Every review", naming `main`'s head and the pull
+request's. The coordinator fixes each finding where it belongs before the gate: `docs/now.md` in a
 coordinator record, an open point of the exit list by finishing it, the plan in that pull request; the
-rest become items. The second round checks those fixes.
+rest become items, which closes them for that pull request. It answers with one comment naming the new
+heads of `main` and the pull request; the second round checks those fixes.
 
 ### The review for harm
 
