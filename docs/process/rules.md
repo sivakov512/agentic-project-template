@@ -12,8 +12,9 @@ The first of these that fits is your role:
 2. **It is "Fix pull request #N":** you are a work session fixing findings. Follow "If you fix a pull
    request".
 3. **It is "Review pull request #N", or the same "for harm", "for architecture", "for UI" or "reading
-   whole <modules>":** you are
-   a reviewer. Follow "If you are the reviewer".
+   whole <modules>", or "Review milestone <n> before its gate on pull request #N, reading whole
+   <modules>":** you are a reviewer. Follow "If you are
+   the reviewer".
 4. **This repository is the template** (the `owner/name` of its `origin` remote is the `template` in
    `.process-lock.json`): you are the template's coordinator. Run `doctor.py` at the start of a
    session. Changes to the process go as [updates.md](updates.md#changing-the-process) says, reviewed
@@ -67,13 +68,15 @@ Whatever your role: a question from the owner is a question. Answer it and propo
   and say what is left and why in its "Not done and open questions" and in your last message. The
   coordinator decides what happens to the pull request.
 - Once the pull request is open (the empty start commit is pushed to open it), run these before every
-  push, and finish only with every one passing:
+  push, and finish only with every one passing (`check_pr.py` from when the pull request leaves draft):
   - `python3 tools/process/check.py` (the process checks and the project's own);
   - `python3 tools/process/check_pr.py --body <description file> --title "<title>" --labels <review
     label>`;
   - `python3 tools/process/check_commits.py --title "<title>" --number <its number>`.
 - Tick your item in the backlog (`- [x]`) in the same pull request. Don't edit `docs/now.md`: the
   coordinator does.
+- When every point of "Done when" is met and the checks pass, fill in every section of the description
+  and mark the pull request ready (`gh pr ready`): that starts the reviews.
 - Don't edit the template's files ([README.md](README.md#what-lives-where)). If the process is wrong,
   report it.
 
@@ -105,8 +108,9 @@ Your brief names one of these reviews. The coordinator gives each pull request t
 
 | Brief | Review | For |
 |---|---|---|
-| "Review pull request #N" | the review | every pull request, but two that step 5 names |
+| "Review pull request #N" | the review | every pull request, but those step 5 names |
 | "Review pull request #N reading whole <modules>" | the review, on whole modules | the last of a run of pull requests that build or change the same modules ("The review" below) |
+| "Review milestone <n> before its gate on pull request #N, reading whole <modules>" | the gate review | the end of each milestone ([coordinator.md](coordinator.md#before-a-gate)) |
 | "Review pull request #N for harm" | the review for harm | code `docs/plan.md` names as risky |
 | "Review pull request #N for architecture" | the architecture review | a change to the architecture or to a contract between parts (the design document, an interface, an API, a data or file format) |
 | "Review pull request #N for UI" | the UI review | a change to what a person sees and uses (a GUI, web pages and the like) |
@@ -128,15 +132,19 @@ Your brief names one of these reviews. The coordinator gives each pull request t
      one-line reason:
      - **fix:** wrong behaviour, a risk the project's rules name, a wrong or unsupported fact, a red or
        flaky check, a check loosened without the owner's OK (a test removed or skipped, a threshold
-       eased), a review label
-       weaker than [reports.md](reports.md#when-the-owner-looks) asks, documents that contradict each
-       other, a gap the next item would trip on, or what your review below calls a "fix" finding;
+       eased), a review label weaker than [reports.md](reports.md#when-the-owner-looks) asks (a standing
+       OK lowers it only as [reports.md](reports.md#the-owners-standing-oks) says), documents that
+       contradict each other, a gap the next item would trip on, or what your review below calls a "fix"
+       finding;
      - **drop:** wording, taste, layout, or no effect on the result or the next steps.
 
      Nothing is put off for later. A problem the pull request didn't cause and its item doesn't cover is
      marked **fix** and "outside the item"; the fixing session lists it under "Not done and open
      questions", which settles it here.
   4. A last line: "Ready to merge as is: yes" when no "fix" finding is left, otherwise "no".
+
+  The marks **fix** and **drop**, "outside the item" and the last line stay in English, whatever the
+  comment's language, so the coordinator and the fixer find them.
 - A second round comes only if the first had "fix" findings, or, for a review for harm, if a fix changed
   the code `docs/plan.md` names as risky. Review only the change from the head you reviewed to the new
   head the fix comment names: `git diff <reviewed> <new>`, or, where a merge of `main` came in between,
@@ -156,13 +164,13 @@ a section with a verdict on three points, each with what you judged it on; falli
 - **Easy to change:** each piece has one job, nothing is copied where the copies will drift apart, and
   tests, where there are any, read as a description of the behaviour.
 
-**Reading whole.** Each review sees one diff, so code that several pull requests build drifts apart:
-two names for one thing, one decision taken two ways, styles that differ. So when a run of pull requests
-builds or changes the same modules or sections of the document chain (the parts of a split item, a run
-of their own even where later items change the same modules; items cut from one design; items of a
-milestone in parallel or in waves), a review reads them whole with the
-last pull request of the run, once the coordinator judges the run done and the rest of it has merged; and before each gate a reviewer reads
-what the milestone changed that no such review read ([coordinator.md](coordinator.md#before-a-gate)). It comes on top of the pull request's other
+**Reading whole.** Each review sees one diff, so code that several pull requests build drifts apart: two
+names for one thing, one decision taken two ways, styles that differ. So when a run of pull requests
+builds or changes the same modules or sections of the document chain (the parts of a split item, a run of
+their own even where later items change the same modules; items cut from one design; items of a milestone
+in parallel or in waves), a review reads them whole with the last pull request of the run, once the
+coordinator judges the run done and the rest of it has merged; the gate review reads what the milestone
+changed that no such review read. The review reading whole comes on top of the pull request's other
 reviews, by another reviewer, in the same rounds. The coordinator names the modules in the brief: those
 the milestone's plan lists, and any others the diffs show the pull requests met in.
 
@@ -170,8 +178,28 @@ With such a brief, judge the three points on each named module read from the top
 would: one name for one thing, one way for one decision, one style, and where you got lost. In a large
 module, read whole the types or sections those pull requests touched. Findings in the named modules are
 this review's own, marked as usual, even in code that earlier pull requests merged; one in a file the
-project's rules forbid changing, or too large to fix within the pull request's size, becomes an item,
-and so do the findings at a gate.
+project's rules forbid changing, or too large to fix within the pull request's size, becomes an item.
+
+### The gate review
+
+The coordinator starts it before each gate, on the pull request of the next milestone's plan (at the
+plan's last milestone, on the coordinator record that brings `docs/now.md` up to date), in place of
+that pull request's plain review ([coordinator.md](coordinator.md#before-a-gate)). From the repository
+alone:
+
+1. Say where the work stands and what comes next, and compare it with `docs/now.md`: a difference is a
+   "fix" finding (the cold-start test).
+2. Check that each point of the exit list the coordinator ticked in that pull request's description
+   holds, by its evidence.
+3. Judge the next milestone's plan as the review judges a pull request, and hunt for gaps in what it
+   builds on.
+4. Read whole the modules the brief names, as "Reading whole" above says.
+
+Post one comment on that pull request, in the format of "Every review", naming `main`'s head and the pull
+request's. The coordinator fixes each finding where it belongs before the gate: `docs/now.md` in a
+coordinator record, an open point of the exit list by finishing it, the plan in that pull request; the
+rest become items, which closes them for that pull request. It answers with one comment naming the new
+heads of `main` and the pull request; the second round checks those fixes.
 
 ### The review for harm
 

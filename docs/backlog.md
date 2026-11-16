@@ -10,4 +10,4 @@ Setting up adds the first milestone's items, under a heading of its own.
 
 ## Later
 
-What is left out of the milestones so far, a line each ([the process](process/workflow.md#milestones-and-gates)).
+What is left out of the milestones so far, a line each ([the process](process/workflow.md#the-list-for-later)).

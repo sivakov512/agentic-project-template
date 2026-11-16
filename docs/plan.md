@@ -14,8 +14,9 @@ What the project makes, for whom, and when the goal is met.
 ## Document chain
 
 The project's documents from the top down to the backlog and the code, each with what it holds and the
-IDs it defines (they are also in `docs/process.json`), where the interfaces between parts are
-written, and, with code, which document describes the code's design and lists its folders. A change starts in the highest one it touches.
+IDs it defines (they are also in `docs/process.json`), where the interfaces between parts are written,
+and, with code, which document describes the code's design and lists its folders. A change starts in the
+highest one it touches.
 
 ## Milestones
 
@@ -45,10 +46,11 @@ on what changed there ([reports.md](process/reports.md)). Or "none".
 
 ## Releases
 
-How the project ships, strictly enough that every session does it the same way: what is released
-(an app, a package, a deployed service, documents), how versions are numbered, what builds and
-publishes a release and where, and who or what starts it. Or "not yet", with where it will be
-decided; or "none", with the reason. The short form is `releases` in `docs/process.json`.
+How the project ships, strictly enough that every session does it the same way: what is released (an app,
+a package, a deployed service, documents), how versions are numbered, what builds and publishes a release
+and where, who or what starts it, and how the owner tries work before it is released, with the steps
+([config.md](process/config.md#releases)). Or "not yet", with where it will be decided, only until the
+foundation ends; or "none", with the reason. The short form is `releases` in `docs/process.json`.
 
 ## Defences
 

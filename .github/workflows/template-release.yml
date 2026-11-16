@@ -45,7 +45,7 @@ jobs:
               exit 0
             fi
             echo "::error::Tag v$version exists but is not on main below this commit, or has no release:" \
-              "the owner deletes the tag (docs/process/updates.md, step 4) and runs this workflow again"
+              "the owner deletes the tag (docs/process/updates.md, "Release tags") and runs this workflow again"
             exit 1
           fi
           python3 - "$version" > "$RUNNER_TEMP/notes.md" <<'EOF'

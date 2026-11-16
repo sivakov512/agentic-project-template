@@ -31,7 +31,9 @@ Process update: {old} to {new}, from {template}.
 ## What changed
 
 The template's files at release {tag}, and the lock. What the changelog asks of the project, if
-anything, the coordinator does in this pull request and adds here. The changelog entries since {old}:
+anything, the coordinator does in this pull request and adds here, apart from a step that needs the
+owner's decision, which it names here and opens a pull request for right after this one merges
+(docs/process/updates.md, step 2). The changelog entries since {old}:
 
 {changelog}
 
@@ -156,7 +158,8 @@ def main():
     pull = gh_json("api", f"repos/{repo}/pulls", "-f", f"title={title}",
                    "-f", f"head={branch}", "-f", "base=main", "-f", f"body={body}")
     run("gh", "api", f"repos/{repo}/issues/{pull['number']}/labels", "-f", f"labels[]={label}")
-    print(f"Opened {pull['html_url']}. The checkout is on {branch}: do there what the changelog asks,"
+    print(f"Opened {pull['html_url']}. The checkout is on {branch}: do there what the changelog asks"
+          " (a step that needs the owner's decision goes in a pull request of its own after this one),"
           " and label it owner-review if that changes what the owner keeps (docs/process/updates.md).")
     return 0
 

@@ -28,18 +28,20 @@ The work goes in milestones, which `docs/plan.md` lists:
 
 - **The foundation,** the first milestone, once and short: what the product is for and for whom, the
   owner's main scenarios, the limits; research only where a decision can't be made without it; the
-  technologies and the frame of the design only as far as the next milestone needs. For a product that
-  exists already, it also holds an inventory of what the product does and checks that it still does it
-  (tests, for code), where these don't exist yet, for the parts the next milestone touches; each later
-  milestone adds them for the parts it touches.
+  technologies and the frame of the design only as far as the next milestone needs; for a product that
+  ships, how it is released and how the owner tries work before it is released
+  ([config.md](config.md#releases)). For a product that exists already, it also holds an inventory of
+  what the product does and checks that it still does it (tests, for code), where these don't exist yet,
+  for the parts the next milestone touches; each later milestone adds them for the parts it touches.
 - **The milestones after it,** one after another, each ending with something the owner uses: a build, a
   document, a board, whatever the project makes. Each says what the owner gets from it in their real
   work: something they can do that they couldn't, or, for a step of a rebuild, a part of the product
   they use running on the rebuilt part, checked. Inside it: the requirements, research, design and
   interfaces for that scope only, and the items that build it; everything else goes to the list for
   later. The first milestone after the foundation of a new product is its smallest version the owner can
-  use. For a product that exists, each milestone changes the working product, and a rebuild goes as a
-  series of milestones, each leaving it working.
+  use, in the form they will use it: an app installed on their machine, a service they reach. For a
+  product that exists, each milestone changes the working product, and a rebuild goes as a series of
+  milestones, each leaving it working.
 
 ### Writing a milestone out
 
@@ -57,20 +59,32 @@ Each milestone is written out at the end of the one before it, from what is know
   written down already or settled at the milestone's start, before the work that depends on it;
 - its exit list, which always includes that every backlog item of the milestone is merged or dropped
   with a reason, and after the foundation that the owner has used the milestone in real work and it is
-  released as `docs/plan.md` says.
+  released as `docs/plan.md` says ("not yet" there doesn't count after the foundation).
 
 This change to the plan goes to the owner in the same report as the gate.
 
 ### Starting and finishing
 
 - An item starts only when everything it depends on is merged and its milestone has started; an item
-  whose "Depends on" says "any time" may start whatever its dependencies and milestone. A milestone starts when the previous one is
-  finished and its own written-out plan is merged.
+  whose "Depends on" says "any time" may start whatever its dependencies and milestone. A milestone
+  starts when the previous one is finished and its own written-out plan is merged.
 - A milestone is finished only when every point of its exit list is true.
-- A milestone after the foundation ends in this order: the coordinator runs the result end to end and
-  gives it to the owner ready to try, with the steps; the owner uses it in real work and says what came
-  up; what must be fixed for it to do its job is fixed in this milestone, the rest goes to the next one
-  or the list for later. Meanwhile the coordinator writes out the next milestone.
+- A milestone after the foundation ends in this order; meanwhile the coordinator writes out the next
+  one.
+  1. The coordinator runs the result end to end and gives it to the owner to try, with the steps, the
+     way the Releases section of `docs/plan.md` says ([config.md](config.md#releases)). The same way
+     serves to try work in progress during the milestone.
+  2. What must be fixed for it to do its job is fixed in this milestone and tried again; the rest goes
+     to the next milestone or the list for later.
+  3. Once the owner says that the result is fine, the release goes out; its release pull
+     request is labelled and merged as [reports.md](reports.md#the-review-label) says for a bot's.
+     Where the release itself is the try, it went out at step 1, and the owner's word ends the try.
+  4. The owner uses the release in real work before the gate; what that finds goes out as a fix
+     release or to the next milestone.
+
+  Releases may go out within the milestone too, each once the owner has said the build they tried is
+  fine, except where the release itself is the try. The gate, not a release, ends the milestone. Where
+  the project doesn't ship (`releases` is `none`), steps 3 and 4 are using the result as the plan says.
 - **A gate** ends every milestone: the owner accepts what the milestone delivered and agrees the next
   one. Agreeing it lets the coordinator start the work sessions and reviewers for its items without
   asking again; where its tool starts a session only on the owner's word, the coordinator asks for that
@@ -107,23 +121,27 @@ new items.
 2. **The brief** is "Do B-###" and nothing else.
 3. **Questions first** ([rules.md](rules.md#your-work)): the coordinator answers in the draft pull
    request, bringing the owner in when a question is the owner's to decide.
-4. **The work,** on the item's branch and pull request. Then the pull request leaves draft.
+4. **The work,** on the item's branch and pull request. The session marks it ready when the work is
+   done ([rules.md](rules.md#your-work)).
 5. **Review and checks.**
-   - **Which reviews.** Every pull request gets the review, but two: a coordinator record that changes
-     only `docs/now.md` or the backlog (its section "Later" included), and a process update that only
-     brings the template's release. A process update whose step 2 also changes project files
-     ([updates.md](updates.md#getting-a-newer-process)) gets the review of those changes, against the
-     release's "Projects:" steps in the changelog. The review for harm, the architecture review and the UI review come
-     on top for the pull requests they are for ([rules.md](rules.md#if-you-are-the-reviewer)), each by
-     another reviewer, in the same rounds. The last of a run of pull requests on the same modules
-     also gets the review reading them whole ([rules.md](rules.md#the-review)). The coordinator decides which reviews a pull request gets, by
-     these rules and any more `docs/plan.md` names.
+   - **Which reviews.** Every pull request gets the review, but three: a coordinator record that changes
+     only `docs/now.md` or the backlog (its section "Later" included), a process update that only brings
+     the template's release, and the next milestone's plan, which the gate review reviews. A process
+     update whose step 2 also changes project files ([updates.md](updates.md#getting-a-newer-process))
+     gets the review of those changes, against the release's "Projects:" steps in the changelog. The
+     review for harm, the architecture review and the UI review come on top for the pull requests they
+     are for ([rules.md](rules.md#if-you-are-the-reviewer)), each by another reviewer, in the same
+     rounds. The last of a run of pull requests on the same modules also gets the review reading them
+     whole ([rules.md](rules.md#the-review)). The coordinator decides which reviews a pull request gets,
+     by these rules and any more `docs/plan.md` names.
    - **Fixes.** One work session ("Fix pull request #N") fixes the findings of all the reviews. The pull
      request merges only with CI green and no "fix" finding left.
    - **At most two rounds:** a full review, then, only if it had "fix" findings, a review of the fix
-     alone. Small leftovers of the second round (wording, a link) the coordinator fixes itself; anything
-     in the product goes back to a work session. If blocking problems remain after that, the coordinator
-     stops, rethinks the item (its approach or its size) and tells the owner.
+     alone. Small leftovers of the second round (wording, a link) the coordinator fixes itself; under a
+     standing OK of the owner's, such a fix sends the pull request to the owner
+     ([reports.md](reports.md#the-owners-standing-oks)). Anything in the product goes back to a work
+     session. If blocking problems remain after that, the coordinator stops, rethinks the item (its
+     approach or its size) and tells the owner.
    - **Risky code.** Any later change to it goes back to the review for harm before the merge, and the
      coordinator never makes such a change itself. If a finding of the review for harm is still open
      after its second round, or a change to the risky code would need a third round, the coordinator
@@ -131,12 +149,13 @@ new items.
    - **Closing a finding.** A finding of the review for harm is closed only by its reviewer. A finding of
      another review that contradicts the item or the plan, or rests on something untrue about the code,
      the coordinator may close, with the reason in a comment on the pull request; the next report names
-     it among the coordinator's own decisions. Where reviews ask for opposite things, the review for
-     harm wins.
-   - **The coordinator's own check:** the diff against "Done when", the running result, and the review
+     it among the coordinator's own decisions. Where reviews ask for opposite things, the review for harm
+     wins.
+   - **The coordinator's own check:** that the reviews covered every point of "Done when", and the review
      label against [reports.md](reports.md#when-the-owner-looks) and the decisions the milestone's plan
-     gave the owner, corrected if needed. Risky code and decisions of the owner's kinds are then offered
-     to the owner ([reports.md](reports.md#reviewed-work-offered-to-the-owner)).
+     gave the owner, corrected if needed. The whole result it runs itself at the milestone's end
+     ("Starting and finishing"). What [reports.md](reports.md#reviewed-work-offered-to-the-owner) names
+     is then offered to the owner, or merged under a standing OK that covers it.
 6. **The report to the owner** ([reports.md](reports.md)). The owner discusses the pull request in its
    comments on GitHub, or in the chat when agents work under the owner's account; the coordinator
    answers where the owner wrote. It posts the owner's remarks on the pull request as "fix" findings,
@@ -209,7 +228,7 @@ How the OK works is the owner's choice, in `docs/process.json` ([config.md](conf
   merging. `main` still takes changes only through pull requests with green checks, but nothing but the
   rules stops an agent from merging.
 
-**Who merges** (`merged_by`):
+**Who merges** (`merged_by`) a pull request that needs the owner's OK; the coordinator merges the rest:
 
 - `coordinator`: the coordinator merges once the owner's OK is there; the owner only says yes.
 - `owner`: the owner merges. With the agents' own account the owner approves and merges; with the

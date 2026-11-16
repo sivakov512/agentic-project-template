@@ -3,6 +3,94 @@
 The newest version first. Each entry says what changed and what projects must do, if anything
 ([updates.md](updates.md#changing-the-process)).
 
+## 0.11.0 — 2026-11-16
+
+Release cycles, and fixes from an independent review of the whole template.
+
+Releases:
+
+- How a product that ships is released is decided in the foundation: `releases` and the Releases
+  section of `docs/plan.md` may say "not yet" only until the foundation ends, and "not yet" doesn't
+  meet the exit list after it (`workflow.md`, `config.md`). The first milestone after the foundation
+  comes in the form the owner will use it, an app installed on their machine or a service they reach.
+  Before, a plan could put the installable app off to its last milestone, and the owner had nothing to
+  try at the first gate.
+- The Releases section says how the owner tries work before it is released, with the steps: by
+  default one command that builds `main`; on a copy of the owner's data where an untried build must
+  not touch the real data; or the release itself with a way back, where only a release can be tried;
+  documents are read where they will be published (`config.md`, "releases"; the `docs/plan.md`
+  placeholder).
+- A milestone after the foundation ends in one cycle (`workflow.md`, "Starting and finishing"): the
+  owner tries the result; fixes are tried again; once the owner says it is fine, the
+  release goes out; the owner uses the release in real work before the gate, and what that finds goes
+  out as a fix release or to the next milestone. Releases within the milestone go out the same way,
+  each after the owner's word on the build they tried. The gate ends the milestone.
+- A release pull request is `ok-without-reading`, merged by the coordinator once the owner has said the
+  build they tried is fine; what merged after the try goes with it, without another try. Where the
+  release itself is the try, it merges before the try, `owner-review` when it acts on the owner's real
+  data (`reports.md`, "The review label"). `merged_by` is about pull requests that need the owner's OK
+  (`workflow.md`).
+- release-please on Conventional Commits, building and publishing with no step by hand for each
+  release, is the default for a project that ships, unless the Releases section says otherwise and why.
+
+From the review:
+
+- The gate review: one brief, "Review milestone <n> before its gate on pull request #N, reading whole
+  <modules>", on the pull request of the next milestone's plan and in place of its plain review, does the
+  cold-start test, checks the exit list the coordinator ticked, judges the plan and its gaps, and reads
+  whole what no review read; the coordinator fixes each finding where it belongs before the gate
+  (`rules.md`, "The gate review"; `coordinator.md`, "Before a gate"; `workflow.md`, step 5). Before, the
+  gate's reviewer and the cold-start session had no brief, and a fresh session could take itself for the
+  coordinator.
+- A process update merges without a "Projects:" step that needs the owner's decision; the update's
+  description names that step, and it goes in a pull request of its own right after (`updates.md`,
+  step 2; `update.py` says so in the description it writes).
+- A rollback of the process is recorded in `docs/now.md`, so the next coordinator doesn't take the
+  broken release again (`updates.md`, "When a release breaks the project").
+- A work session marks its pull request ready when "Done when" is met (`rules.md`, "Your work";
+  `check_pr.py` from then on).
+- The coordinator takes over a draft, or a pull request with unanswered "fix" findings, whose session
+  is gone, not only one waiting on answers (`coordinator.md`).
+- The coordinator's own check no longer repeats the reviewer's: it checks that the reviews covered
+  "Done when", and the label; it runs the whole result at the milestone's end (`workflow.md`, step 5).
+- Review marks and the last line stay in English in a comment in any language (`rules.md`).
+- The owner's word after the try is all a release needs (`reports.md`, point 3).
+- A change the architecture review is for, contracts between parts that only agents build and library
+  interfaces included, is offered to the owner after its reviews, with the option to stop asking until
+  the milestone ends, as the owner decided for 0.7.0; 0.7.0 had left agent-only interfaces out
+  (`reports.md`, "Reviewed work offered to the owner").
+- The owner's standing OKs (`reports.md`, "The owner's standing OKs"): the owner may give a standing
+  OK for any reviewed technical work, decisions the plan names as theirs included when named, for a
+  date or a gate they name. Never covered: the milestone's plan and its try, what goes beyond the plan,
+  what the owner keeps or the project's `CLAUDE.md` leaves to them, code that migrates or rewrites the
+  owner's existing data, and their earlier explicit instructions unless named. A pull request merges
+  under one only if standing OKs cover every reason it would go to the owner, after its reviews passed
+  on the head that merges, with no commit of the coordinator's after them; a kind with no review of its
+  own needs the owner's yes to that weaker net and a written decision. One line per standing OK under
+  "Standing OKs" in `docs/now.md`, formerly "Offers stopped until the milestone's end", which the next
+  report quotes; each pull request merged under one is listed in the report with what it decided. An
+  answer to an offer that gives a standing OK is also the OK of the pull request offered. Before, the
+  owner could only stop offers, and only until the end of the milestone.
+- The gate: the coordinator ticks the exit list in the description of the next milestone's plan pull
+  request, each point with its evidence, and asks the owner's word on real use as an item of "Needed
+  from you"; the gate review checks those ticks and its fixes come back in one comment
+  (`coordinator.md`, "Before a gate"; `rules.md`, "The gate review").
+- Smaller: `updates.md` names `update.py`'s force push of its own branch; the anchor in the
+  `docs/backlog.md` placeholder; the example in `coordinator.md` names no real project;
+  `pull-requests.md` says the kind in the title is checked only without Conventional Commits; a reference
+  in `template-release.yml`.
+
+Projects: a project that ships and is past its foundation checks the Releases section of its
+`docs/plan.md`: if it says "not yet", or doesn't say how the owner tries work before it is released, the
+coordinator brings the owner a change to the plan in a pull request of its own after the update. The
+cycle applies from the end of the milestone in work. The gate review starts with the next gate the
+coordinator prepares; a gate already brought to the owner finishes as it started. A Releases section that
+asks for more than the template (the owner's Approve of the release pull request, say) stays as it is. A
+project in its foundation, or with `releases` set to `none`, has nothing to do. Every project renames the
+line "Offers stopped until the milestone's end" in its `docs/now.md` to "Standing OKs", or adds "Standing
+OKs: none" where it has no such line; an offer stopped already stays as a standing OK until the end of
+the milestone.
+
 ## 0.10.0 — 2026-11-13
 
 - The review reading whole (`rules.md`, "The review"). When a run of pull requests builds or changes
