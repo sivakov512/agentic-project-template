@@ -73,8 +73,7 @@ whether something stays inside the plan (both below). The owner looks at:
   until the owner stops the offers of its kind. It says in plain words what it decides or changes, and
   for the checks and CI what it loosens or tightens.
 - Everything else is labelled `ok-without-reading`: the requirements and the documents of the chain
-  inside the agreed scope, studies, code and tests, interfaces between parts that only the agents build,
-  the backlog, `docs/now.md`, records of facts, and records of the owner's own decisions outside what
+  inside the agreed scope, studies, code and tests, the backlog, `docs/now.md`, records of facts, and records of the owner's own decisions outside what
   the owner keeps.
 - A bot's pull request the coordinator labels after the reviewer's findings and its own check:
   - a dependency bump inside the plan: `ok-without-reading`;
@@ -86,14 +85,16 @@ whether something stays inside the plan (both below). The owner looks at:
 
 ### Reviewed work offered to the owner
 
-Risky code (as `docs/plan.md` names it) and a decision of the kinds in 2 that the plan didn't name: once
-such a pull request's reviews have no "fix" finding left, the coordinator offers it to the owner as one
-item of "Needed from you". The item says what it does, which reviews and checks passed, what exactly is
-worth a look (files or sections) and that the look may be skipped, and asks one question: keep offering
-this kind of pull request, or stop asking until the end of the milestone.
+Risky code (as `docs/plan.md` names it), a change the architecture review is for (the architecture, or a
+contract between parts, a library's interface among them, [rules.md](rules.md#if-you-are-the-reviewer)),
+and a decision of the kinds in 2 that the plan didn't name: once such a pull request's reviews have no
+"fix" finding left, the coordinator offers it to the owner as one item of "Needed from you". The item
+says what it does, which reviews and checks passed, what exactly is worth a look (files or sections) and
+that the look may be skipped, and asks one question: keep offering this kind of pull request, or stop
+asking until the end of the milestone.
 
-- A kind is what the owner names when stopping; by default risky code is one kind, and each kind of
-  decision in 2 is one.
+- A kind is what the owner names when stopping; by default risky code is one kind, architecture and
+  contracts one, and each kind of decision in 2 is one.
 - After a stop, the coordinator merges that kind itself after its reviews, labelled
   `ok-without-reading`, and lists each among the pull requests merged without the owner, unless the
   pull request also changes what the owner keeps: then it still needs the owner's OK.
@@ -102,8 +103,7 @@ this kind of pull request, or stop asking until the end of the milestone.
   requests merge after their reviews without asking"), and removes it when the milestone ends.
 - What the milestone's plan names as the owner's is not offered: it comes as an `owner-review` item, and
   the owner looks at what the item points to. Risky code the plan says goes `ok-without-reading` isn't
-  offered either, nor are interfaces between parts that only the agents
-  build, or code that builds a user interface the owner already agreed.
+  offered either, nor is code that builds a user interface the owner already agreed.
 
 ### When the coordinator isn't sure
 

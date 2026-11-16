@@ -54,6 +54,10 @@ From the review:
   "Done when", and the label; it runs the whole result at the milestone's end (`workflow.md`, step 5).
 - Review marks and the last line stay in English in a comment in any language (`rules.md`).
 - The owner's word after the try is all a release needs (`reports.md`, point 3).
+- A change the architecture review is for, contracts between parts that only agents build and library
+  interfaces included, is offered to the owner after its reviews, with the option to stop asking until
+  the milestone ends, as the owner decided for 0.7.0; 0.7.0 had left agent-only interfaces out
+  (`reports.md`, "Reviewed work offered to the owner").
 - Smaller: the example in `coordinator.md` names no real project; `pull-requests.md` says the kind in
   the title is checked only without Conventional Commits; a reference in `template-release.yml`.
 
