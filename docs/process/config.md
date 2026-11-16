@@ -66,12 +66,17 @@ beyond these go in the project's own check.
 ## releases
 
 A project that ships decides by the end of the foundation how, and writes it in the Releases section of
-`docs/plan.md`: what is released and where, and the one command that gives the owner a build of `main`
-to try. The default, unless that section says otherwise and why, is release-please: it opens release
-pull requests from the Conventional Commits history (set `commits.conventional`), keeps the changelog
-and tags versions, and the project's own workflows build and publish once its release pull request
-merges, with no step by hand. That merge comes after the owner's OK on the milestone
-([workflow.md](workflow.md#starting-and-finishing)).
+`docs/plan.md`: what is released and where, and how the owner tries work before it is released, with
+the steps. By default that is one command that builds `main`, and the build shows the commit it was
+built from; where an untried build must not touch the owner's real data, it runs on a copy of them;
+where only a release can be tried (a service with one installation, the owner's), the release itself
+is the try, with a way back; documents are read where they will be published.
+
+The release tool by default, unless that section says otherwise and why, is release-please: it opens
+release pull requests from the Conventional Commits history (set `commits.conventional`), keeps the
+changelog and tags versions, and the project's own workflows build and publish once its release pull
+request merges, with no step by hand for each release. How releases and the owner's tries come
+together at the end of a milestone: [workflow.md](workflow.md#starting-and-finishing).
 
 - Run it with a GitHub App's token, not the agents' or the owner's
   ([pull-requests.md](pull-requests.md#pull-requests-from-a-github-app)).

@@ -69,13 +69,22 @@ This change to the plan goes to the owner in the same report as the gate.
   whose "Depends on" says "any time" may start whatever its dependencies and milestone. A milestone starts when the previous one is
   finished and its own written-out plan is merged.
 - A milestone is finished only when every point of its exit list is true.
-- A milestone after the foundation ends in this order: the coordinator runs the result end to end and
-  gives it to the owner ready to try, as a build of `main` by the one command the Releases section of
-  `docs/plan.md` names, with the steps; the owner uses it in real work and says what came up; what must
-  be fixed for it to do its job is fixed in this milestone and tried again on a new build, the rest goes
-  to the next one or the list for later. Once the owner says it is fine, the release goes out as the
-  Releases section says (with release-please, the coordinator merges its release pull request).
-  Meanwhile the coordinator writes out the next milestone.
+- A milestone after the foundation ends in this order; meanwhile the coordinator writes out the next
+  one.
+  1. The coordinator runs the result end to end and gives it to the owner to try, with the steps, the
+     way the Releases section of `docs/plan.md` says ([config.md](config.md#releases)). The same way
+     serves to try work in progress during the milestone.
+  2. What must be fixed for it to do its job is fixed in this milestone and tried again; the rest goes
+     to the next milestone or the list for later.
+  3. Once the owner says it is fine (their word; a project may ask for their Approve as well), the
+     release goes out from the commit the owner tried: if `main` moved since, the new commit is built
+     and tried first. With release-please, whoever `merged_by` names merges its release pull request.
+  4. The owner uses the release in real work before the gate; what that finds goes out as a fix
+     release or to the next milestone.
+
+  Releases may go out within the milestone as well; the owner's OK closes the milestone, it doesn't
+  open releasing. Where the project doesn't ship (`releases` is `none`), steps 3 and 4 are using the
+  result as the plan says.
 - **A gate** ends every milestone: the owner accepts what the milestone delivered and agrees the next
   one. Agreeing it lets the coordinator start the work sessions and reviewers for its items without
   asking again; where its tool starts a session only on the owner's word, the coordinator asks for that

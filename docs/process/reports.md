@@ -76,7 +76,9 @@ whether something stays inside the plan (both below). The owner looks at:
   the backlog, `docs/now.md`, records of facts, and records of the owner's own decisions outside what
   the owner keeps.
 - A bot's pull request the coordinator labels after the reviewer's findings and its own check: a
-  dependency bump inside the plan `ok-without-reading`, a release as the plan's Releases section says.
+  dependency bump inside the plan `ok-without-reading`; a release `ok-without-reading` once the owner
+  has said the build it comes from is fine ([workflow.md](workflow.md#starting-and-finishing)), and not
+  merged before, unless the plan's Releases section asks for more.
 
 ### Reviewed work offered to the owner
 

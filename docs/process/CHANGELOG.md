@@ -11,17 +11,25 @@ The newest version first. Each entry says what changed and what projects must do
   comes in the form the owner will use it, an app installed on their machine or a service they reach.
   Before, a plan could put the installable app off to its last milestone, and the owner had nothing to
   try at the first gate.
-- Each milestone after the foundation ends with one cycle (`workflow.md`, "Starting and finishing"):
-  the owner tries a build of `main` made by one command the Releases section names; what must be fixed
-  is fixed and tried on a new build; once the owner says it is fine, the release goes out, with
-  release-please by merging its release pull request.
-- release-please on Conventional Commits, building and publishing with no step by hand, is the
-  default for a project that ships, unless the Releases section says otherwise and why (`config.md`,
-  "releases"; the `docs/plan.md` placeholder; `setup.md`).
+- The Releases section says how the owner tries work before it is released, with the steps: by
+  default one command that builds `main`, the build showing its commit; on a copy of the owner's data
+  where an untried build must not touch the real data; or the release itself with a way back, where
+  only a release can be tried (`config.md`, "releases"; the `docs/plan.md` placeholder).
+- A milestone after the foundation ends in one cycle (`workflow.md`, "Starting and finishing"): the
+  owner tries the result; fixes are tried again; after the owner's OK (their word, and their Approve
+  where the project asks for it) the release goes out from the commit the owner tried, built and tried
+  again if `main` moved; the owner uses the release in real work before the gate, and what that finds
+  goes out as a fix release or to the next milestone. Releases may also go out within the milestone.
+  With release-please, whoever `merged_by` names merges the release pull request, labelled
+  `ok-without-reading` once the owner said the build is fine and not merged before (`reports.md`).
+- release-please on Conventional Commits, building and publishing with no step by hand for each
+  release, is the default for a project that ships, unless the Releases section says otherwise and why.
 
 Projects: a project that ships and is past its foundation checks the Releases section of its
-`docs/plan.md`: if it says "not yet", or names no command that gives the owner a build of `main`, the
-coordinator brings the owner a change to the plan (the owner keeps that file). Nothing else to do.
+`docs/plan.md`: if it says "not yet", or doesn't say how the owner tries work before it is released,
+the coordinator brings the owner a change to the plan (the owner keeps that file). The cycle applies
+from the end of the milestone in work; its written-out exit list needs no change. A project in its
+foundation, or with `releases` set to `none`, has nothing to do.
 
 ## 0.10.0 — 2026-11-13
 
