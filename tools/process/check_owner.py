@@ -9,7 +9,8 @@ the paths docs/process.json's "kept" names on the base branch, or the template's
 names compared whatever their case. The OK is an approval of the pull request's last commit by the
 repository's owner. A file Claude Code loads as rules by itself (a CLAUDE.md or CLAUDE.local.md, a rule
 under .claude/rules/) that imports ("@" and a path) a file the owner doesn't keep never goes in, approved
-or not: its rules could then change without the owner. The template's files and the lock of a process
+or not: its rules could then change without the owner. Nor does a symlink or submodule at a path the
+owner keeps, or an import through one: the check can't see where it leads. The template's files and the lock of a process
 update are the exception where each is exactly as in the newer release that the update's lock names,
 for the template that the base's lock names, and that release is on the template's main: the owner
 agreed it in the template.
@@ -76,8 +77,9 @@ def text_of(object_id):
     return done.stdout.decode("utf-8", "replace")
 
 
-# Git's modes of a regular file, plain or executable.
+# Git's modes of a regular file, plain or executable, and of a symlink and a submodule.
 REGULAR = ("100644", "100755")
+LINKS = ("120000", "160000")
 
 
 def is_rule_file(path):
@@ -87,44 +89,57 @@ def is_rule_file(path):
     return path.rsplit("/", 1)[-1] in KEPT_NAMES[:2] or ("/.claude/rules/" in "/" + path and path.endswith(".md"))
 
 
+def through_link(path, found):
+    """The folder on the way to path that is a symlink or submodule in found (path to (mode, id, path),
+    keys in lower case), or None."""
+    parts = path.split("/")
+    for end in range(1, len(parts)):
+        entry = found.get("/".join(parts[:end]))
+        if entry and entry[0] in LINKS:
+            return entry[2]
+    return None
+
+
+def link_errors(entries, kept=()):
+    """A symlink or submodule (entries, from tree) at a path the owner keeps (kept_by_owner, with kept):
+    the check can't see where it leads, so what lies behind it could change without the owner. Such a
+    pull request can't merge whatever its approvals."""
+    return sorted(f"{path} is a {'symlink' if mode == LINKS[0] else 'submodule'} where the owner keeps a file:"
+                  " put the file itself there, or import it with @"
+                  for mode, _, path in entries if mode in LINKS and kept_by_owner(path, kept))
+
+
 def import_errors(entries, kept=()):
     """Why the pull request can't merge whatever its approvals: a file Claude Code loads as rules
     (is_rule_file), or one it imports in turn, imports with "@path" a file of the tree (entries, from
     tree) the owner doesn't keep (kept_by_owner, with kept): its rules could then change without the
     owner. A path is read relative to the importing file and from the repository's root; anything after
     an "@" that could be a path counts, inside code or not, and a path to nothing in the tree is left
-    alone. A rules file that is a symlink (AGENTS.md linked as CLAUDE.md, say) counts as importing what it
-    points to, which must then be kept too. Raises ValueError when git can't read a file."""
+    alone, unless it goes through a symlink or submodule, which the check can't follow. Raises ValueError
+    when git can't read a file."""
     found = {path.casefold(): (mode, object_id, path) for mode, object_id, path in entries}
-    queue = [path for mode, _, path in entries if mode in ("120000",) + REGULAR and is_rule_file(path)]
+    queue = [path for mode, _, path in entries if mode in REGULAR and is_rule_file(path)]
     seen, errors = set(), []
     while queue:
         path = queue.pop()
         if path.casefold() in seen:
             continue
         seen.add(path.casefold())
-        mode, object_id, _ = found[path.casefold()]
-        if mode == "120000":
-            target = posixpath.normpath(posixpath.join(posixpath.dirname(path), text_of(object_id).strip()))
-            if target.casefold() not in found:
-                errors.append(f"{path} is a symlink to {target}, which isn't a file of the repository")
-            elif not kept_by_owner(found[target.casefold()][2], kept):
-                errors.append(f"{path} is a symlink to {target}, which the owner doesn't keep: add it to"
-                              " \"kept\" in docs/process.json")
-            else:
-                queue.append(found[target.casefold()][2])
-            continue
-        for raw in re.findall(r"@([^\s@`'\"()<>\[\]{}]+)", text_of(object_id)):
+        for raw in re.findall(r"@([^\s@`'\"()<>\[\]{}]+)", text_of(found[path.casefold()][1])):
             for name in {raw, raw.rstrip(".,;:!?")}:
                 for base in (posixpath.dirname(path), ""):
                     target = posixpath.normpath(posixpath.join(base, name)).casefold()
                     if target not in found:
+                        link = through_link(target, found)
+                        if link:
+                            errors.append(f"{path} imports {name} through {link}, a symlink or submodule:"
+                                          " import the file at its own path")
                         continue
                     mode, _, imported = found[target]
                     if not kept_by_owner(imported, kept):
                         errors.append(f"{path} imports {imported}, which the owner doesn't keep: add"
                                       " it to \"kept\" in docs/process.json or move it under .claude/")
-                    elif mode.startswith("100") or mode == "120000":
+                    elif mode in REGULAR:
                         queue.append(imported)
     return sorted(set(errors))
 
@@ -276,7 +291,8 @@ def main(argv):
         kept = kept_patterns(base)
         # The head's "kept" counts for imports too: a pull request that adds to it changes
         # docs/process.json, which needs the owner's OK anyway.
-        errors = (import_errors(tree(head), kept + kept_patterns(head))
+        head_tree, head_kept = tree(head), kept + kept_patterns(head)
+        errors = (link_errors(head_tree, head_kept) + import_errors(head_tree, head_kept)
                   + check(labels(repo, pull["number"]), changed, reviews(repo, pull["number"]), head, author,
                           released_files(changed, base, head, repo), kept))
     except (OSError, ValueError, KeyError, IndexError) as error:

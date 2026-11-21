@@ -604,26 +604,30 @@ class OwnerCheck(unittest.TestCase):
         self.assertIn("add it to \"kept\" in docs/process.json or move it under .claude/", unkept[0])
         self.assertEqual(short(kept), ["AGENTS.md imports docs/more.md"])
 
-    def test_a_rules_file_linked_to_another_needs_that_one_kept(self):
+    def test_links_where_the_owner_keeps_files_never_go_in(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             git_in(root, "init", "-q")
             (root / "AGENTS.md").write_text("Rules.\n")
             (root / "CLAUDE.md").symlink_to("AGENTS.md")
+            (root / "shared").mkdir()
+            (root / "shared/rules.md").write_text("More.\n")
+            (root / "linked").symlink_to("shared")
             (root / "sub").mkdir()
-            (root / "sub/CLAUDE.md").symlink_to("../../outside.md")
+            (root / "sub/CLAUDE.md").write_text("See @../linked/rules.md\n")
+            (root / "notes.md").symlink_to("AGENTS.md")
             commit_files(root, {}, "links")
             saved, check_owner.ROOT = check_owner.ROOT, root
             try:
                 entries = check_owner.tree(git_in(root, "rev-parse", "HEAD"))
-                unkept = check_owner.import_errors(entries)
-                kept = check_owner.import_errors(entries, ["AGENTS.md"])
+                links = check_owner.link_errors(entries, ["AGENTS.md"])
+                imports = check_owner.import_errors(entries, ["AGENTS.md"])
             finally:
                 check_owner.ROOT = saved
-        self.assertEqual(len(unkept), 2, unkept)
-        self.assertIn("CLAUDE.md is a symlink to AGENTS.md, which the owner doesn't keep", unkept[0])
-        self.assertIn("isn't a file of the repository", unkept[1])
-        self.assertEqual(len(kept), 1, kept)
+        self.assertEqual(len(links), 1, links)
+        self.assertIn("CLAUDE.md is a symlink where the owner keeps a file", links[0])
+        self.assertEqual(len(imports), 1, imports)
+        self.assertIn("through linked, a symlink or submodule", imports[0])
 
 
     def owner_check(self, head_tree, changed, labels, reviews, head_kept=(), text=""):
@@ -1141,6 +1145,10 @@ class Workflows(unittest.TestCase):
             (root / ".github/workflows/project-checks.yml").write_text(types + ", ready_for_review]\n" + slow,
                                                                        encoding="utf-8")
             self.assertEqual(check.workflow_problems(root), [])
+            for skip in ("if: ${{ !github.event.pull_request.draft }}", "if: github.event.pull_request.draft != true"):
+                (root / ".github/workflows/project-checks.yml").write_text(
+                    "on:\n  pull_request:\njobs:\n  slow:\n    " + skip + "\n", encoding="utf-8")
+                self.assertEqual(len(check.workflow_problems(root)), 1, skip)
 
 
 T0 = merge.when("2026-11-15T10:56:00Z")
@@ -1156,8 +1164,8 @@ def run(name, minutes, status="completed", conclusion="success", event="pull_req
 
 
 class MergeDecision(unittest.TestCase):
-    def decide(self, runs, pushed=None, reopened=None, now=200):
-        return merge.decide(runs, T0, pushed if pushed is None else at(pushed),
+    def decide(self, runs, pushed=None, reopened=None, now=200, merged=1):
+        return merge.decide(runs, T0, None if merged is None else at(merged), pushed if pushed is None else at(pushed),
                             None if reopened is None else at(reopened), at(now))
 
     def test_green_runs_after_the_base_moved_merge(self):
@@ -1169,6 +1177,18 @@ class MergeDecision(unittest.TestCase):
         self.assertEqual(self.decide(runs, reopened=-90)[0], "rerun")
         self.assertEqual(self.decide(runs, reopened=195)[0], "wait")
         self.assertEqual(self.decide(runs, reopened=100)[0], "stop")
+
+    def test_runs_after_main_moved_but_before_githubs_new_merge_run_again(self):
+        runs = [run("process-checks", 60)]
+        self.assertEqual(self.decide(runs, merged=90)[0], "rerun")
+        self.assertEqual(self.decide(runs, merged=None)[0], "rerun")
+        self.assertEqual(self.decide(runs, merged=30), ("merge", ""))
+
+    def test_a_skipped_run_tested_nothing_so_its_age_doesnt_matter(self):
+        runs = [run("process-checks", 60), run("preview", -60, conclusion="skipped")]
+        self.assertEqual(self.decide(runs), ("merge", ""))
+        reopened = [run("process-checks", 196), run("preview", -60, conclusion="skipped")]
+        self.assertEqual(self.decide(reopened, reopened=195), ("merge", ""))
 
     def test_right_after_reopening_runs_from_before_it_wait(self):
         runs = [run("process-checks", 100, conclusion="failure")]
@@ -1217,7 +1237,8 @@ class MergeCommand(unittest.TestCase):
             if "/issues/7/events" in path:
                 return []
             if "/commits/" + "m" * 40 in path:
-                return {"parents": [{"sha": merge_parent or self.BASE}]}
+                return {"parents": [{"sha": merge_parent or self.BASE}],
+                        "commit": {"committer": {"date": "2026-11-15T10:57:00Z"}}}
             raise AssertionError(path)
 
         def gh(*args):

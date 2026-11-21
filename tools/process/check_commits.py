@@ -3,7 +3,7 @@
 
 main takes each pull request as one squash commit whose subject is the title and whose body is empty
 (docs/process/workflow.md#the-merge), so the title is the commit main gets: not empty, at most 72
-characters together with the " (#N)" GitHub adds when the owner merges on its page, and a Conventional
+characters together with the " (#N)" the squash merge adds, and a Conventional
 Commits subject where docs/process.json asks for it (docs/process/config.md,
 "commits"). The commits on the branch are not checked: none of them reaches main. Pull requests opened
 by a GitHub App are checked too, since their titles land on main as well.
@@ -45,7 +45,7 @@ def rules(root):
 
 def check(title, rules, number=None):
     """Takes the title, the commit rules and the pull request's number, if known; returns the problems
-    found. With the number, the " (#N)" GitHub adds to the subject when the owner merges on its page
+    found. With the number, the " (#N)" the squash merge adds to the subject
     counts toward the 72 characters."""
     errors = []
     suffix = f" (#{number})" if number else ""

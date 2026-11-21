@@ -23,6 +23,10 @@ import owned  # noqa: E402
 ROOT = HERE.parents[1]
 
 
+# How a workflow skips draft pull requests: draft == false, draft != true, or !...draft.
+SKIPS_DRAFTS = r"pull_request\.draft\s*(==\s*false|!=\s*true)|!\s*github\.event\.pull_request\.draft"
+
+
 def workflow_problems(root):
     """The workflows under .github/workflows that skip draft pull requests but don't run on
     `ready_for_review`, as messages: a skipped job counts as passing for the merge, so such a job would
@@ -30,7 +34,7 @@ def workflow_problems(root):
     problems = []
     for path in sorted((root / ".github" / "workflows").glob("*.y*ml")):
         text = path.read_text(encoding="utf-8")
-        if re.search(r"pull_request\.draft\s*==\s*false", text) and "ready_for_review" not in text:
+        if re.search(SKIPS_DRAFTS, text) and "ready_for_review" not in text:
             problems.append(f"{path.relative_to(root)} skips draft pull requests but doesn't run on "
                             f"ready_for_review, so its skipped jobs would never test the pull request "
                             f"(docs/process/workflow.md#reviews-in-draft)")

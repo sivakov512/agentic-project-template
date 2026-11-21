@@ -69,12 +69,14 @@ def latest_runs(runs):
     return list(newest.values())
 
 
-def decide(runs, base_time, pushed_at, reopened_at, now):
+def decide(runs, base_time, merged_at, pushed_at, reopened_at, now):
     """What to do, with the reason: ("merge", ""), ("wait", why), ("rerun", why), ("stop", why),
     ("cancelled", why) or ("red", why).
     runs: the newest run of each workflow on the pull request's last commit; base_time: when the base
-    branch got its current commit; pushed_at: when the last commit was pushed, or None; reopened_at: when
-    the pull request was last reopened, or None; now: the current time. Times are aware datetimes."""
+    branch got its current commit; merged_at: when GitHub made its merge of the pull request on that
+    commit, or None while it hasn't (a run tests the merge GitHub made last, so only runs after it test
+    the base as it is); pushed_at: when the last commit was pushed, or None; reopened_at: when the pull
+    request was last reopened, or None; now: the current time. Times are aware datetimes."""
     reopened_here = reopened_at is not None and reopened_at >= base_time
     just_reopened = reopened_here and now - reopened_at < START_GRACE
     if not runs:
@@ -89,11 +91,13 @@ def decide(runs, base_time, pushed_at, reopened_at, now):
     running = sorted(run["name"] for run in runs if run["status"] != "completed")
     if running:
         return "wait", "still running: " + ", ".join(running)
-    if just_reopened and any(when(run["created_at"]) < reopened_at for run in runs):
+    # A skipped run tested nothing (a workflow only on labels, say), so its age doesn't matter.
+    tested = [run for run in runs if run["conclusion"] != "skipped"]
+    if just_reopened and any(when(run["created_at"]) < reopened_at for run in tested):
         return "wait", "the checks haven't all started again since the pull request was reopened"
-    old = sorted(run["name"] for run in runs if when(run["created_at"]) < base_time)
+    old = sorted(run["name"] for run in tested if merged_at is None or when(run["created_at"]) < merged_at)
     if old:
-        why = "the base moved after these ran: " + ", ".join(old)
+        why = "these didn't run on GitHub's merge of the pull request on the current base: " + ", ".join(old)
         if not reopened_here:
             return "rerun", why
         return "stop", why + ", even after reopening it on this base"
@@ -126,6 +130,18 @@ def last_event(repo, number, name):
     return max(times) if times else None
 
 
+def merged_on(repo, pull, base_sha):
+    """When GitHub made its merge of the pull request (pull, from the API) on base_sha, by that commit's
+    date, or None when its merge is on another commit or there is none."""
+    sha = pull.get("merge_commit_sha")
+    if not sha:
+        return None
+    found = api(f"repos/{repo}/commits/{sha}")
+    if found["parents"][0]["sha"] != base_sha:
+        return None
+    return when(found["commit"]["committer"]["date"])
+
+
 def wait_for_merge_on(repo, number, base_sha):
     """Waits until GitHub's merge of the pull request is on base_sha; False if it isn't in time, or if the
     pull request conflicts with the base."""
@@ -144,7 +160,11 @@ def wait_for_merge_on(repo, number, base_sha):
 
 def reopen(repo, number):
     """Closes and reopens the pull request; raises Failed, saying it is left closed, if reopening fails."""
-    gh("api", "-X", "PATCH", f"repos/{repo}/pulls/{number}", "-f", "state=closed")
+    try:
+        gh("api", "-X", "PATCH", f"repos/{repo}/pulls/{number}", "-f", "state=closed")
+    except Failed as error:
+        raise Failed(f"closing pull request #{number} failed, so it may be left CLOSED: check it, and reopen "
+                     f"it if so: gh api -X PATCH repos/{repo}/pulls/{number} -f state=open ({error})")
     for attempt in range(3):
         try:
             gh("api", "-X", "PATCH", f"repos/{repo}/pulls/{number}", "-f", "state=open")
@@ -177,7 +197,7 @@ def merge(repo, number, commit):
     base_sha = api(f"repos/{repo}/git/ref/heads/{base}")["object"]["sha"]
     runs = api(f"repos/{repo}/actions/runs?head_sha={head}&per_page=100")
     action, why = decide(latest_runs(runs.get("workflow_runs", [])), moved_at(repo, base, base_sha),
-                         moved_at(repo, pull["head"]["ref"], head),
+                         merged_on(repo, pull, base_sha), moved_at(repo, pull["head"]["ref"], head),
                          last_event(repo, number, "reopened"), datetime.now(timezone.utc))
     if action == "wait":
         return 1, f"Not merged: {why}. Run this again when the checks finish."

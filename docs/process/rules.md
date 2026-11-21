@@ -110,7 +110,8 @@ rest.
 - Where the language has a linter for such comments, the project's checks run it.
 - The design document of the code lists its folders, one line each: what it holds and, for a name that
   isn't plain, where the name comes from. A new folder goes into the list in the pull request that makes
-  it. The project's checks include one that fails on a folder missing from the list.
+  it. The project's checks include one that fails on a folder missing from the list, which the item that
+  adds the first code adds.
 
 ## Git and GitHub
 

@@ -65,7 +65,8 @@ what the owner keeps:
   exception is a process update whose files are exactly those of the template's release, `.github/`
   aside ([updates.md](updates.md#getting-a-newer-process)). Rules Claude Code loads by itself (a
   `CLAUDE.md` or `CLAUDE.local.md`, `.claude/rules/`) never import (an `@` before the path) a file the
-  owner doesn't keep;
+  owner doesn't keep, and a symlink or submodule never stands where the owner keeps a file or on the way
+  of an import, since the check can't see where it leads;
 - any change that loosens the project's checks, in whatever file (a test removed or skipped, a lint rule
   or a threshold eased), which the label and the reviewers catch.
 

@@ -5,15 +5,17 @@ The newest version first. Each entry says what changed and what projects must do
 
 ## 0.12.0 — 2026-11-21
 
-The process made a third shorter, with the same protections, and the merge on the current `main`. The
-process documents went from about 16,300 words to about 11,200; what each role reads before it acts went
-down more: a work session from about 4,500 words to 2,000, the coordinator from about 10,900 to 6,200.
+The process made shorter, with the same protections, and the merge on the current `main`. The process
+documents went from about 15,700 words in 0.11.0 to about 11,400; what each role reads before it acts
+went down more: a work session from about 4,200 words to 2,100, the coordinator from about 10,300 to
+6,400.
 
 - **The merge on the current `main`** (`workflow.md`, "The merge"). Closing and reopening a pull request
   didn't make its checks test the current `main`, since GitHub makes its merge into `main` again only
   some time after `main` moves, and a pull request merged green on a six-hour-old `main` broke it. The
   coordinator now merges with `python3 tools/process/merge.py <N> <commit>`: it merges only the commit
-  named, the one reviewed and approved, and only when every check ran after `main` last moved; otherwise
+  named, the one reviewed and approved, and only when every check started after GitHub made its merge of
+  the pull request on the current `main`; otherwise
   it waits until GitHub has merged the pull request on the current `main`, then closes and reopens it,
   which keeps the owner's Approve, at most once for each commit of `main`. Every workflow on pull
   requests runs on `reopened`. Work pull requests with green checks merge before the coordinator's own
@@ -35,9 +37,9 @@ down more: a work session from about 4,500 words to 2,000, the coordinator from 
   to a number it names.
 - **One mode of account:** the agents work under their own account, and the coordinator merges after the
   owner's Approve. `agents_account` and `merged_by` in `docs/process.json` are no longer read.
-- **Removed:** the rules on symlinks and submodules (they guarded against malice, not mistakes), but a
-  rules file that is a symlink counts as importing what it points to,
-  `roles.md` (now in `README.md`), the long form of `defences.md`, and repeated text across the files.
+- **Removed:** `roles.md` (now in `README.md`), the long form of `defences.md`, and repeated text across
+  the files. The rules on symlinks and submodules are one now: none where the owner keeps a file or on
+  the way of an import.
 - The UI review asks for images as the product's own code draws them: screenshots of the real window,
   menu or page, or its own views rendered offscreen, never a mock-up. A project's rules may make the
   template's looser only in the choices it leaves to the project.
@@ -54,8 +56,9 @@ included. A project with `agents_account` or `merged_by` set to `owner` first mo
 agents' own and the coordinator's merge, with the owner. Check that the
 "Owner review" section of `docs/plan.md` still says what the owner meant under the new point 6, and say
 in the update's "Owner review" what changed for the owner. From now on the coordinator merges with
-`merge.py`. If a project's own workflow on pull requests lists its event types without `reopened`,
-adding it goes to the owner in a pull request of its own, merged before the others. A project whose owner
+`merge.py`. If a project's own workflow on pull requests lists its event types without `reopened` (one
+that runs on a label included), adding it goes to the owner in a pull request of its own, merged before
+the others. A project whose owner
 wants the reviews in draft says so in `CLAUDE.md`, and its own workflows add `ready_for_review` and
 `if: github.event.pull_request.draft == false` on their slow jobs, in a pull request of its own.
 
