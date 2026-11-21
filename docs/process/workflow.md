@@ -158,9 +158,10 @@ A pull request merges with green checks, no "fix" finding left, and the owner's 
 naming the last commit reviewed and approved. It makes one squash commit on `main`, its subject the pull
 request's title and number, its body empty. It refuses any other commit, and merges only when the checks
 ran on `main` as it is now: GitHub tests a pull request on its merge into `main`, which it makes again
-only some time after `main` moves, so only runs that started after GitHub made its merge on the current
-`main` count. When the last runs are older, `merge.py` waits until GitHub has merged the pull request on
-the current `main`, then closes and reopens it, which runs the checks
+only some time after `main` moves, so a run may test an old `main`. The process checks note the commit
+of `main` each run tests, and only runs from the first that tested the current `main` count. When there
+are none, `merge.py` waits until GitHub has merged the pull request on the current `main`, then closes
+and reopens it, which runs the checks
 again and keeps the owner's Approve, at most once for each commit of `main`; the coordinator runs it
 again once they finish. Every workflow that runs on pushes runs on `reopened` for this
 ([pull-requests.md](pull-requests.md#the-checks-ci-runs)). If `merge.py` fails on an error of its own,

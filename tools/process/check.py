@@ -1,13 +1,16 @@
 #!/usr/bin/env python3
 """Runs every check an agent runs before pushing: the documents, the template's files against the lock,
 that workflows skipping draft pull requests run when one leaves draft, the checks' own tests, then the
-project's checks from docs/process.json. The pull request's description and title have checks of their
-own, check_pr.py and check_commits.py (docs/process/rules.md, "Your work"). Standard library and git only.
+project's checks from docs/process.json. In a pull request's run in CI it also notes which commit of
+the base the run tests, for merge.py (docs/process/workflow.md#the-merge). The pull request's
+description and title have checks of their own, check_pr.py and check_commits.py
+(docs/process/rules.md, "Your work"). Standard library and git only.
 
     python3 tools/process/check.py                  everything
     python3 tools/process/check.py --process-only   what the process workflow runs in CI
 """
 
+import os
 import re
 import subprocess
 import sys
@@ -41,6 +44,22 @@ def workflow_problems(root):
     return problems
 
 
+# The title of the note a pull request's run leaves on GitHub with the base commit it tests, which
+# merge.py reads.
+TESTED_BASE = "Tested base"
+
+
+def tested_base(root, environ):
+    """The commit of the base branch that a pull request's run in GitHub Actions tests: the first parent
+    of GitHub's merge it checked out. None outside such a run, when HEAD isn't a merge, or when git can't
+    read it."""
+    if environ.get("GITHUB_EVENT_NAME") != "pull_request":
+        return None
+    done = subprocess.run(["git", "cat-file", "-p", "HEAD"], cwd=root, capture_output=True, text=True)
+    parents = [line.split()[1] for line in done.stdout.splitlines() if line.startswith("parent ")]
+    return parents[0] if done.returncode == 0 and len(parents) == 2 else None
+
+
 def run_tests():
     suite = unittest.defaultTestLoader.discover(str(HERE), pattern="test_*.py")
     result = unittest.TextTestRunner(stream=sys.stdout, verbosity=0).run(suite)
@@ -49,6 +68,9 @@ def run_tests():
 
 def main(argv):
     process_only = "--process-only" in argv[1:]
+    base = tested_base(ROOT, os.environ) if process_only else None
+    if base:
+        print(f"::notice title={TESTED_BASE}::{base}")
     failed = []
     for name, errors in (("Docs", check_docs.check(ROOT)), ("Template files", owned.check(ROOT)),
                          ("Workflows", workflow_problems(ROOT))):

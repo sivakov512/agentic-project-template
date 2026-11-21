@@ -1158,6 +1158,24 @@ class Workflows(unittest.TestCase):
                 self.assertEqual(len(check.workflow_problems(root)), 1, skip)
 
 
+class TestedBase(unittest.TestCase):
+    def test_a_pull_requests_run_names_the_base_of_githubs_merge(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            git_in(root, "init", "-q", "-b", "main")
+            base = commit_files(root, {"a.txt": "a\n"}, "base")
+            git_in(root, "checkout", "-q", "-b", "topic")
+            commit_files(root, {"b.txt": "b\n"}, "topic")
+            git_in(root, "checkout", "-q", "main")
+            commit_files(root, {"c.txt": "c\n"}, "main moves")
+            main = git_in(root, "rev-parse", "HEAD")
+            git_in(root, "merge", "-q", "--no-ff", "-m", "Merge", "topic")
+            self.assertEqual(check.tested_base(root, {"GITHUB_EVENT_NAME": "pull_request"}), main)
+            self.assertIsNone(check.tested_base(root, {"GITHUB_EVENT_NAME": "push"}))
+            git_in(root, "checkout", "-q", base)
+            self.assertIsNone(check.tested_base(root, {"GITHUB_EVENT_NAME": "pull_request"}))
+
+
 T0 = merge.when("2026-11-15T10:56:00Z")
 
 
@@ -1171,8 +1189,8 @@ def run(name, minutes, status="completed", conclusion="success", event="pull_req
 
 
 class MergeDecision(unittest.TestCase):
-    def decide(self, runs, pushed=None, reopened=None, now=200, merged=1):
-        return merge.decide(runs, T0, None if merged is None else at(merged), pushed if pushed is None else at(pushed),
+    def decide(self, runs, pushed=None, reopened=None, now=200, tested=1):
+        return merge.decide(runs, T0, None if tested is None else at(tested), pushed if pushed is None else at(pushed),
                             None if reopened is None else at(reopened), at(now))
 
     def test_green_runs_after_the_base_moved_merge(self):
@@ -1185,11 +1203,17 @@ class MergeDecision(unittest.TestCase):
         self.assertEqual(self.decide(runs, reopened=195)[0], "wait")
         self.assertEqual(self.decide(runs, reopened=100)[0], "stop")
 
-    def test_runs_after_main_moved_but_before_githubs_new_merge_run_again(self):
+    def test_only_runs_from_the_first_that_tested_the_current_base_count(self):
         runs = [run("process-checks", 60)]
-        self.assertEqual(self.decide(runs, merged=90)[0], "rerun")
-        self.assertEqual(self.decide(runs, merged=None)[0], "rerun")
-        self.assertEqual(self.decide(runs, merged=30), ("merge", ""))
+        self.assertEqual(self.decide(runs, tested=90)[0], "rerun")
+        self.assertEqual(self.decide(runs, tested=None)[0], "rerun")
+        self.assertEqual(self.decide(runs, tested=60), ("merge", ""))
+
+    def test_a_run_again_of_an_older_run_still_running_waits(self):
+        old = dict(run("process-owner", 10, status="in_progress", conclusion=None, number=1))
+        newer = run("process-owner", 20, event="pull_request_review", number=2)
+        self.assertEqual(merge.latest_runs([old, newer]), [old])
+        self.assertEqual(self.decide(merge.latest_runs([old, newer]))[0], "wait")
 
     def test_a_skipped_run_never_hides_an_older_one(self):
         red = run("e2e", 60, conclusion="failure", number=1)
@@ -1234,8 +1258,12 @@ class MergeDecision(unittest.TestCase):
 class MergeCommand(unittest.TestCase):
     HEAD, BASE = "h" * 40, "b" * 40
 
-    def fake(self, runs, merge_parent=None):
+    def fake(self, runs, merge_parent=None, tested=None, checked_at=50):
+        """Fake api and gh for merge.merge on pull request 7; the process checks ran at checked_at
+        minutes and noted tested (the base by default) as the base they tested."""
         calls = []
+        runs = [dict(run("process-checks", checked_at, number=99), path=".github/workflows/process-checks.yml",
+                     check_suite_id=5)] + runs
 
         def api(path, *args):
             if path.endswith("/pulls/7"):
@@ -1252,6 +1280,10 @@ class MergeCommand(unittest.TestCase):
                 return {"workflow_runs": runs}
             if "/issues/7/events" in path:
                 return []
+            if "/check-suites/5/check-runs" in path:
+                return {"check_runs": [{"id": 6}]}
+            if "/check-runs/6/annotations" in path:
+                return [{"title": "Tested base", "message": tested or self.BASE}]
             if "/commits/" + "m" * 40 in path:
                 return {"parents": [{"sha": merge_parent or self.BASE}],
                         "commit": {"committer": {"date": "2026-11-15T10:57:00Z"}}}
@@ -1285,6 +1317,13 @@ class MergeCommand(unittest.TestCase):
                 self.assertIn(expected, message)
         self.assertNotIn("Fix", merge.red_message("failed: process-owner"))
 
+    def test_runs_before_the_first_that_tested_the_base_dont_merge(self):
+        api, gh, calls = self.fake([run("project", 40)], checked_at=50)
+        with mock.patch.object(merge, "api", api), mock.patch.object(merge, "gh", gh):
+            code, message = merge.merge("o/r", "7", self.HEAD)
+        self.assertEqual(code, 1)
+        self.assertIn("may not have tested the current base: project", message)
+
     def test_refuses_another_commit_than_the_approved_one(self):
         api, gh, calls = self.fake([run("project", 60)])
         with mock.patch.object(merge, "api", api), mock.patch.object(merge, "gh", gh):
@@ -1293,12 +1332,12 @@ class MergeCommand(unittest.TestCase):
         self.assertIn("not cccccccc", message)
 
     def test_reopens_only_once_github_merged_on_the_current_base(self):
-        api, gh, calls = self.fake([run("project", -60)], merge_parent="o" * 40)
+        api, gh, calls = self.fake([run("project", -60)], merge_parent="o" * 40, tested="o" * 40)
         with mock.patch.object(merge, "api", api), mock.patch.object(merge, "gh", gh), \
                 mock.patch.object(merge, "WAIT_SECONDS", 0), mock.patch.object(merge.time, "sleep"):
             code, _ = merge.merge("o/r", "7", self.HEAD)
         self.assertEqual((code, calls), (1, []))
-        api, gh, calls = self.fake([run("project", -60)])
+        api, gh, calls = self.fake([run("project", -60)], tested="o" * 40)
         with mock.patch.object(merge, "api", api), mock.patch.object(merge, "gh", gh):
             code, message = merge.merge("o/r", "7", self.HEAD)
         self.assertEqual(code, 1)
