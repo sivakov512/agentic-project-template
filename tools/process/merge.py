@@ -8,9 +8,11 @@ base moves. When the base moved after the last runs, or no run came at all, this
 merged the pull request on the new base, then closes and reopens it, which runs the checks again (every
 workflow on pull requests runs on `reopened`, docs/process/pull-requests.md) and keeps the owner's
 Approve; the coordinator runs it again once they finish. It reopens at most once for each commit of the
-base: if that didn't help, it stops and says what is still wrong. It reads the runs of pull request and
-review events, so a review that dismisses the owner's Approve counts. Rules on GitHub (reviews, required
-checks) still decide whether the merge goes through. Standard library and gh only.
+base: if that didn't help, it stops and says what is still wrong. Waiting for GitHub's new merge
+before reopening is what makes the runs the reopening starts test the base as it is now. It reads the
+runs of pull request and review events, so a review that dismisses the owner's Approve counts. Rules on
+GitHub (reviews, required checks) still decide whether the merge goes through. Standard library and gh
+only.
 
     python3 tools/process/merge.py <number> <commit>
 
@@ -161,7 +163,7 @@ def red_message(why):
         return (f"Not merged: {why}. The owner's Approve of the last commit is missing or not yet checked; "
                 f"run this again after it.")
     return (f"Not merged: {why}. Fix the red check: it is a \"fix\" finding "
-            f"(docs/process/workflow.md, step 5).")
+            f"(docs/process/reviews.md#every-review).")
 
 
 def merge(repo, number, commit):

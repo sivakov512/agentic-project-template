@@ -31,11 +31,11 @@ Where facts found by experiment are recorded, and in what form.
 
 ## Owner review
 
-What the owner looks at in this project beyond [the process's list](process/owner.md#when-the-owner-looks),
-or what of its point 6 goes without them. Which code is risky, if any (it handles a secret, or acts on the
-owner's machine, on infrastructure or on data that can't be restored), so it gets a review for harm; and
-whether more rounds of that review may run, up to how many
-([the process](process/workflow.md#how-a-piece-of-work-goes), step 5).
+What the owner looks at in this project beyond
+[the process's list](process/owner.md#when-the-owner-looks), or what of its point 6 goes without them.
+Which code is risky, if any (it handles a secret, or acts on the owner's machine, on infrastructure or on
+data that can't be restored), so it gets a review for harm; and whether more rounds of that review may
+run, up to how many ([the process](process/workflow.md#how-a-piece-of-work-goes), step 5).
 
 ## Tracker
 

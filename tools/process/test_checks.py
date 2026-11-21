@@ -604,6 +604,27 @@ class OwnerCheck(unittest.TestCase):
         self.assertIn("add it to \"kept\" in docs/process.json or move it under .claude/", unkept[0])
         self.assertEqual(short(kept), ["AGENTS.md imports docs/more.md"])
 
+    def test_a_rules_file_linked_to_another_needs_that_one_kept(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            git_in(root, "init", "-q")
+            (root / "AGENTS.md").write_text("Rules.\n")
+            (root / "CLAUDE.md").symlink_to("AGENTS.md")
+            (root / "sub").mkdir()
+            (root / "sub/CLAUDE.md").symlink_to("../../outside.md")
+            commit_files(root, {}, "links")
+            saved, check_owner.ROOT = check_owner.ROOT, root
+            try:
+                entries = check_owner.tree(git_in(root, "rev-parse", "HEAD"))
+                unkept = check_owner.import_errors(entries)
+                kept = check_owner.import_errors(entries, ["AGENTS.md"])
+            finally:
+                check_owner.ROOT = saved
+        self.assertEqual(len(unkept), 2, unkept)
+        self.assertIn("CLAUDE.md is a symlink to AGENTS.md, which the owner doesn't keep", unkept[0])
+        self.assertIn("isn't a file of the repository", unkept[1])
+        self.assertEqual(len(kept), 1, kept)
+
 
     def owner_check(self, head_tree, changed, labels, reviews, head_kept=(), text=""):
         """check_owner.main on a pull request with these head tree entries, changed paths, labels and

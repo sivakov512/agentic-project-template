@@ -1,7 +1,7 @@
 # Defences
 
-What could go wrong and what stops it. The threat is agents' mistakes, not malice. `docs/plan.md` adds the
-project's own.
+What could go wrong and what stops it. The threat is agents' mistakes, not malice. `docs/plan.md` adds
+the project's own.
 
 | What goes wrong | What stops it |
 |---|---|

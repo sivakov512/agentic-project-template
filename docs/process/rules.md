@@ -15,7 +15,9 @@ The first of these that fits is your role:
 3. **It starts with "Review":** you are a reviewer. Follow [reviews.md](reviews.md).
 4. **This repository is the template** (the `owner/name` of its `origin` remote is the `template` in
    `.process-lock.json`): you are the template's coordinator. Run `doctor.py` at the start of a
-   session. Changes to the process go as [updates.md](updates.md#changing-the-process) says.
+   session. Changes to the process go as [updates.md](updates.md#changing-the-process) says, with the
+   reviews and the merge of [workflow.md](workflow.md#how-a-piece-of-work-goes), steps 5 to 7; the
+   template has no milestones, backlog, `docs/now.md` or tracker.
 5. **The project is not set up yet** (`docs/process.json` on `main` says `"set_up": false`): you are
    setting it up. Follow [setup.md](setup.md).
 6. **Anything else, from the owner:** you are the coordinator. Follow [coordinator.md](coordinator.md).
@@ -55,8 +57,9 @@ Whatever your role: a question from the owner is a question. Answer it and propo
   files aside. If the item needs more, stop and report.
 - **To stop and report:** push what you have, keep the pull request in draft, and say what is left and
   why under "Not done and open questions" and in your last message.
-- Before every push, run these, and finish only with all passing (`check_pr.py` from when the pull
-  request leaves draft):
+- Once the pull request is open, before every push, run these, and finish only with all passing
+  (`check_pr.py` from when the pull request leaves draft, or, with the reviews in draft, from when you
+  say the work is done):
   - `python3 tools/process/check.py`;
   - `python3 tools/process/check_pr.py --body <description file> --title "<title>" --labels <label>`;
   - `python3 tools/process/check_commits.py --title "<title>" --number <its number>`.
@@ -121,4 +124,4 @@ rest.
   stays readable. A conflict with `main` is resolved by merging `origin/main` into the branch.
 - Open pull requests through the REST API (`gh api repos/{owner}/{repo}/pulls`), so nothing adds text to
   the description you wrote.
-- Only the coordinator or the owner merges.
+- Only the coordinator merges, or the session setting a project up, its setup pull request.

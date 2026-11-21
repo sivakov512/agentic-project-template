@@ -16,14 +16,15 @@ brief doesn't answer, in one batch of questions, each with your recommendation. 
 - **how the project ships** ([config.md](config.md#releases)), or that it isn't released;
 - the owner's language, and the commit rules, if any ([config.md](config.md#commits)).
 
-Push nothing before `gh api user` shows the agents' account. Once the pull request is open, put the brief,
-the questions and the answers in a comment on it.
+Push nothing before `gh api user` shows the agents' account. Once the pull request is open, put the
+brief, the questions and the answers in a comment on it.
 
 ## Steps
 
 1. **Branch** `setup` from `main`, start it with `git commit --allow-empty -m "chore: start the setup"`,
-   and open a draft pull request `Plan: set up the project`, "Backlog item: Setup", with these steps as a
-   checklist, ticked as they are done.
+   and open a draft pull request `Plan: set up the project` (`docs(plan): set up the project` with
+   Conventional Commits), "Backlog item: Setup", with these steps as a checklist, ticked as they are
+   done.
 2. **`CLAUDE.md`:** what the project is, in two or three lines, and the project's own rules for agents
    (dangerous operations, hardware, accounts, secrets, house style): a rule every session must keep goes
    here, never only in `docs/plan.md`. Keep the line `@docs/process/rules.md`.
@@ -37,8 +38,8 @@ the questions and the answers in a comment on it.
 5. **`docs/backlog.md`:** the first milestone's items ([changes.md](changes.md#the-backlog)).
 6. **`docs/now.md`:** the foundation, nothing in work, the first items next.
 7. **`README.md`:** what the project is, for a visitor. **`LICENSE`:** the project's license, or none.
-8. **GitHub:** `python3 tools/process/doctor.py --fix-labels` creates the two labels. The settings are the
-   owner's; list them in the pull request as paths of clicks:
+8. **GitHub:** `python3 tools/process/doctor.py --fix-labels` creates the two labels. The settings are
+   the owner's; list them in the pull request as paths of clicks:
    - Settings → General → Pull Requests: only "Allow squash merging", its default message "Pull request
      title" (in a ruleset for `main` too: Allowed merge methods: Squash only);
    - protect `main` (Settings → Branches, or Rules): changes only through pull requests; required checks
@@ -54,7 +55,8 @@ the questions and the answers in a comment on it.
    `check.py` and `doctor.py` until both pass, apart from what waits on the owner.
 10. **Review and merge:** the pull request leaves draft labelled `owner-review` and gets the review
     ([reviews.md](reviews.md)); its "Owner review" asks the owner to read the plan and `CLAUDE.md` and to
-    do the settings. It merges after the owner's Approve; the next session is the coordinator.
+    do the settings. The session merges it with `merge.py` after the owner's Approve
+    ([workflow.md](workflow.md#the-merge)); the next session is the coordinator.
 
 ## Adopting the process in an existing project
 

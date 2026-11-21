@@ -6,8 +6,8 @@ The newest version first. Each entry says what changed and what projects must do
 ## 0.12.0 — 2026-11-21
 
 The process made a third shorter, with the same protections, and the merge on the current `main`. The
-process documents went from about 16,300 words to about 11,000; what each role reads before it acts went
-down more: a work session from about 4,600 words to 2,000, the coordinator from about 10,800 to 6,200.
+process documents went from about 16,300 words to about 11,200; what each role reads before it acts went
+down more: a work session from about 4,500 words to 2,000, the coordinator from about 10,900 to 6,200.
 
 - **The merge on the current `main`** (`workflow.md`, "The merge"). Closing and reopening a pull request
   didn't make its checks test the current `main`, since GitHub makes its merge into `main` again only
@@ -35,7 +35,8 @@ down more: a work session from about 4,600 words to 2,000, the coordinator from 
   to a number it names.
 - **One mode of account:** the agents work under their own account, and the coordinator merges after the
   owner's Approve. `agents_account` and `merged_by` in `docs/process.json` are no longer read.
-- **Removed:** the rules on symlinks and submodules (they guarded against malice, not mistakes),
+- **Removed:** the rules on symlinks and submodules (they guarded against malice, not mistakes), but a
+  rules file that is a symlink counts as importing what it points to,
   `roles.md` (now in `README.md`), the long form of `defences.md`, and repeated text across the files.
 - The UI review asks for images as the product's own code draws them: screenshots of the real window,
   menu or page, or its own views rendered offscreen, never a mock-up. A project's rules may make the
@@ -46,7 +47,11 @@ them): `reports.md#when-the-owner-looks`, `#reviewed-work-offered-to-the-owner` 
 `#the-owners-standing-oks` go to `owner.md#when-the-owner-looks`, `reports.md` to `owner.md` or
 `coordinator.md#the-report`, `workflow.md#the-owners-ok-and-the-merge` to `owner.md#the-owners-ok`,
 `rules.md#if-you-are-the-reviewer`, `#the-review`, `#the-ui-review` and the like to `reviews.md`, and
-`roles.md` to `README.md#roles`; remove the line "Standing OKs" from `docs/now.md`. Check that the
+`roles.md` to `README.md#roles`, and the rest by topic (`check.py` lists them). Standing OKs in
+`docs/now.md`, if any, move into the "Owner review" section of `docs/plan.md`, and its line "Standing
+OKs" goes; until that merges, what they covered goes to the owner, open pull requests under them
+included. A project with `agents_account` or `merged_by` set to `owner` first moves to an account of the
+agents' own and the coordinator's merge, with the owner. Check that the
 "Owner review" section of `docs/plan.md` still says what the owner meant under the new point 6, and say
 in the update's "Owner review" what changed for the owner. From now on the coordinator merges with
 `merge.py`. If a project's own workflow on pull requests lists its event types without `reopened`,

@@ -29,8 +29,8 @@
 
 A decision that is hard to reverse gets a record: one per file in `docs/decisions/`,
 `NNNN-kebab-case.md`, with its status and date, then Context, Decision, Consequences, and a line in
-`docs/decisions/README.md`. Records are never rewritten: a new record supersedes the old one, whose status
-becomes "superseded by NNNN".
+`docs/decisions/README.md`. Records are never rewritten: a new record supersedes the old one, whose
+status becomes "superseded by NNNN".
 
 ## Traceability
 

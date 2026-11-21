@@ -54,8 +54,8 @@ or a pull request.
 
 In the template, its coordinator changes the process files itself:
 
-1. A pull request of kind `plan`, labelled `owner-review`, "Backlog item: Process change", reviewed as any
-   other.
+1. A pull request of kind `plan`, labelled `owner-review`, "Backlog item: Process change", reviewed as
+   any other.
 2. It adds an entry at the top of [CHANGELOG.md](CHANGELOG.md): the version, the date, what changed, and
    a last line `Projects: …` saying what projects must do, or `Projects: nothing to do.` A change that
    can fail open pull requests says what to fix in them. Versions are `MAJOR.MINOR.PATCH`: patch for

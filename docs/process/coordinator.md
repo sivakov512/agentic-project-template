@@ -65,9 +65,9 @@ commands.
    is asked in "Needed from you".
 3. Start the gate review ([reviews.md](reviews.md#the-gate-review)) on that pull request, naming the
    modules the milestone built or changed; at the plan's last milestone, on the coordinator record that
-   brings `docs/now.md` up to date. Its findings are fixed where they belong before the gate: `docs/now.md`
-   in a coordinator record, an open point of the exit list by finishing it, the plan in its pull request;
-   the rest become backlog items.
+   brings `docs/now.md` up to date. Its findings are fixed where they belong before the gate:
+   `docs/now.md` in a coordinator record, an open point of the exit list by finishing it, the plan in its
+   pull request; the rest become backlog items.
 
 ## The tracker
 

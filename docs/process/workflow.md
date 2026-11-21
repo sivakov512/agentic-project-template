@@ -120,7 +120,7 @@ later"; a milestone takes work back from there as new items.
    ([coordinator.md](coordinator.md#the-report)). The owner's remarks the coordinator posts on the pull
    request as "fix" findings, quoting the owner, after first recording any that change a document above
    it, and starts "Fix pull request #N"; that fix gets a review of the fix by each review the change
-   needs, as a new pair of rounds.
+   needs, and a second round if that one has "fix" findings.
 7. **The merge** ("The merge" below).
 8. **After the merge** the coordinator brings `docs/now.md` up to date in a coordinator record, several
    merges in one, before its next report, and records the merge in the tracker, if there is one.
@@ -141,7 +141,9 @@ reviews go on:
   last commit;
 - the reviews and their fixes go on the draft, and the coordinator marks it ready once no "fix" finding
   is left; a review that needs CI's result (a UI review of screenshots taken in CI) comes after that, in
-  the same round. `CLAUDE.md` may hold the draft longer, until the owner has tried a local build, say.
+  the same round. `CLAUDE.md` may hold the draft longer, until the owner has tried a local build, say;
+- a red check once the pull request is ready is a "fix" finding; its fix gets one review of the fix,
+  outside the two rounds, since that CI ran only now.
 
 Slow CI then usually runs twice: once when the pull request is ready, and again when `main` has moved
 before the merge.

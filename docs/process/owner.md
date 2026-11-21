@@ -26,8 +26,9 @@ The owner looks at:
 
 `docs/plan.md`, in its section "Owner review", may add to this list or take point 6 off it, in whole or
 in part. When the owner says to stop asking about something, or to ask again, the coordinator records it
-there the same day; the pull request needs only the owner's Approve, and the rule holds from its merge.
-Points 1 to 5 stay with the owner whatever the plan says.
+there the same day in a pull request the owner approves with no reading needed. Asking again holds from
+the owner's word; stopping holds from that merge. Points 1 to 5 stay with the owner whatever the plan
+says.
 
 When the coordinator isn't sure whether something stays inside the plan, it asks the owner in one line in
 the report, with its recommendation, and holds that pull request until the answer.
@@ -42,10 +43,10 @@ Every pull request carries one of two labels, which follows its strictest part:
   agreed scope, studies, code and tests, the backlog, `docs/now.md`, records of facts, and records of the
   owner's own decisions outside what the owner keeps.
 
-A bot's pull request the coordinator labels after its review: a dependency bump inside the plan or a
-release goes `ok-without-reading`, a release merging once the owner has said the build they tried is
-fine; where the release itself is the try, it merges before the try, and goes `owner-review` when it acts
-on the owner's real data.
+A bot's pull request the coordinator labels after its review. A dependency bump inside the plan goes
+`ok-without-reading`. So does a release, which merges once the owner has said the build they tried is
+fine; where the release itself is the try, it merges before the try instead, and goes `owner-review` if
+it acts on the owner's real data.
 
 ## The owner's OK
 
@@ -69,7 +70,6 @@ what the owner keeps:
   or a threshold eased), which the label and the reviewers catch.
 
 The rest the coordinator merges on its own once the checks are green and the reviews have no "fix"
-finding left; the next report lists it, and the owner can have any of it reverted. The owner may also
-merge on GitHub themselves.
+finding left; the next report lists it, and the owner can have any of it reverted.
 
 The owner discusses a pull request in its comments on GitHub; the coordinator answers there.

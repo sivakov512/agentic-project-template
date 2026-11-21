@@ -16,9 +16,10 @@ For reviewers. Your brief names one of these reviews; the coordinator decides wh
 - Look for what is wrong or missing, not for reasons to approve. Don't fix things yourself.
 - Check the pull request against its item's "Done when" and the documents it links. A pull request with
   no item has its bar elsewhere: for "Setup", the steps of [setup.md](setup.md) and the owner's answers
-  in its comments; for "Process change", its description and [updates.md](updates.md#changing-the-process);
-  for "Process update", the "Projects:" steps of the release's changelog entries; for a "Coordinator
-  record", the owner's words it quotes and the documents above it.
+  in its comments; for "Process change", its description and
+  [updates.md](updates.md#changing-the-process); for "Process update", the "Projects:" steps of the
+  release's changelog entries; for a "Coordinator record", the owner's words it quotes and the documents
+  above it.
 - Check that the evidence is real: repeat it where you can.
 - Post one comment on the pull request:
   1. A first line with the review's name and the head commit you reviewed.
@@ -26,7 +27,8 @@ For reviewers. Your brief names one of these reviews; the coordinator decides wh
   3. The findings, each with the file and line, what is wrong and why it matters, and a mark with a
      one-line reason:
      - **fix:** wrong behaviour, a risk the project's rules name, a wrong or unsupported fact, a red or
-       flaky check, a check loosened without the owner's OK, a wrong review label
+       flaky check, behaviour added or changed without tests where the project can run them, a check
+       loosened without the owner's OK, a wrong review label
        ([owner.md](owner.md#the-review-label)), documents that contradict each other, a gap the next
        item would trip on, or what your review below calls a "fix" finding;
      - **drop:** wording, taste, layout, or no effect on the result or the next steps.
@@ -49,7 +51,8 @@ In a pull request that changes the work itself (code, a design, a document of th
 a section with a verdict on three points, each with what you judged it on; falling short on one is a
 "fix" finding:
 
-- **Understood by a person** who hasn't read the rest of the project (for code, [rules.md](rules.md#code)).
+- **Understood by a person** who hasn't read the rest of the project (for code,
+  [rules.md](rules.md#code)).
 - **Fits the design:** each part sits where the design puts it, and the boundaries between parts hold.
 - **Easy to change:** each piece has one job, nothing is copied where the copies will drift apart, and
   tests read as a description of the behaviour.
@@ -117,4 +120,6 @@ The coordinator starts it before each gate, on the pull request of the next mile
    decision, one style. In a large module, read whole the parts the milestone touched. A finding too
    large to fix before the gate becomes a backlog item.
 
-Post one comment in the format of "Every review", naming `main`'s head and the pull request's.
+Post one comment in the format of "Every review", naming `main`'s head and the pull request's. The
+coordinator answers with one comment naming the new heads of `main` and the pull request; the second
+round checks those fixes.

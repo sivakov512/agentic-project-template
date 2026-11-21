@@ -57,7 +57,7 @@ def kept_by_owner(name, kept=()):
 
 
 def tree(commit):
-    """Every entry of the commit's tree, as (mode, object id, path): files, symlinks and submodules.
+    """Every entry of the commit's tree, as (mode, object id, path).
     Raises ValueError when git can't read it."""
     entries = []
     for entry in git("ls-tree", "-r", "-z", commit).split("\0"):
@@ -76,6 +76,10 @@ def text_of(object_id):
     return done.stdout.decode("utf-8", "replace")
 
 
+# Git's modes of a regular file, plain or executable.
+REGULAR = ("100644", "100755")
+
+
 def is_rule_file(path):
     """Whether Claude Code loads the file as rules by itself: a CLAUDE.md or CLAUDE.local.md in any
     folder, or a Markdown file under a .claude/rules/ folder."""
@@ -89,16 +93,28 @@ def import_errors(entries, kept=()):
     tree) the owner doesn't keep (kept_by_owner, with kept): its rules could then change without the
     owner. A path is read relative to the importing file and from the repository's root; anything after
     an "@" that could be a path counts, inside code or not, and a path to nothing in the tree is left
-    alone. Raises ValueError when git can't read a file."""
+    alone. A rules file that is a symlink (AGENTS.md linked as CLAUDE.md, say) counts as importing what it
+    points to, which must then be kept too. Raises ValueError when git can't read a file."""
     found = {path.casefold(): (mode, object_id, path) for mode, object_id, path in entries}
-    queue = [path for mode, _, path in entries if mode.startswith("100") and is_rule_file(path)]
+    queue = [path for mode, _, path in entries if mode in ("120000",) + REGULAR and is_rule_file(path)]
     seen, errors = set(), []
     while queue:
         path = queue.pop()
         if path.casefold() in seen:
             continue
         seen.add(path.casefold())
-        for raw in re.findall(r"@([^\s@`'\"()<>\[\]{}]+)", text_of(found[path.casefold()][1])):
+        mode, object_id, _ = found[path.casefold()]
+        if mode == "120000":
+            target = posixpath.normpath(posixpath.join(posixpath.dirname(path), text_of(object_id).strip()))
+            if target.casefold() not in found:
+                errors.append(f"{path} is a symlink to {target}, which isn't a file of the repository")
+            elif not kept_by_owner(found[target.casefold()][2], kept):
+                errors.append(f"{path} is a symlink to {target}, which the owner doesn't keep: add it to"
+                              " \"kept\" in docs/process.json")
+            else:
+                queue.append(found[target.casefold()][2])
+            continue
+        for raw in re.findall(r"@([^\s@`'\"()<>\[\]{}]+)", text_of(object_id)):
             for name in {raw, raw.rstrip(".,;:!?")}:
                 for base in (posixpath.dirname(path), ""):
                     target = posixpath.normpath(posixpath.join(base, name)).casefold()
@@ -108,7 +124,7 @@ def import_errors(entries, kept=()):
                     if not kept_by_owner(imported, kept):
                         errors.append(f"{path} imports {imported}, which the owner doesn't keep: add"
                                       " it to \"kept\" in docs/process.json or move it under .claude/")
-                    elif mode.startswith("100"):
+                    elif mode.startswith("100") or mode == "120000":
                         queue.append(imported)
     return sorted(set(errors))
 

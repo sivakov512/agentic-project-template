@@ -33,7 +33,9 @@ read for it:
   of work goes, the merge), [owner.md](owner.md) (what goes to the owner), [changes.md](changes.md)
   (records, the backlog, IDs) and [pull-requests.md](pull-requests.md); [config.md](config.md)
   (`docs/process.json`) and [updates.md](updates.md) when it needs them;
-- the session setting a project up: [setup.md](setup.md).
+- the session setting a project up: [setup.md](setup.md);
+- the template's coordinator: [updates.md](updates.md#changing-the-process) and the coordinator's files
+  where they apply.
 
 [defences.md](defences.md) lists what could go wrong and what stops it; [CHANGELOG.md](CHANGELOG.md),
 what changed in each version.
