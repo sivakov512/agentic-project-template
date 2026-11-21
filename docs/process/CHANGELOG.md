@@ -21,12 +21,13 @@ rounds of the review for harm by the owner's leave, and smaller fixes.
   (`pull-requests.md`). The coordinator merges work pull requests whose checks are green before its own
   records.
 - The reviews in draft (`workflow.md`, step 5; `rules.md`, "Your work"), where the project's `CLAUDE.md`
-  asks for them, so that slow CI runs once: the project's own workflows skip drafts and run on
-  `ready_for_review`; the work session leaves its finished pull request in draft; the reviews and fixes go
-  on the draft, and the coordinator marks it ready once no "fix" finding is left. A review that needs
-  CI's result comes after that, in the same round; `CLAUDE.md` may hold the draft longer, until the owner
-  has tried a local build. A red check once ready is a "fix" finding whose fix gets one review outside the
-  two rounds.
+  asks for them, so that slow CI runs once: the slow jobs of the project's own workflows skip drafts and
+  the workflows run on `ready_for_review`; the work session leaves its finished pull request in draft and
+  says on it that the work is done; the reviews and fixes go on the draft, and the coordinator marks it
+  ready once no "fix" finding is left. `merge.py` counts a run skipped before the pull request left draft
+  as old. A review that needs CI's result comes after that, in the same round; `CLAUDE.md` may hold the
+  draft longer, until the owner has tried a local build. A red check once ready is a "fix" finding, fixed
+  with the pull request kept ready, whose fix gets one review outside the two rounds.
 - More rounds of the review for harm (`workflow.md`, step 5, "Risky code"): where `docs/plan.md` gives
   that decision to the coordinator, it may run them instead of stopping; the merge still needs the
   reviewer for harm's "Ready to merge as is: yes", and the report names each round. `rules.md`: a
@@ -41,9 +42,10 @@ Projects: the coordinator merges with `tools/process/merge.py` from now on. If o
 workflows on pull requests doesn't run on `reopened`, adding it goes to the owner in a pull request of
 its own, since `.github/` is theirs. Open pull requests may turn red on `process-docs` with "Base:";
 nothing in them needs fixing, `merge.py` runs their checks again. A project whose owner wants the reviews
-in draft says so in `CLAUDE.md`, with its workflows skipping drafts; one whose owner gives the
-coordinator more rounds of the review for harm says so in `docs/plan.md`; each in a pull request of its
-own for the owner.
+in draft says so in `CLAUDE.md`, and its own workflows add `ready_for_review` to the types of their
+`pull_request` trigger and `if: github.event.pull_request.draft == false` to their slow jobs; one whose
+owner gives the coordinator more rounds of the review for harm says so in `docs/plan.md`; each in a pull
+request of its own for the owner.
 
 ## 0.11.0 — 2026-11-16
 

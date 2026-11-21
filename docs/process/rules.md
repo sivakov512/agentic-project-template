@@ -77,8 +77,9 @@ Whatever your role: a question from the owner is a question. Answer it and propo
 - When every point of "Done when" is met and the checks pass, fill in every section of the description
   and mark the pull request ready (`gh pr ready`): that starts the reviews. Where the project's
   `CLAUDE.md` asks for the reviews in draft ([workflow.md](workflow.md#how-a-piece-of-work-goes), step
-  5), leave it in draft instead, with `check_pr.py` passing too, and say in your last message that the
-  work is done: the coordinator marks it ready.
+  5), leave it in draft instead, with `check_pr.py` passing too, and say that the work is done in a
+  comment on the pull request naming its last commit, and in your last message: the coordinator marks it
+  ready.
 - Don't edit the template's files ([README.md](README.md#what-lives-where)). If the process is wrong,
   report it.
 

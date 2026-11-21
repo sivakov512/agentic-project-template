@@ -122,7 +122,8 @@ new items.
 3. **Questions first** ([rules.md](rules.md#your-work)): the coordinator answers in the draft pull
    request, bringing the owner in when a question is the owner's to decide.
 4. **The work,** on the item's branch and pull request. The session marks it ready when the work is
-   done ([rules.md](rules.md#your-work)).
+   done, or, with the reviews in draft (step 5), says so on the pull request and the coordinator marks
+   it ready later ([rules.md](rules.md#your-work)).
 5. **Review and checks.**
    - **Which reviews.** Every pull request gets the review, but three: a coordinator record that changes
      only `docs/now.md` or the backlog (its section "Later" included), a process update that only brings
@@ -135,14 +136,15 @@ new items.
      whole ([rules.md](rules.md#the-review)). The coordinator decides which reviews a pull request gets,
      by these rules and any more `docs/plan.md` names.
    - **Reviews in draft,** where the project's `CLAUDE.md` asks for them, so that slow CI runs once: the
-     project's own workflows skip draft pull requests and run on `ready_for_review`
-     ([pull-requests.md](pull-requests.md#the-checks-ci-runs)); the work session leaves its finished pull
-     request in draft ([rules.md](rules.md#your-work)); the reviews and their fixes go on the draft as on
-     any pull request, and the coordinator marks it ready once no "fix" finding is left. A review that
-     needs CI's result (a UI review of screenshots taken in CI) comes after that, in the same round.
-     `CLAUDE.md` may hold the pull request in draft longer, until the owner has tried a local build, say.
-     A red check once it is ready is a "fix" finding; its fix gets one review of the fix alone, outside
-     the two rounds.
+     slow jobs of the project's own workflows skip draft pull requests and the workflows run on
+     `ready_for_review` ([pull-requests.md](pull-requests.md#the-checks-ci-runs)); the work session
+     leaves its finished pull request in draft and says on it that the work is done
+     ([rules.md](rules.md#your-work)); the reviews and their fixes go on the draft as on any pull
+     request, and the coordinator marks it ready once no "fix" finding is left. A review that needs CI's
+     result (a UI review of screenshots taken in CI) comes after that, in the same round. `CLAUDE.md` may
+     hold the pull request in draft longer, until the owner has tried a local build, say. A red check
+     once it is ready is a "fix" finding, fixed with the pull request kept ready; its fix gets one review
+     of the fix alone, outside the two rounds.
    - **Fixes.** One work session ("Fix pull request #N") fixes the findings of all the reviews. The pull
      request merges only with CI green and no "fix" finding left.
    - **At most two rounds:** a full review, then, only if it had "fix" findings, a review of the fix
@@ -179,9 +181,9 @@ new items.
    number, its body empty.
    - After the owner's OK where it is needed ("The owner's OK and the merge" below), the coordinator
      merges with `python3 tools/process/merge.py <N> <commit>`, naming the last commit reviewed and
-     approved: it refuses another, and merges only once every check ran on the current `main` ("The base"
-     below). It merges work pull requests whose checks are green before its own records, so that `main`
-     doesn't move under them needlessly.
+     approved: it refuses another, and merges only once every run of pull request and review events ran
+     on the current `main` ("The base" below). The coordinator merges work pull requests whose checks are
+     green before its own records, so that `main` doesn't move under them needlessly.
    - The owner, merging on GitHub, keeps what GitHub offers, which the repository's settings make the
      same ([setup.md](setup.md), step 8).
    - If the owner says no, the pull request stays open, and the owner's remarks go as step 6 says.

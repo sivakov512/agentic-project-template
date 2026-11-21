@@ -8,8 +8,9 @@ base moves, so a green run may have tested an old base (check_base.py). When the
 last runs, a run failed on an old base, or no run came at all, this waits until GitHub has merged the pull
 request on the new base, then closes and reopens it, which runs the checks again (every workflow on pull
 requests runs on `reopened`, docs/process/pull-requests.md) and keeps the owner's Approve; the coordinator
-runs it again once they finish. It reopens at most once for each commit of the base: if that didn't help,
-it stops and says what is still wrong. It reads the runs of pull request and review events, so a review
+runs it again once they finish. A run a workflow skipped while the pull request was a draft, made before
+it left draft, counts as old too. It reopens at most once for each such cause: if that didn't help, it
+stops and says what is still wrong. It reads the runs of pull request and review events, so a review
 that dismisses the owner's Approve counts. Rules on GitHub (reviews, required checks) still decide whether
 the merge goes through. Standard library and gh only.
 
@@ -71,34 +72,48 @@ def latest_runs(runs):
     return list(newest.values())
 
 
-def decide(runs, base_time, stale_base, pushed_at, reopened_at, now):
+def decide(runs, base_time, stale_base, pushed_at, reopened_at, now, ready_at=None):
     """What to do, with the reason: ("merge", ""), ("wait", why), ("rerun", why), ("stop", why) or
     ("red", why).
     runs: the newest run of each workflow on the pull request's last commit; base_time: when the base
     branch got its current commit; stale_base: whether a run failed on an old base (check_base.TITLE);
     pushed_at: when the last commit was pushed, or None; reopened_at: when the pull request was last
-    reopened, or None; now: the current time. Times are aware datetimes."""
-    reopened_here = reopened_at is not None and reopened_at >= base_time
+    reopened, or None; now: the current time; ready_at: when it last left draft, or None. A run skipped
+    before it left draft counts as old: a workflow that skips drafts but doesn't run on
+    `ready_for_review` never tested it. Times are aware datetimes."""
+    cause = max(base_time, ready_at) if ready_at else base_time
+    reopened_here = reopened_at is not None and reopened_at >= cause
+    just_reopened = reopened_here and now - reopened_at < START_GRACE
     if not runs:
         why = "no checks have run on the last commit"
-        if reopened_here and now - reopened_at < START_GRACE:
+        if just_reopened:
             return "wait", why + " since it was reopened"
         if reopened_here:
-            return "stop", why + ", even after reopening it on this base"
+            return "stop", why + ", even after reopening it"
         if pushed_at is None or now - pushed_at < START_GRACE:
             return "wait", why + " yet"
         return "rerun", why
     running = sorted(run["name"] for run in runs if run["status"] != "completed")
     if running:
         return "wait", "still running: " + ", ".join(running)
+    if just_reopened and any(when(run["created_at"]) < reopened_at for run in runs):
+        return "wait", "the checks haven't all started again since the pull request was reopened"
     old = sorted(run["name"] for run in runs if when(run["created_at"]) < base_time)
-    if old or stale_base:
-        why = ("the base moved after these ran: " + ", ".join(old)) if old else "a run tested an old base"
+    skipped = sorted(run["name"] for run in runs if run["conclusion"] == "skipped" and ready_at
+                     and when(run["created_at"]) < ready_at and run["name"] not in old)
+    if old or skipped or stale_base:
+        whys = []
+        if old:
+            whys.append("the base moved after these ran: " + ", ".join(old))
+        if skipped:
+            whys.append("these were skipped while it was a draft and didn't run when it left draft: "
+                        + ", ".join(skipped))
+        if stale_base:
+            whys.append("a run tested an old base")
+        why = "; ".join(whys)
         if not reopened_here:
             return "rerun", why
-        if old and now - reopened_at < START_GRACE:
-            return "wait", "the checks haven't all started again since the pull request was reopened"
-        return "stop", why + ", even after reopening it on this base"
+        return "stop", why + ", even after reopening it"
     cancelled = sorted(run["name"] for run in runs if run["conclusion"] == "cancelled")
     if cancelled:
         return "red", "cancelled, to run again: " + ", ".join(cancelled)
@@ -117,9 +132,14 @@ def moved_at(repo, branch, sha):
     return when(api(f"repos/{repo}/commits/{sha}")["commit"]["committer"]["date"])
 
 
-def last_reopened(repo, number):
-    events = api(f"repos/{repo}/issues/{number}/events?per_page=100") or []
-    times = [when(event["created_at"]) for event in events if event.get("event") == "reopened"]
+def last_event(repo, number, name):
+    """When the pull request last had the issue event name (reopened, ready_for_review), or None."""
+    times = []
+    for page in range(1, 11):
+        events = api(f"repos/{repo}/issues/{number}/events?per_page=100&page={page}") or []
+        times += [when(event["created_at"]) for event in events if event.get("event") == name]
+        if len(events) < 100:
+            break
     return max(times) if times else None
 
 
@@ -176,7 +196,8 @@ def merge(repo, number, commit):
     runs = api(f"repos/{repo}/actions/runs?head_sha={head}&per_page=100")
     action, why = decide(latest_runs(runs.get("workflow_runs", [])), moved_at(repo, base, base_sha),
                          stale_base(repo, head), moved_at(repo, pull["head"]["ref"], head),
-                         last_reopened(repo, number), datetime.now(timezone.utc))
+                         last_event(repo, number, "reopened"), datetime.now(timezone.utc),
+                         last_event(repo, number, "ready_for_review"))
     if action == "wait":
         return 1, f"Not merged: {why}. Run this again when the checks finish."
     if action == "red":

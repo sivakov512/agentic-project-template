@@ -1218,9 +1218,10 @@ def run(name, minutes, status="completed", conclusion="success", event="pull_req
 
 
 class MergeDecision(unittest.TestCase):
-    def decide(self, runs, stale=False, pushed=None, reopened=None, now=200):
+    def decide(self, runs, stale=False, pushed=None, reopened=None, now=200, ready=None):
         return merge.decide(runs, T0, stale, pushed if pushed is None else at(pushed),
-                            None if reopened is None else at(reopened), at(now))
+                            None if reopened is None else at(reopened), at(now),
+                            None if ready is None else at(ready))
 
     def test_green_runs_after_the_base_moved_merge(self):
         self.assertEqual(self.decide([run("process-checks", 60), run("project", 61)]), ("merge", ""))
@@ -1236,6 +1237,18 @@ class MergeDecision(unittest.TestCase):
         runs = [run("process-checks", 100, conclusion="failure")]
         self.assertEqual(self.decide(runs, stale=True)[0], "rerun")
         self.assertEqual(self.decide(runs, stale=True, reopened=99)[0], "stop")
+
+    def test_right_after_reopening_old_runs_wait_whatever_made_them_stale(self):
+        runs = [run("process-checks", 100, conclusion="failure")]
+        self.assertEqual(self.decide(runs, stale=True, reopened=195)[0], "wait")
+
+    def test_a_run_skipped_while_a_draft_runs_again_once(self):
+        runs = [run("process-checks", 100), run("macos", 100, conclusion="skipped")]
+        self.assertEqual(self.decide(runs)[0], "merge")
+        self.assertEqual(self.decide(runs, ready=150)[0], "rerun")
+        self.assertEqual(self.decide(runs, ready=150, reopened=120)[0], "rerun")
+        self.assertIn("macos", self.decide(runs, ready=150, reopened=160)[1])
+        self.assertEqual(self.decide(runs, ready=150, reopened=160)[0], "stop")
 
     def test_a_red_run_is_not_run_again(self):
         self.assertEqual(self.decide([run("project", 60, conclusion="failure")]), ("red", "failed: project"))

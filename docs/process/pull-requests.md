@@ -54,8 +54,9 @@ never clash with the project's own.
 Every workflow that runs on pull requests, the project's own included, runs on `reopened`, since
 `merge.py` runs the checks again by closing and reopening the pull request
 ([workflow.md](workflow.md#how-a-piece-of-work-goes), step 7). Where the project's `CLAUDE.md` asks for
-the reviews in draft (step 5), the project's own workflows skip draft pull requests
-(`if: github.event.pull_request.draft == false`) and run on `ready_for_review` too.
+the reviews in draft (step 5), the slow jobs of the project's own workflows skip draft pull requests
+(`if: github.event.pull_request.draft == false`), and those workflows run on `ready_for_review` too;
+quick jobs may still run on drafts.
 
 A passing run of `process-pr` or `process-owner` runs again the failed jobs of the red runs earlier events
 left on the same commit, which would block the merge. If one stays red, `gh run list --workflow

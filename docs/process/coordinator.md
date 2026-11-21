@@ -17,10 +17,11 @@ What the coordinator does is in [roles.md](roles.md); how it does it is here. Be
   session is about to start, and it starts that without waiting, unless the owner's opening message
   called a pause; a later "pause" stops it. What the owner agreed at the gate still holds.
 - **Takes over what waits on a gone session:** a draft pull request, or one with "fix" findings that no
-  fix comment has answered, whose session is gone gets a fresh session with the same brief ("Do B-###",
-  or "Fix pull request #N" for unfinished fixes), which continues its branch; open questions are answered
-  in the pull request first. One whose session stopped and reported waits for the coordinator's decision
-  ([rules.md](rules.md#your-work)).
+  fix comment has answered, whose session is gone gets a fresh session (a draft whose session said on it
+  that the work is done, with the reviews in draft, goes to its reviews instead) with the same brief ("Do
+  B-###", or "Fix pull request #N" for unfinished fixes), which continues its branch; open questions are
+  answered in the pull request first. One whose session stopped and reported waits for the coordinator's
+  decision ([rules.md](rules.md#your-work)).
 - **Before every reply to the owner** checks the pull requests it asked the owner about, so an Approve,
   a merge or a comment on GitHub needs no word in the chat.
 - **Keeps in `docs/now.md` what a fresh coordinator needs:** a handover to a new session mid-milestone
