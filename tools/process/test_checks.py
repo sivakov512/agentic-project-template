@@ -1191,12 +1191,14 @@ class MergeDecision(unittest.TestCase):
         self.assertEqual(self.decide(runs, merged=None)[0], "rerun")
         self.assertEqual(self.decide(runs, merged=30), ("merge", ""))
 
-    def test_a_skipped_run_never_hides_a_red_one(self):
+    def test_a_skipped_run_never_hides_an_older_one(self):
         red = run("e2e", 60, conclusion="failure", number=1)
         skipped = run("e2e", 70, conclusion="skipped", number=2)
         self.assertEqual(merge.latest_runs([red, skipped]), [red])
-        green = dict(red, conclusion="success")
-        self.assertEqual(merge.latest_runs([green, skipped]), [skipped])
+        green = dict(red, conclusion="success", created_at=at(-10).isoformat().replace("+00:00", "Z"))
+        self.assertEqual(merge.latest_runs([green, skipped]), [green])
+        self.assertEqual(merge.latest_runs([skipped]), [skipped])
+        self.assertEqual(self.decide(merge.latest_runs([green, skipped, run("process-checks", 71)]))[0], "rerun")
 
     def test_a_skipped_run_tested_nothing_so_its_age_doesnt_matter(self):
         runs = [run("process-checks", 60), run("preview", -60, conclusion="skipped")]

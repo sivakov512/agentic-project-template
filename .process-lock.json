@@ -13,7 +13,7 @@
     "docs/process/coordinator.md": "6a49743364c0e1dae10f39238dac93d7877d16de66512821ff94e6250baad476",
     "docs/process/defences.md": "46b66749366906f5b84d97ad07f75aef7cc8d704f685b003f28029ca62538ca2",
     "docs/process/owner.md": "79a7ef13e81b2bb8dc755259bc99f3fbe5cec32c8707265343c892d64ca39554",
-    "docs/process/pull-requests.md": "c9496980bb4a4dac40574d0f15f749d6b358643e5c709921de3ea73b85d97cd6",
+    "docs/process/pull-requests.md": "56e2d226e1985417cb25a0594999d7915c21c738152218b0296de15106d4e02f",
     "docs/process/reviews.md": "ee66ab886c4821203fe0ef9d48060d4875801867a61bdaa2d29b8516c77a8340",
     "docs/process/rules.md": "302616970b1bb9f943ca94877fa0df8364a37e9fa477c276edf17939bca54401",
     "docs/process/setup.md": "e497be88366c0ff6221c9124bf68238c71e66d45c4ef98bbe0170a57d43c8af1",
@@ -27,10 +27,10 @@
     "tools/process/check_pr.py": "80fd0353a1fe464e3c2b16596ca6abff91bcbdd69ed3be06712806ed5b1f39ac",
     "tools/process/doctor.py": "872fb1e9749f53857cca519dd63e9dffee8e3dcd26a61a248d2a5cc6053b1646",
     "tools/process/lock.py": "9471e9d741b07bc4f5434e8b36f5d2aca93601a5b184985e2aa9fa3a3d7fb283",
-    "tools/process/merge.py": "b6f95d41cf248546749d901bebc11fd16a4746be085e2483de08f6df199a0824",
+    "tools/process/merge.py": "6870140c4cc65a423250f3cd76220b5c0fdc47f86a630a07e9d9ae85ccfcd119",
     "tools/process/owned.py": "14af8ac8c7308feef0f077f0724c2bd5ecd2e9eed429e58a3cdd91aec3f0a511",
     "tools/process/sync.py": "5cc06b0c465ef0438a9e47242416ef221d0a9fb9ae99114aac3834e67483cc30",
-    "tools/process/test_checks.py": "ad523814515e3373ec9011831afbe438518161e3de4ddc6f09121c0587dc6ef8",
+    "tools/process/test_checks.py": "282793e18e9bc3937ba7603f4b21d9758b0c4f49aa8bfcf5b3f45f9f3bad01a4",
     "tools/process/update.py": "4bf3b87faf973e80c98459b416c6545b4a47dd43769b4080ba4f9afd780969f5"
   }
 }

@@ -58,19 +58,18 @@ def when(text):
 
 
 def latest_runs(runs):
-    """The newest run of each workflow from pull request and review events, from GitHub's list of runs;
-    but where that one was skipped (its jobs run only on a label, say) and the newest run that wasn't
-    failed, that failed run, so a skipped run never hides a red one."""
-    newest, tested = {}, {}
+    """The newest run of each workflow from pull request and review events, from GitHub's list of runs,
+    leaving out skipped runs where the workflow has others: a skipped run tested nothing (its jobs run
+    only on a label, say), so it neither hides an older run's result nor makes it fresh."""
+    newest = {}
     for run in runs:
         if run.get("event") not in EVENTS:
             continue
-        for found in (newest, tested) if run["conclusion"] != "skipped" else (newest,):
-            known = found.get(run["workflow_id"])
-            if known is None or (run["created_at"], run["id"]) > (known["created_at"], known["id"]):
-                found[run["workflow_id"]] = run
-    return [tested[workflow] if run["conclusion"] == "skipped" and workflow in tested
-            and tested[workflow]["conclusion"] not in GOOD else run for workflow, run in newest.items()]
+        known = newest.get(run["workflow_id"])
+        key = (run["conclusion"] != "skipped", run["created_at"], run["id"])
+        if known is None or key > (known["conclusion"] != "skipped", known["created_at"], known["id"]):
+            newest[run["workflow_id"]] = run
+    return list(newest.values())
 
 
 def decide(runs, base_time, merged_at, pushed_at, reopened_at, now):
@@ -95,7 +94,7 @@ def decide(runs, base_time, merged_at, pushed_at, reopened_at, now):
     running = sorted(run["name"] for run in runs if run["status"] != "completed")
     if running:
         return "wait", "still running: " + ", ".join(running)
-    # A skipped run tested nothing (a workflow only on labels, say), so its age doesn't matter.
+    # A workflow with only skipped runs tested nothing, so their age doesn't matter.
     tested = [run for run in runs if run["conclusion"] != "skipped"]
     if just_reopened and any(when(run["created_at"]) < reopened_at for run in tested):
         return "wait", "the checks haven't all started again since the pull request was reopened"
@@ -210,9 +209,10 @@ def merge(repo, number, commit):
     if action == "red":
         return 1, red_message(why)
     if action == "stop":
-        return 1, (f"Not merged: {why}. Reopening again won't help: a workflow that doesn't run on "
-                   f"`reopened` must get it in the project's .github/workflows "
-                   f"(docs/process/pull-requests.md); otherwise say so in the report.")
+        return 1, (f"Not merged: {why}. Reopening again won't help: a workflow whose jobs run only on a "
+                   f"label needs the label put on again; one that doesn't run on `reopened` must get it in "
+                   f"the project's .github/workflows (docs/process/pull-requests.md); otherwise say so in "
+                   f"the report.")
     if action == "rerun":
         if not wait_for_merge_on(repo, number, base_sha):
             return 1, (f"Not merged: {why}, and GitHub hasn't merged the pull request on {base} at "
