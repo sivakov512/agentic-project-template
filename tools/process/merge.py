@@ -4,8 +4,8 @@ the commit that was reviewed and approved, its subject the title and the number,
 only when every check tested the base as it is now.
 
 GitHub tests a pull request on its merge into the base, which it makes again only some time after the
-base moves, so a run may test an old base. The process checks note the base commit each run tests
-(check.py), and only runs created from the first one that tested the current base count. When there are
+base moves, so a run may test an old base. The process checks note in each of their runs the base
+commit it tests (check.py), and only runs created from the first one that tested the current base count. When there are
 no such runs, this waits until GitHub has merged the pull request on the current base, then closes and
 reopens it, which runs the checks again (every workflow on pushes runs on `reopened`,
 docs/process/pull-requests.md) and keeps the owner's Approve; the coordinator runs it again once they
@@ -37,6 +37,8 @@ WAIT_SECONDS = 180
 POLL_SECONDS = 5
 # How long after a push, or a reopening, runs may take to appear.
 START_GRACE = timedelta(minutes=10)
+# How much earlier than the run of the process checks GitHub may create the other runs of the same event.
+SAME_EVENT = timedelta(seconds=10)
 GOOD = {"success", "skipped", "neutral"}
 EVENTS = {"pull_request", "pull_request_review"}
 # The workflow of the owner's OK (check_owner.py): red alone, it waits for the owner's Approve.
@@ -66,28 +68,31 @@ def when(text):
 def latest_runs(runs):
     """The run of each workflow from pull request and review events, from GitHub's list of runs, that
     decides: one still running if there is one (a run again of an older run among them), else the newest
-    that wasn't skipped, else the newest. A skipped run tested nothing (its jobs run only on a label, say),
-    so it neither hides an older run's result nor makes it fresh."""
+    red one (GitHub keeps a red run of an earlier event blocking the merge after a later run passes,
+    docs/process/pull-requests.md), else the newest that wasn't skipped, else the newest. A skipped run
+    tested nothing (its jobs run only on a label, say), so it neither hides an older run nor makes it
+    fresh. A run again keeps its run's creation time and tests the same commit."""
+    def weight(run):
+        done, skipped = run["status"] == "completed", run["conclusion"] == "skipped"
+        return (not done, done and not skipped and run["conclusion"] not in GOOD, not skipped,
+                run["created_at"], run["id"])
     chosen = {}
     for run in runs:
-        if run.get("event") not in EVENTS:
-            continue
-        key = (run["status"] != "completed", run["conclusion"] != "skipped", run["created_at"], run["id"])
-        known = chosen.get(run["workflow_id"])
-        if known is None or key > (known["status"] != "completed", known["conclusion"] != "skipped",
-                                   known["created_at"], known["id"]):
-            chosen[run["workflow_id"]] = run
+        if run.get("event") in EVENTS:
+            known = chosen.get(run["workflow_id"])
+            if known is None or weight(run) > weight(known):
+                chosen[run["workflow_id"]] = run
     return list(chosen.values())
 
 
 def decide(runs, base_time, tested_from, pushed_at, reopened_at, now):
     """What to do, with the reason: ("merge", ""), ("wait", why), ("rerun", why), ("stop", why),
-    ("cancelled", why) or ("red", why). runs: the newest run of each workflow on the pull request's last
-    commit; base_time: when the base branch got its current commit; tested_from: when the first run that
-    tested that commit was created (first_tested), or None (a run tests the merge GitHub made last, which
-    may be on an older base, so only runs from then on test the base as it is); pushed_at: when the last
-    commit was pushed, or None; reopened_at: when the pull request was last reopened, or None; now: the
-    current time. Times are aware datetimes."""
+    ("cancelled", why) or ("red", why). runs: the run of each workflow on the pull request's last commit
+    that decides (latest_runs); base_time: when the base branch got its current commit; tested_from: when
+    the first run that tested that commit was created (first_tested), or None (a run tests the merge
+    GitHub made last, which may be on an older base, so only runs from then on test the base as it is);
+    pushed_at: when the last commit was pushed, or None; reopened_at: when the pull request was last
+    reopened, or None; now: the current time. Times are aware datetimes."""
     reopened_here = reopened_at is not None and reopened_at >= base_time
     just_reopened = reopened_here and now - reopened_at < START_GRACE
     if not runs:
@@ -106,6 +111,12 @@ def decide(runs, base_time, tested_from, pushed_at, reopened_at, now):
     tested = [run for run in runs if run["conclusion"] != "skipped"]
     if just_reopened and any(when(run["created_at"]) < reopened_at for run in tested):
         return "wait", "the checks haven't all started again since the pull request was reopened"
+    cancelled = sorted(run["name"] for run in runs if run["conclusion"] == "cancelled")
+    if cancelled:
+        return "cancelled", ", ".join(cancelled) + " cancelled"
+    red = sorted(run["name"] for run in runs if run["conclusion"] not in GOOD)
+    if red:
+        return "red", "failed: " + ", ".join(red)
     old = sorted(run["name"] for run in tested
                  if tested_from is None or when(run["created_at"]) < tested_from)
     if old:
@@ -113,12 +124,6 @@ def decide(runs, base_time, tested_from, pushed_at, reopened_at, now):
         if not reopened_here:
             return "rerun", why
         return "stop", why + ", even after reopening it on this base"
-    cancelled = sorted(run["name"] for run in runs if run["conclusion"] == "cancelled")
-    if cancelled:
-        return "cancelled", ", ".join(cancelled) + " cancelled"
-    red = sorted(run["name"] for run in runs if run["conclusion"] not in GOOD)
-    if red:
-        return "red", "failed: " + ", ".join(red)
     return "merge", ""
 
 
@@ -144,8 +149,9 @@ def last_event(repo, number, name):
 
 def first_tested(repo, runs, base_sha):
     """When the first run of the process checks (.github/workflows/process-checks.yml) that tested
-    base_sha was created, by the note its process-docs job leaves (check.TESTED_BASE), or None. Runs from
-    then on test base_sha too: GitHub's merge was on it by then, and the base hasn't moved since."""
+    base_sha was created, by the note its process-docs job leaves (check.TESTED_BASE), less SAME_EVENT, or
+    None. Runs from then on test base_sha too: GitHub's merge was on it by then, and the base hasn't moved
+    since; GitHub creates the other runs of one event up to a few seconds apart."""
     ours = sorted((run for run in runs if run.get("path", "").endswith("process-checks.yml")
                    and run.get("event") == "pull_request"), key=lambda run: (run["created_at"], run["id"]))
     for run in ours:
@@ -154,7 +160,7 @@ def first_tested(repo, runs, base_sha):
             notes = api(f"repos/{repo}/check-runs/{check_run['id']}/annotations") or []
             if any(note.get("title") == check.TESTED_BASE and note.get("message", "").strip() == base_sha
                    for note in notes):
-                return when(run["created_at"])
+                return when(run["created_at"]) - SAME_EVENT
     return None
 
 
@@ -198,8 +204,9 @@ def red_message(why):
     if why == "failed: " + OWNER_WORKFLOW:
         return (f"Not merged: {why}. The owner's Approve of the last commit is missing or not yet checked; "
                 f"run this again after it.")
-    return (f"Not merged: {why}. Fix the red check: it is a \"fix\" finding "
-            f"(docs/process/reviews.md#every-review).")
+    return (f"Not merged: {why}. A red run blocks the merge even after a later one passed: if it failed for "
+            f"a reason since gone, run it again (gh run rerun <id> --failed); otherwise it is a \"fix\" "
+            f"finding (docs/process/reviews.md#every-review).")
 
 
 def merge(repo, number, commit):

@@ -1209,6 +1209,14 @@ class MergeDecision(unittest.TestCase):
         self.assertEqual(self.decide(runs, tested=None)[0], "rerun")
         self.assertEqual(self.decide(runs, tested=60), ("merge", ""))
 
+    def test_a_red_run_counts_after_a_later_one_passed(self):
+        red = run("project-checks", 60, conclusion="failure", number=1)
+        green = run("project-checks", 70, number=2)
+        self.assertEqual(merge.latest_runs([red, green]), [red])
+        self.assertEqual(self.decide([red, green])[0], "red")
+        self.assertEqual(self.decide([dict(red, created_at=at(-10).isoformat().replace("+00:00", "Z"))])[0],
+                         "red")
+
     def test_a_run_again_of_an_older_run_still_running_waits(self):
         old = dict(run("process-owner", 10, status="in_progress", conclusion=None, number=1))
         newer = run("process-owner", 20, event="pull_request_review", number=2)
@@ -1248,11 +1256,13 @@ class MergeDecision(unittest.TestCase):
         self.assertEqual(self.decide([], pushed=100)[0], "rerun")
         self.assertEqual(self.decide([], pushed=100, reopened=150)[0], "stop")
 
-    def test_the_newest_run_of_each_workflow_counts_review_events_included(self):
-        runs = [run("process-owner", 60, conclusion="failure", number=1),
+    def test_runs_of_pull_request_and_review_events_count_and_a_red_one_wins(self):
+        runs = [run("process-owner", 60, number=1),
                 run("process-owner", 70, event="pull_request_review", number=2),
                 run("project", 80, event="push", conclusion="failure", number=3)]
         self.assertEqual(merge.latest_runs(runs), [runs[1]])
+        runs[0]["conclusion"] = "failure"
+        self.assertEqual(merge.latest_runs(runs), [runs[0]])
 
 
 class MergeCommand(unittest.TestCase):
@@ -1306,8 +1316,8 @@ class MergeCommand(unittest.TestCase):
     def test_red_checks_say_what_to_do(self):
         for runs, expected in (([run("process-owner", 60, conclusion="failure")], "owner's Approve"),
                                ([run("process-owner", 60, conclusion="failure"),
-                                 run("project", 61, conclusion="failure", number=2)], "Fix the red check"),
-                               ([run("project", 60, conclusion="failure")], "Fix the red check"),
+                                 run("project", 61, conclusion="failure", number=2)], "\"fix\" finding"),
+                               ([run("project", 60, conclusion="failure")], "\"fix\" finding"),
                                ([run("project", 60, conclusion="cancelled")], "gh run rerun")):
             api, gh, calls = self.fake(runs)
             with self.subTest(expected=expected), mock.patch.object(merge, "api", api), \
@@ -1315,7 +1325,14 @@ class MergeCommand(unittest.TestCase):
                 code, message = merge.merge("o/r", "7", self.HEAD)
                 self.assertEqual((code, calls), (1, []))
                 self.assertIn(expected, message)
-        self.assertNotIn("Fix", merge.red_message("failed: process-owner"))
+        self.assertNotIn("fix", merge.red_message("failed: process-owner"))
+
+    def test_runs_of_the_same_event_created_a_moment_earlier_count(self):
+        early = dict(run("preview", 0, number=3), created_at="2026-11-15T11:45:58Z")
+        api, gh, calls = self.fake([early, run("project", 50)], checked_at=50)
+        with mock.patch.object(merge, "api", api), mock.patch.object(merge, "gh", gh):
+            code, _ = merge.merge("o/r", "7", self.HEAD)
+        self.assertEqual(code, 0)
 
     def test_runs_before_the_first_that_tested_the_base_dont_merge(self):
         api, gh, calls = self.fake([run("project", 40)], checked_at=50)
