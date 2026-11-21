@@ -41,7 +41,7 @@ The workflows `.github/workflows/process-*.yml` run these jobs, all required for
 
 | Job | Runs | Checks |
 |---|---|---|
-| `process-docs` | `tools/process/check.py --process-only` | the documents (links, the backlog, IDs and coverage, decision records), the template's files against the lock, the workflows, the checks' own tests |
+| `process-docs` | `tools/process/check.py --process-only` | the documents (links, the backlog, IDs and coverage, decision records), the template's files against the lock, the workflows, the checks' own tests; on a pull request it notes the commit of the base it tests, for `merge.py` |
 | `process-pr` | `tools/process/check_pr.py` | the description's sections, the kind in the title and the label; a draft only once it leaves draft |
 | `process-commits` | `tools/process/check_commits.py` | the title against the commit rules ([config.md](config.md#commits)) |
 | `process-lock` | `tools/process/check_lock.py` | a pull request that changes the template's files moves to a newer version ([updates.md](updates.md#the-lock)) |
@@ -49,8 +49,9 @@ The workflows `.github/workflows/process-*.yml` run these jobs, all required for
 
 Every workflow that runs on pushes to pull requests, the project's own included, runs on `reopened`,
 since `merge.py` runs the checks again by reopening the pull request
-([workflow.md](workflow.md#the-merge)). `merge.py` goes by each workflow's last run that wasn't skipped,
-so a job that runs only on a label is run again by putting the label on again once `main` has moved.
+([workflow.md](workflow.md#the-merge)). `merge.py` doesn't count a skipped run where the workflow has
+others, so a job that runs only on a label is run again by putting the label on again once `main` has
+moved.
 
 A passing run of `process-pr` or `process-owner` runs again the failed jobs earlier events left red on
 the same commit. If one stays red: `gh run list --workflow <file> --commit <last commit>`, then

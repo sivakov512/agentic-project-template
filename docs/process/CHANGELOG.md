@@ -3,6 +3,22 @@
 The newest version first. Each entry says what changed and what projects must do, if anything
 ([updates.md](updates.md#changing-the-process)).
 
+## 0.12.1 — 2026-11-21
+
+Two fixes to `merge.py` from its first merges in a project.
+
+- It waited for nothing while GitHub ran again an older run of a required check, and merged into a
+  refusal. Now any run still going, a run again of an older one included, makes it wait, and a red run
+  counts even after a later run of the same workflow passed, as it does for GitHub.
+- It judged whether a run tested the current `main` by the date of GitHub's merge commit, which GitHub
+  makes again on the same `main` after a review or an edit, so a fresh run looked old and the pull
+  request was reopened for nothing. Now `process-docs` notes on a pull request the commit of the base its
+  run tests (`check.py`), and only runs created from the first one that tested the current `main` count,
+  less a few seconds for the other runs of the same event (`workflow.md`, "The merge").
+
+Projects: nothing to do. The update changes only `tools/process/` and the template's documents, so the
+coordinator merges it on its own.
+
 ## 0.12.0 — 2026-11-21
 
 The process made shorter, with the same protections, and the merge on the current `main`. The process
