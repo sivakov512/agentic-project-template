@@ -12,9 +12,8 @@ The first of these that fits is your role:
 2. **It is "Fix pull request #N":** you are a work session fixing findings. Follow "If you fix a pull
    request".
 3. **It is "Review pull request #N", or the same "for harm", "for architecture", "for UI" or "reading
-   whole <modules>", or "Review milestone <n> before its gate on pull request #N, reading whole
-   <modules>":** you are a reviewer. Follow "If you are
-   the reviewer".
+   whole <modules>", each perhaps followed by "at <commit>", or "Review milestone <n> before its gate on
+   pull request #N, reading whole <modules>":** you are a reviewer. Follow "If you are the reviewer".
 4. **This repository is the template** (the `owner/name` of its `origin` remote is the `template` in
    `.process-lock.json`): you are the template's coordinator. Run `doctor.py` at the start of a
    session. Changes to the process go as [updates.md](updates.md#changing-the-process) says, reviewed
@@ -77,6 +76,11 @@ Whatever your role: a question from the owner is a question. Answer it and propo
   coordinator does.
 - When every point of "Done when" is met and the checks pass, fill in every section of the description
   and mark the pull request ready (`gh pr ready`): that starts the reviews.
+- Where the project's `CLAUDE.md` asks for the review before the push
+  ([workflow.md](workflow.md#how-a-piece-of-work-goes), step 5), push nothing past the start commit until
+  the coordinator says no "fix" finding is left: commit the finished work, run the checks, fill in the
+  description, and end with your last commit in your last message. Then push it as it is and mark the
+  pull request ready. Never rewrite a commit a reviewer has seen, pushed or not.
 - Don't edit the template's files ([README.md](README.md#what-lives-where)). If the process is wrong,
   report it.
 
@@ -97,7 +101,7 @@ Whatever your role: a question from the owner is a question. Answer it and propo
 
   Leave the **drop** ones.
 - Commit the fixes on top of the branch ("Git and GitHub" below), run the checks as in "Your work", and
-  push.
+  push; with the review before the push, push only as "Your work" says.
 - Answer with one comment: the new head commit, and for each "fix" finding what you changed and where,
   or why you couldn't.
 
@@ -150,6 +154,11 @@ Your brief names one of these reviews. The coordinator gives each pull request t
   head the fix comment names: `git diff <reviewed> <new>`, or, where a merge of `main` came in between,
   `git log -p --first-parent --remerge-diff <reviewed>..<new>`. Check whether each finding the
   coordinator didn't close is fixed, and whether the fix broke anything nearby.
+- A review for harm has more rounds only where the project lets the coordinator run them
+  ([workflow.md](workflow.md#how-a-piece-of-work-goes), step 5); each goes as the second.
+- With "at <commit>" in your brief, the review comes before the push: review that commit from this
+  repository (`git diff origin/main...<commit>`, or from the commit you reviewed before), since it isn't
+  on GitHub yet, and name it in your first line. You can't see CI then; the merge waits for it.
 
 ### The review
 
@@ -225,9 +234,10 @@ names, written before the first UI work; a UI pull request without one is a "fix
 
 The pull request gives you:
 
-- images rendered by a command it names (in CI or headless, never by starting an app on the owner's
-  machine without the owner's consent), at 2x, in the themes and screen sizes the design-system
-  document names, before and after for a change;
+- screenshots of the real interface (the real window or page, never a copy of it or a stand-in for a part
+  of the system) taken by a command it names (in CI or headless, never by starting an app on the owner's
+  machine without the owner's consent), at 2x, in the themes and screen sizes the design-system document
+  names, before and after for a change;
 - fixture data with the worst cases (empty, long text, extreme values, late, paused, a heavy day with
   many items);
 - when it adds a screen or changes what a screen is for, a table from each such screen to the

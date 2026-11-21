@@ -1,13 +1,15 @@
 #!/usr/bin/env python3
 """Runs every check an agent runs before pushing: the documents, the template's files against the lock,
-the checks' own tests, then the project's checks from docs/process.json. The pull request's description
-and title have checks of their own, check_pr.py and check_commits.py (docs/process/rules.md, "Your
-work"). Standard library and git only.
+the checks' own tests, then the project's checks from docs/process.json; in a pull request's run in CI,
+also that the run tests the pull request on its base as the base is now (check_base.py). The pull
+request's description and title have checks of their own, check_pr.py and check_commits.py
+(docs/process/rules.md, "Your work"). Standard library and git only.
 
     python3 tools/process/check.py                  everything
     python3 tools/process/check.py --process-only   what the process workflow runs in CI
 """
 
+import os
 import subprocess
 import sys
 import unittest
@@ -16,6 +18,7 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 
+import check_base  # noqa: E402
 import check_docs  # noqa: E402
 import owned  # noqa: E402
 
@@ -36,6 +39,11 @@ def main(argv):
             print(f"{name}: {error}")
         if errors:
             failed.append(name)
+    for error in check_base.check(ROOT, os.environ):
+        # The annotation's title is how merge.py tells this failure from others.
+        print(f"::error title={check_base.TITLE}::{error}")
+        print(f"Base: {error}")
+        failed.append("Base")
     if not run_tests():
         failed.append("Tests of the checks")
     if not process_only:

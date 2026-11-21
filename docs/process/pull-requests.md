@@ -45,7 +45,7 @@ never clash with the project's own.
 
 | Job | Runs | Checks |
 |---|---|---|
-| `process-docs` | `tools/process/check.py --process-only` | the documents (links, the backlog, IDs and coverage, decision records), the template's files against the lock, the checks' own tests |
+| `process-docs` | `tools/process/check.py --process-only` | the documents (links, the backlog, IDs and coverage, decision records), the template's files against the lock, the checks' own tests; on a pull request, that the run tests it on the current base ([workflow.md](workflow.md#how-a-piece-of-work-goes), step 7) |
 | `process-pr` | `tools/process/check_pr.py` | the sections of the description, the kind in the title (where Conventional Commits are off) and the review label; a draft is checked when it leaves draft |
 | `process-lock` | `tools/process/check_lock.py` | a pull request that changes the template's files moves to a newer version ([updates.md](updates.md#the-lock)) |
 | `process-commits` | `tools/process/check_commits.py` | the title against the commit rules ([config.md](config.md#commits)); a job of `process-pr.yml`, so it runs on the same events |

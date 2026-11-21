@@ -134,6 +134,14 @@ new items.
      rounds. The last of a run of pull requests on the same modules also gets the review reading them
      whole ([rules.md](rules.md#the-review)). The coordinator decides which reviews a pull request gets,
      by these rules and any more `docs/plan.md` names.
+   - **Review before the push,** where the project's `CLAUDE.md` asks for it (so that slow CI runs once),
+     since every session must know it: the work session stops before pushing its work
+     ([rules.md](rules.md#your-work)); the coordinator runs the reviews on its last commit, "Review pull
+     request #N at <commit>", in the same repository on the same machine, and a fix goes on top,
+     unpushed, its second round the same way. Once no "fix" finding is left, the session pushes and marks
+     the pull request ready, and the coordinator checks that the pushed head is the last commit reviewed.
+     A red check after the push is a "fix" finding; its fix gets one review of the fix alone, outside the
+     two rounds.
    - **Fixes.** One work session ("Fix pull request #N") fixes the findings of all the reviews. The pull
      request merges only with CI green and no "fix" finding left.
    - **At most two rounds:** a full review, then, only if it had "fix" findings, a review of the fix
@@ -145,7 +153,10 @@ new items.
    - **Risky code.** Any later change to it goes back to the review for harm before the merge, and the
      coordinator never makes such a change itself. If a finding of the review for harm is still open
      after its second round, or a change to the risky code would need a third round, the coordinator
-     neither fixes it nor merges, but stops and tells the owner.
+     neither fixes it nor merges, but stops and tells the owner. Where the project's `CLAUDE.md` gives
+     that decision to the coordinator, it may instead run more rounds, each a work session's fix and a
+     review for harm of that fix; it still merges only once the reviewer for harm ends with "Ready to
+     merge as is: yes", and the report names each such round.
    - **Closing a finding.** A finding of the review for harm is closed only by its reviewer. A finding of
      another review that contradicts the item or the plan, or rests on something untrue about the code,
      the coordinator may close, with the reason in a comment on the pull request; the next report names
@@ -166,17 +177,20 @@ new items.
 7. **The merge,** by squash: `main` gets one commit, its subject the pull request's title and its
    number, its body empty.
    - After the owner's OK where it is needed ("The owner's OK and the merge" below), the coordinator
-     merges with `gh api -X PUT repos/{owner}/{repo}/pulls/<N>/merge -f merge_method=squash -f sha=<the
-     last commit> -f commit_title="<the title> (#<N>)" -f commit_message=`. `sha` makes GitHub refuse
-     the merge if a commit came after the one checked and approved.
+     merges with `python3 tools/process/merge.py <N>`. It merges the last commit, the one checked and
+     approved, and only once every check ran on the current `main` ("The base" below).
    - The owner, merging on GitHub, keeps what GitHub offers, which the repository's settings make the
      same ([setup.md](setup.md), step 8).
    - If the owner says no, the pull request stays open, and the owner's remarks go as step 6 says.
    - When merges change where the work stands, the coordinator brings `docs/now.md` up to date
      afterwards in a coordinator record, several merges in one, before its next report.
-   - **The base.** The checks must have run on the current `main`. If `main` has a commit newer than
-     their last runs, the coordinator closes and reopens the pull request, which runs them again on it
-     and keeps the owner's Approve (re-running an old run tests its old base).
+   - **The base.** The checks must have run on the current `main`. GitHub tests a pull request on its
+     merge into `main`, which it makes again only some time after `main` moves, so a run may test an old
+     `main`, even one started by closing and reopening the pull request. The process check fails such a
+     run (`check_base.py`), and `merge.py` doesn't merge when `main` moved after the last runs or a run
+     failed on an old `main`: it waits until GitHub has merged the pull request on the current `main`,
+     then closes and reopens it, which runs the checks again and keeps the owner's Approve. The
+     coordinator runs `merge.py` again once they finish. Re-running an old run tests its old base.
    - **Conflicts.** `main` is merged into the branch only when it conflicts. A conflict goes to a work
      session as a "fix" finding ("merge `main` in, conflict in X") with "Fix pull request #N". A merge of
      `main` that only resolves conflicts doesn't count as a review round: a reviewer, for risky code the

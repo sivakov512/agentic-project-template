@@ -3,6 +3,35 @@
 The newest version first. Each entry says what changed and what projects must do, if anything
 ([updates.md](updates.md#changing-the-process)).
 
+## 0.12.0 — 2026-11-21
+
+Proposals from a project's way of work: the merge on the current `main`, the review before the push,
+more rounds of the review for harm by the owner's leave, and smaller fixes.
+
+- The merge on the current `main` (`workflow.md`, step 7, "The base"): closing and reopening a pull
+  request didn't make its checks test the current `main`, since GitHub makes its merge into `main` again
+  only some time after `main` moves, and a pull request merged green on a six-hour-old `main` broke it.
+  Now `process-docs` fails a run that tests an old `main` (`tools/process/check_base.py`, from
+  `check.py` in a pull request's run), and the coordinator merges with `python3 tools/process/merge.py
+  <N>` in place of the `gh api` command: it merges only when every check ran after `main`'s last commit
+  and none failed on an old `main`; otherwise it waits until GitHub has merged the pull request on the
+  current `main`, then closes and reopens it, which keeps the owner's Approve.
+- The review before the push (`workflow.md`, step 5; `rules.md`, "Your work"), where the project's
+  `CLAUDE.md` asks for it, so that slow CI runs once: the work session stops before pushing; the reviews,
+  "Review pull request #N at <commit>", read the commit from the same repository; once no "fix" finding
+  is left, the session pushes the reviewed commit as it is. A red check after the push is a "fix"
+  finding whose fix gets one review outside the two rounds.
+- More rounds of the review for harm (`workflow.md`, step 5, "Risky code"): where the project's
+  `CLAUDE.md` gives that decision to the coordinator, it may run them instead of stopping; the merge
+  still needs the reviewer for harm's "Ready to merge as is: yes", and the report names each round.
+- The UI review asks for screenshots of the real window or page, never of a copy of it or a stand-in for
+  a part of the system (`rules.md`, "The UI review").
+- Risks and blockers go into the tracker only where the project has one (`changes.md`).
+
+Projects: the coordinator merges with `tools/process/merge.py` from now on. A project whose owner wants
+the review before the push, or gives the coordinator more rounds of the review for harm, says so in
+`CLAUDE.md`, in a pull request of its own for the owner.
+
 ## 0.11.0 — 2026-11-16
 
 Release cycles, and fixes from an independent review of the whole template.

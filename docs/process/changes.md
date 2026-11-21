@@ -10,7 +10,7 @@
 - Backlog items a change affects are updated, or closed as superseded with a pointer to the new item.
 - Facts found by experiment are recorded by the session that finds them
   ([rules.md](rules.md#your-work)). A guess is never presented as a fact.
-- Risks and blockers go into the report and the tracker.
+- Risks and blockers go into the report, and into the tracker if the project has one.
 
 ## The backlog
 

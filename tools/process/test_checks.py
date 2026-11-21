@@ -15,12 +15,14 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
+import check_base  # noqa: E402
 import check_commits  # noqa: E402
 import check_docs  # noqa: E402
 import check_lock  # noqa: E402
 import check_owner  # noqa: E402
 import check_pr  # noqa: E402
 import doctor  # noqa: E402
+import merge  # noqa: E402
 import owned  # noqa: E402
 import sync  # noqa: E402
 import update  # noqa: E402
@@ -1155,6 +1157,57 @@ class Sync(unittest.TestCase):
             entries = sync.changelog_since(template, "0.1.0")
             self.assertIn("## 0.2.0", entries)
             self.assertNotIn("## 0.1.0", entries)
+
+
+class BaseOfTheRun(unittest.TestCase):
+    def test_a_merge_on_the_current_base_passes(self):
+        self.assertIsNone(check_base.problem(["a" * 40, "b" * 40], "main", "a" * 40))
+
+    def test_a_merge_on_an_old_base_fails_naming_both(self):
+        found = check_base.problem(["a" * 40, "b" * 40], "main", "c" * 40)
+        self.assertIn("aaaaaaaa", found)
+        self.assertIn("cccccccc", found)
+
+    def test_a_run_not_on_a_merge_fails(self):
+        self.assertIsNotNone(check_base.problem(["a" * 40], "main", "a" * 40))
+
+    def test_nothing_is_checked_outside_a_pull_request(self):
+        self.assertEqual(check_base.check(Path("."), {"GITHUB_EVENT_NAME": "push", "GITHUB_BASE_REF": ""}), [])
+        self.assertEqual(check_base.check(Path("."), {}), [])
+
+
+def run(name, created, status="completed", conclusion="success", workflow=None):
+    return {"name": name, "workflow_id": workflow or name, "created_at": created, "status": status,
+            "conclusion": conclusion}
+
+
+class MergeDecision(unittest.TestCase):
+    BASE = "2026-11-15T10:56:00Z"
+
+    def test_green_runs_after_the_base_merge(self):
+        runs = [run("process-checks", "2026-11-15T12:00:00Z"), run("project", "2026-11-15T12:00:01Z")]
+        self.assertEqual(merge.decide(runs, self.BASE, False), ("merge", ""))
+
+    def test_runs_older_than_the_base_run_again(self):
+        runs = [run("process-checks", "2026-11-15T12:00:00Z"), run("project", "2026-11-15T09:00:00Z")]
+        self.assertEqual(merge.decide(runs, self.BASE, False)[0], "rerun")
+
+    def test_a_run_on_an_old_base_runs_again_though_newer_than_it(self):
+        runs = [run("process-checks", "2026-11-15T12:37:34Z", conclusion="failure")]
+        self.assertEqual(merge.decide(runs, self.BASE, True)[0], "rerun")
+
+    def test_a_red_run_is_not_run_again(self):
+        runs = [run("project", "2026-11-15T12:00:00Z", conclusion="failure")]
+        self.assertEqual(merge.decide(runs, self.BASE, False), ("red", "failed: project"))
+
+    def test_running_or_missing_checks_wait(self):
+        self.assertEqual(merge.decide([], self.BASE, False)[0], "wait")
+        runs = [run("project", "2026-11-15T12:00:00Z", status="in_progress", conclusion=None)]
+        self.assertEqual(merge.decide(runs, self.BASE, False)[0], "wait")
+
+    def test_only_the_newest_run_of_each_workflow_counts(self):
+        runs = [run("project", "2026-11-15T09:00:00Z", conclusion="failure"), run("project", "2026-11-15T12:00:00Z")]
+        self.assertEqual(merge.latest_runs(runs), [runs[1]])
 
 
 if __name__ == "__main__":
