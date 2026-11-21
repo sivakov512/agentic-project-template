@@ -31,20 +31,18 @@ Where facts found by experiment are recorded, and in what form.
 
 ## Owner review
 
-What, beyond [the process's list](process/reports.md#when-the-owner-looks), the owner looks at in
-this project. Which code is risky, if any (it handles a secret, or acts on the owner's
-machine, on infrastructure or on data that can't be restored), so it gets a review for harm, and
-whether it then goes `ok-without-reading` rather than being
-[offered to the owner](process/reports.md#reviewed-work-offered-to-the-owner), and whether the
-coordinator may run more rounds of that review rather than stopping
-([workflow.md](process/workflow.md#how-a-piece-of-work-goes), step 5).
+What the owner looks at in this project beyond [the process's list](process/owner.md#when-the-owner-looks),
+or what of its point 6 goes without them. Which code is risky, if any (it handles a secret, or acts on the
+owner's machine, on infrastructure or on data that can't be restored), so it gets a review for harm; and
+whether more rounds of that review may run, up to how many
+([the process](process/workflow.md#how-a-piece-of-work-goes), step 5).
 
 ## Tracker
 
 How the tracker named in `docs/process.json` is kept: how
 [the process's rules](process/coordinator.md#the-tracker) map onto its own items (milestones, tasks,
 problems or whatever it calls them), how agents reach it, and whether reports to the owner carry a line
-on what changed there ([reports.md](process/reports.md)). Or "none".
+on what changed there ([the report](process/coordinator.md#the-report)). Or "none".
 
 ## Releases
 

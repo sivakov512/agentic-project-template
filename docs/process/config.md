@@ -9,9 +9,7 @@ words what the IDs mean, this file says it for the checks.
     "set_up": true,
     "owner_language": "English",
     "tracker": "Linear, project EXA",
-    "releases": "release-please, versions vX.Y.Z, built and published on release",
-    "agents_account": "own",
-    "merged_by": "coordinator"
+    "releases": "release-please, versions vX.Y.Z, built and published on release"
   },
   "commits": {"conventional": true},
   "checks": ["npm test", "npm run lint"],
@@ -41,17 +39,15 @@ words what the IDs mean, this file says it for the checks.
 - `releases`: how the project ships, in a few words; `not yet: <where it is decided>` for a project that
   will ship but hasn't chosen how, only until the foundation ends; or `none`. The full description is in
   the Releases section of `docs/plan.md` ([releases](#releases)).
-- `agents_account`: `own` (the agents have a GitHub account of their own) or `owner` (they work under
-  the owner's); `merged_by`: `coordinator` or `owner`. What each means:
-  [workflow.md](workflow.md#the-owners-ok-and-the-merge).
 
-All five but `set_up` must be set once `set_up` is `true`.
+All three but `set_up` must be set once `set_up` is `true`. `agents_account` and `merged_by`, from
+versions before 0.12.0, are still accepted and do nothing.
 
 ## commits
 
 The commit rules are checked on the pull request's title (`process-commits`), which becomes the subject
-of its one commit on `main` ([workflow.md](workflow.md#how-a-piece-of-work-goes), step 7); the commits
-on a branch aren't checked.
+of its one commit on `main` ([workflow.md](workflow.md#the-merge)); the commits on a branch aren't
+checked.
 
 - The title is at most 72 characters together with the " (#N)" the merge adds.
 - `conventional` (default `false`): the title follows Conventional Commits: one of the types `feat`,
@@ -78,10 +74,9 @@ changelog and tags versions, and the project's own workflows build and publish o
 request merges, with no step by hand for each release. How releases and the owner's tries come
 together at the end of a milestone: [workflow.md](workflow.md#starting-and-finishing).
 
-- Run it with a GitHub App's token, not the agents' or the owner's
-  ([pull-requests.md](pull-requests.md#pull-requests-from-a-github-app)).
-- Secrets that publish or deploy, and so the job that publishes, are kept as
-  [setup.md](setup.md) step 8 says.
+It runs with a GitHub App's token, not the agents' or the owner's
+([pull-requests.md](pull-requests.md#pull-requests-from-a-github-app)), and the secrets that publish are
+kept as [setup.md](setup.md) step 8 says.
 
 ## checks
 
@@ -92,16 +87,10 @@ project's own tests and linters. CI runs them in the project's own workflows
 ## kept
 
 File patterns (`fnmatch`, from the repository root, where `*` also crosses folders) the owner keeps for
-themself on top of what the process names ([workflow.md](workflow.md#the-owners-ok-and-the-merge)):
-
-- what the owner names;
-- the files that the rules Claude Code loads by itself import, in turn too, which `process-owner` asks
-  for.
-
-`process-owner` reads the patterns from the base branch, and a pull request that changes a match needs
-the owner's OK. Optional, and left out or empty until there is such a file. The configuration of the
-project's checks isn't kept by default: a change that loosens a check needs the owner's OK in whatever
-file it is (workflow.md, same section), and one that doesn't goes as other work.
+themselves on top of what the process names ([owner.md](owner.md#the-owners-ok)): what the owner names,
+and the files the rules Claude Code loads by itself import, which `process-owner` asks for. It reads the
+patterns from the base branch. The configuration of the project's checks isn't kept by default: a change
+that loosens a check needs the owner's OK in whatever file it is.
 
 ## ids_ignore
 

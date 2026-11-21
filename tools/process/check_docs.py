@@ -366,18 +366,14 @@ def project_errors(config):
     if not isinstance(project, dict):
         return [f"{CONFIG}: project must be an object"]
     errors = []
-    for key, kind in (("set_up", bool), ("owner_language", str), ("tracker", str), ("releases", str),
-                      ("agents_account", str), ("merged_by", str)):
+    # agents_account and merged_by, from older releases, do nothing now and are accepted as they are.
+    for key, kind in (("set_up", bool), ("owner_language", str), ("tracker", str), ("releases", str)):
         if key in project and not isinstance(project[key], kind):
             errors.append(f"{CONFIG}: project.{key} must be a {kind.__name__}")
-    for key, allowed in (("agents_account", ("own", "owner")), ("merged_by", ("coordinator", "owner"))):
-        if project.get(key) and project[key] not in allowed:
-            errors.append(f"{CONFIG}: project.{key} must be " + " or ".join(allowed))
     if project.get("set_up") is True:
         for key, what in (("owner_language", "the owner's language"),
                           ("tracker", "the tracker and the project in it, or \"none\""),
-                          ("releases", "how the project ships, \"not yet: ...\" or \"none\""),
-                          ("agents_account", "own or owner"), ("merged_by", "coordinator or owner")):
+                          ("releases", "how the project ships, \"not yet: ...\" or \"none\"")):
             if not str(project.get(key, "")).strip():
                 errors.append(f"{CONFIG}: project.{key} must be set once the project is set up: {what}")
     for key in ("checks", "ids_ignore", "kept"):

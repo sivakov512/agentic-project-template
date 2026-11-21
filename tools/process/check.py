@@ -1,16 +1,14 @@
 #!/usr/bin/env python3
 """Runs every check an agent runs before pushing: the documents, the template's files against the lock,
-the checks' own tests, then the project's checks from docs/process.json; with --process-only in a pull
-request's run in CI, also that the run tests the pull request on its base as the base is now
-(check_base.py), and that workflows skipping drafts run when a draft leaves draft. The pull request's
-description and title have checks of their own, check_pr.py and check_commits.py
-(docs/process/rules.md, "Your work"). Standard library and git only.
+that workflows skipping draft pull requests run when one leaves draft, the checks' own tests, then the
+project's checks from docs/process.json. The pull request's description and title have checks of their
+own, check_pr.py and check_commits.py (docs/process/rules.md, "Your work"). Standard library and git only.
 
     python3 tools/process/check.py                  everything
     python3 tools/process/check.py --process-only   what the process workflow runs in CI
 """
 
-import os
+import re
 import subprocess
 import sys
 import unittest
@@ -19,11 +17,24 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 
-import check_base  # noqa: E402
 import check_docs  # noqa: E402
 import owned  # noqa: E402
 
 ROOT = HERE.parents[1]
+
+
+def workflow_problems(root):
+    """The workflows under .github/workflows that skip draft pull requests but don't run on
+    `ready_for_review`, as messages: a skipped job counts as passing for the merge, so such a job would
+    never test the pull request before it merges. Empty when there are none."""
+    problems = []
+    for path in sorted((root / ".github" / "workflows").glob("*.y*ml")):
+        text = path.read_text(encoding="utf-8")
+        if re.search(r"pull_request\.draft\s*==\s*false", text) and "ready_for_review" not in text:
+            problems.append(f"{path.relative_to(root)} skips draft pull requests but doesn't run on "
+                            f"ready_for_review, so its skipped jobs would never test the pull request "
+                            f"(docs/process/workflow.md#reviews-in-draft)")
+    return problems
 
 
 def run_tests():
@@ -36,23 +47,11 @@ def main(argv):
     process_only = "--process-only" in argv[1:]
     failed = []
     for name, errors in (("Docs", check_docs.check(ROOT)), ("Template files", owned.check(ROOT)),
-                         ("Workflows", check_base.workflow_problems(ROOT))):
+                         ("Workflows", workflow_problems(ROOT))):
         for error in errors:
             print(f"{name}: {error}")
         if errors:
             failed.append(name)
-    if process_only:
-        # Only in process-docs, which checks out GitHub's merge; a project's own job may check out the head.
-        try:
-            base_problems = check_base.check(ROOT, os.environ)
-        except subprocess.CalledProcessError as error:
-            base_problems = [(False, f"git can't tell which base the run tests: {error.stderr or error}")]
-        for stale, error in base_problems:
-            if stale:
-                # The annotation's title is how merge.py tells this failure from others.
-                print(f"::error title={check_base.TITLE}::{error}")
-            print(f"Base: {error}")
-            failed.append("Base")
     if not run_tests():
         failed.append("Tests of the checks")
     if not process_only:

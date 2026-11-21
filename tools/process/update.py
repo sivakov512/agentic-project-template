@@ -70,11 +70,11 @@ def gh_json(*args):
     return json.loads(run("gh", *args))
 
 
-def review(own_account, touches_github):
+def review(touches_github):
     """The review label and the "Owner review" text (to format with tag and template) of the pull request:
-    with the agents' own account an update that changes .github/ needs the owner's Approve, since GitHub
-    keeps .github/ for the owner (docs/process/updates.md)."""
-    if own_account and touches_github:
+    an update that changes .github/ needs the owner's Approve, since GitHub keeps .github/ for the owner
+    (docs/process/updates.md)."""
+    if touches_github:
         return "owner-review", APPROVE_ONLY
     return "ok-without-reading", NO_REVIEW
 
@@ -144,10 +144,9 @@ def main():
 
     run("git", "add", "-A")
     config = json.loads((ROOT / "docs/process.json").read_text(encoding="utf-8"))
-    own_account = (config.get("project") or {}).get("agents_account") != "owner"
     touches_github = any(name.startswith(".github/") for name in
                          run("git", "diff", "--cached", "--name-only").splitlines())
-    label, owner_review = review(own_account, touches_github)
+    label, owner_review = review(touches_github)
     title = title_for(f"update the process to {new}", (config.get("commits") or {}).get("conventional"))
     run("git", "commit", "--quiet", "-m", title)
     # The branch is this script's own: one left from a run that couldn't open its pull request is replaced.

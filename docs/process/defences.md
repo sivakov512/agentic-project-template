@@ -1,29 +1,26 @@
 # Defences
 
-What could go wrong, what stops it, and where that is enforced. `docs/plan.md` adds the project's own.
+What could go wrong and what stops it. The threat is agents' mistakes, not malice. `docs/plan.md` adds the
+project's own.
 
-| What goes wrong | What stops it | Enforced by |
-|---|---|---|
-| An agreement is lost between chats | The repository is the only source; same-day records; `docs/now.md` | The rules, the gate review's cold-start test |
-| A milestone or item starts before its inputs exist | Exit lists; an item starts only when its dependencies are merged and its milestone has started | The coordinator, the reviewer |
-| Parts built by different items don't fit, or a milestone finds what it builds on missing | Interfaces written down before the items on either side; each milestone written out at the end of the one before | The coordinator, the reviewer, the owner at the gate |
-| Code nobody can follow or maintain | Comments on every module and on what it offers; the reviewer's three-point verdict | The reviewer, the project's lint |
-| `main`'s history fills with review rounds | One squash commit per pull request | The merge settings, which `doctor.py` checks; `process-commits` for the title |
-| Work goes into documents, and nothing reaches the owner to use | Milestones that each end with something the owner uses in real work | The plan, the coordinator, the owner at the gate |
-| Something is forgotten | IDs and coverage | `process-docs` |
-| A standing OK of the owner's lets work merge past its reviews, or outlives or outgrows what the owner meant | It covers only what the owner named, until a date or a gate, and only pull requests whose every reason to go to the owner it covers, after their reviews on the head that merges; the report quotes its line in `docs/now.md` and lists what merged under it ([reports.md](reports.md#the-owners-standing-oks)) | The reviewer, the coordinator, the owner reading the report |
-| A session does something other than its item, or more | The brief is the item; a reviewer compares the diff with "Done when" | The rules, the reviewer |
-| "Done" without proof | Evidence someone can repeat, which the reviewer repeats; the coordinator runs the whole result at the milestone's end | The reviewer, the coordinator |
-| A refactor quietly changes behaviour | "Behaviour change" in every pull request, with steps to try it | The reviewer, the owner |
-| A session loosens the rules or the checks, or widens its own permissions | What the owner keeps needs the owner's OK; the template's files are locked | `process-docs`, `process-lock` and `process-owner` against mistakes, the owner and the coordinator against the rest ([pull-requests.md](pull-requests.md#what-the-checks-cant-stop)) |
-| A tag made or moved off the template's `main` brings an unapproved process into projects | Projects trust a release only when its tag is on the template's `main`; a workflow tags on merge; a tag ruleset stops tags being moved or deleted | `check_owner.py`, `update.py`, the owner's ruleset |
-| A broken release stops every project | Reverting the update ([updates.md](updates.md#when-a-release-breaks-the-project)) | The coordinator, the owner |
-| The agents act as the owner, or the owner's account merges past the checks | `doctor.py` fails when gh's account doesn't fit `agents_account` or classic protection lets admins past its checks, and asks the owner to check a ruleset's bypass list | The coordinator |
-| A stranger's pull request runs on the owner's own runner | `doctor.py` fails a public repository with `CI_RUNNER` set | The coordinator |
-| The process drifts apart between projects | One template; the lock; `doctor.py` reports a newer release | CI, the coordinator |
-| A defect in risky code gets past one review | A second, independent review for harm | The coordinator, the reviewers |
-| Reviewers share the authors' blind spots | "Done when" is written before the work; reviewers look for problems; the owner tries the result | The plan, the reviewer, the owner |
-| A merge without the owner's OK | `main` takes changes only through pull requests; one that needs the owner's OK only with the owner's Approve of its last commit | `process-owner`, required for `main` and run from `main`'s copy, and code owners' review of `.github/`; with the owner's account, the rules ([workflow.md](workflow.md#the-owners-ok-and-the-merge)) |
-| The owner is swamped, or misses what matters | The owner's OK only where they decide something; the rest merged by the coordinator and listed in reports | The coordinator, `process-owner` |
-| A question from the owner is taken as an order | Answer and propose, act after a yes | The rules |
-| The setup is broken and nobody notices | `doctor.py` at the start of every coordinator session | The coordinator |
+| What goes wrong | What stops it |
+|---|---|
+| An agreement is lost between chats | The repository is the only source; same-day records; `docs/now.md`; the gate review compares it with the repository |
+| Work starts before what it needs exists, or parts built apart don't fit | Exit lists and "Depends on"; interfaces written down before the items on either side |
+| A session does more or other than its item, or calls unchecked work done | The brief is the item; the reviewer compares the diff with "Done when" and repeats the evidence |
+| Code nobody can follow | Comments on every module; the review's three points; the gate review reads whole modules |
+| A defect in risky code gets past one review | A second, independent review for harm |
+| Nothing reaches the owner to use | Milestones that each end with something the owner uses in real work |
+| Something is forgotten | IDs and coverage, checked by `process-docs` |
+| A merge without the owner's OK, or one that loosens the rules or the checks | `process-owner`, run from `main`'s copy and required for `main`; `.github/` reviewed by the owner as code owner; the template's files locked |
+| A merge on an old `main` breaks it | `merge.py` merges only when the checks ran on the current `main` |
+| A broken process release stops every project | Reverting the update ([updates.md](updates.md#when-a-release-breaks-the-project)) |
+| A tag off the template's `main` brings an unapproved process into projects | Projects take only releases whose tag is on the template's `main`; a tag ruleset |
+| The agents act as the owner | `doctor.py` fails when `gh` works as the repository's owner |
+| A stranger's pull request runs on the owner's own runner | `doctor.py` fails a public repository with `CI_RUNNER` set |
+| The owner is swamped, or misses what matters | The owner looks only where they decide something; the rest is listed in reports |
+| A question from the owner is taken as an order | Answer and propose, act after a yes |
+
+The checks catch mistakes, not a determined agent: a pull request runs its own copy of the workflows and
+scripts. `process-owner` is the exception, since it runs from the base branch's copy, and
+`.github/CODEOWNERS` gives the owner its workflow.

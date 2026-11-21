@@ -5,47 +5,54 @@ The newest version first. Each entry says what changed and what projects must do
 
 ## 0.12.0 — 2026-11-21
 
-Proposals from the projects' way of work: the merge on the current `main`, the reviews in draft, more
-rounds of the review for harm by the owner's leave, and smaller fixes.
+The process made a third shorter, with the same protections, and the merge on the current `main`. The
+process documents went from about 16,300 words to about 11,000; what each role reads before it acts went
+down more: a work session from about 4,600 words to 2,000, the coordinator from about 10,800 to 6,200.
 
-- The merge on the current `main` (`workflow.md`, step 7, "The base"): closing and reopening a pull
-  request didn't make its checks test the current `main`, since GitHub makes its merge into `main` again
-  only some time after `main` moves, and a pull request merged green on a six-hour-old `main` broke it.
-  Now `process-docs` fails a run that tests an old `main` (`tools/process/check_base.py`, from
-  `check.py --process-only` in a pull request's run), and the coordinator merges with
-  `python3 tools/process/merge.py <N> <commit>` in place of the `gh api` command. It merges only the
-  commit named, the one reviewed and approved, and only when every check, those of review events
-  included, ran after `main` last moved and none failed on an old `main`; otherwise it waits until GitHub
-  has merged the pull request on the current `main`, then closes and reopens it, which keeps the owner's
-  Approve, at most once for each commit of `main`. Every workflow on pull requests runs on `reopened`
-  (`pull-requests.md`). The coordinator merges work pull requests whose checks are green before its own
+- **The merge on the current `main`** (`workflow.md`, "The merge"). Closing and reopening a pull request
+  didn't make its checks test the current `main`, since GitHub makes its merge into `main` again only
+  some time after `main` moves, and a pull request merged green on a six-hour-old `main` broke it. The
+  coordinator now merges with `python3 tools/process/merge.py <N> <commit>`: it merges only the commit
+  named, the one reviewed and approved, and only when every check ran after `main` last moved; otherwise
+  it waits until GitHub has merged the pull request on the current `main`, then closes and reopens it,
+  which keeps the owner's Approve, at most once for each commit of `main`. Every workflow on pull
+  requests runs on `reopened`. Work pull requests with green checks merge before the coordinator's own
   records.
-- The reviews in draft (`workflow.md`, step 5; `rules.md`, "Your work"), where the project's `CLAUDE.md`
-  asks for them, so that slow CI runs once: the slow jobs of the project's own workflows skip drafts and
-  the workflows run on `ready_for_review`; the work session leaves its finished pull request in draft and
-  says on it that the work is done; the reviews and fixes go on the draft, and the coordinator marks it
-  ready once no "fix" finding is left. `check.py` fails a workflow that skips drafts but doesn't run on
-  `ready_for_review`. A review that needs CI's result comes after that, in the same round; `CLAUDE.md`
-  may hold the draft longer, until the owner has tried a local build. A red check once ready is a "fix"
-  finding, fixed with the pull request kept ready, whose fix gets one review outside the two rounds.
-- More rounds of the review for harm (`workflow.md`, step 5, "Risky code"): where `docs/plan.md` gives
-  that decision to the coordinator, it may run them instead of stopping; the merge still needs the
-  reviewer for harm's "Ready to merge as is: yes", and the report names each round. `rules.md`: a
-  project's rules may make the template's looser only in the choices it leaves to the project.
-- The UI review asks for images of the interface as the product's own code draws it, on fixture data:
-  screenshots of the real window, menu or page, or its own views rendered offscreen, never a mock-up, a
-  picture drawn again or a stand-in for a part of the system; made in CI, headless, or on the owner's
-  machine with their consent (`rules.md`, "The UI review").
-- Risks and blockers go into the tracker only where the project has one (`changes.md`).
+- **The reviews in draft** (`workflow.md`, "Reviews in draft"), where the project's `CLAUDE.md` asks for
+  them: slow jobs skip drafts and run on `ready_for_review`, which `check.py` checks; the reviews and
+  fixes go on the draft, and the coordinator marks it ready once no "fix" finding is left.
+- **The reviewer's rules moved** from `rules.md` to a new `reviews.md`, so a work session no longer reads
+  them. The review reading whole modules after a run of pull requests is gone: the gate review reads
+  whole the modules the milestone built or changed.
+- **What goes to the owner is in one file,** `owner.md`, which replaces `reports.md` and the owner's
+  part of `workflow.md`; the report moved to `coordinator.md`. Offers with a question and standing OKs
+  are gone: reviewed risky code, architecture and contract changes and decisions the plan didn't name go
+  to the owner (point 6 of "When the owner looks") unless the "Owner review" section of `docs/plan.md`
+  says they go without them; when the owner says to stop asking, or to ask again, the coordinator records
+  it there.
+- **One rule of rounds:** a review, then a review of the fix; the owner's remarks start a new pair; a
+  conflict's resolution gets a look only. `docs/plan.md` may allow more rounds of the review for harm, up
+  to a number it names.
+- **One mode of account:** the agents work under their own account, and the coordinator merges after the
+  owner's Approve. `agents_account` and `merged_by` in `docs/process.json` are no longer read.
+- **Removed:** the rules on symlinks and submodules (they guarded against malice, not mistakes),
+  `roles.md` (now in `README.md`), the long form of `defences.md`, and repeated text across the files.
+- The UI review asks for images as the product's own code draws them: screenshots of the real window,
+  menu or page, or its own views rendered offscreen, never a mock-up. A project's rules may make the
+  template's looser only in the choices it leaves to the project.
 
-Projects: the coordinator merges with `tools/process/merge.py` from now on. If one of the project's own
-workflows on pull requests doesn't run on `reopened`, adding it goes to the owner in a pull request of
-its own, since `.github/` is theirs. Open pull requests may turn red on `process-docs` with "Base:";
-nothing in them needs fixing, `merge.py` runs their checks again. A project whose owner wants the reviews
-in draft says so in `CLAUDE.md`, and its own workflows add `ready_for_review` to the types of their
-`pull_request` trigger and `if: github.event.pull_request.draft == false` to their slow jobs; one whose
-owner gives the coordinator more rounds of the review for harm says so in `docs/plan.md`; each in a pull
-request of its own for the owner.
+Projects: in the update pull request, fix the links into the process the update breaks (`check.py` lists
+them): `reports.md#when-the-owner-looks`, `#reviewed-work-offered-to-the-owner` and
+`#the-owners-standing-oks` go to `owner.md#when-the-owner-looks`, `reports.md` to `owner.md` or
+`coordinator.md#the-report`, `workflow.md#the-owners-ok-and-the-merge` to `owner.md#the-owners-ok`,
+`rules.md#if-you-are-the-reviewer`, `#the-review`, `#the-ui-review` and the like to `reviews.md`, and
+`roles.md` to `README.md#roles`; remove the line "Standing OKs" from `docs/now.md`. Check that the
+"Owner review" section of `docs/plan.md` still says what the owner meant under the new point 6, and say
+in the update's "Owner review" what changed for the owner. From now on the coordinator merges with
+`merge.py`. If a project's own workflow on pull requests lists its event types without `reopened`,
+adding it goes to the owner in a pull request of its own, merged before the others. A project whose owner
+wants the reviews in draft says so in `CLAUDE.md`, and its own workflows add `ready_for_review` and
+`if: github.event.pull_request.draft == false` on their slow jobs, in a pull request of its own.
 
 ## 0.11.0 — 2026-11-16
 

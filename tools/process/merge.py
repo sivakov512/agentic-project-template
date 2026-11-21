@@ -1,17 +1,16 @@
 #!/usr/bin/env python3
-"""The coordinator's merge of a pull request (docs/process/workflow.md, step 7): a squash merge of the
-commit that was reviewed and approved, its subject the title and the number, its body empty, made only
-when every check ran on the base as it is now.
+"""The coordinator's merge of a pull request (docs/process/workflow.md#the-merge): a squash merge of
+the commit that was reviewed and approved, its subject the title and the number, its body empty, made
+only when every check ran after the base got its current commit.
 
 GitHub tests a pull request on its merge into the base, which it makes again only some time after the
-base moves, so a green run may have tested an old base (check_base.py). When the base moved after the
-last runs, a run failed on an old base, or no run came at all, this waits until GitHub has merged the pull
-request on the new base, then closes and reopens it, which runs the checks again (every workflow on pull
-requests runs on `reopened`, docs/process/pull-requests.md) and keeps the owner's Approve; the coordinator
-runs it again once they finish. It reopens at most once for each commit of the base: if that didn't help,
-it stops and says what is still wrong. It reads the runs of pull request and review events, so a review
-that dismisses the owner's Approve counts. Rules on GitHub (reviews, required checks) still decide whether
-the merge goes through. Standard library and gh only.
+base moves. When the base moved after the last runs, or no run came at all, this waits until GitHub has
+merged the pull request on the new base, then closes and reopens it, which runs the checks again (every
+workflow on pull requests runs on `reopened`, docs/process/pull-requests.md) and keeps the owner's
+Approve; the coordinator runs it again once they finish. It reopens at most once for each commit of the
+base: if that didn't help, it stops and says what is still wrong. It reads the runs of pull request and
+review events, so a review that dismisses the owner's Approve counts. Rules on GitHub (reviews, required
+checks) still decide whether the merge goes through. Standard library and gh only.
 
     python3 tools/process/merge.py <number> <commit>
 
@@ -24,11 +23,6 @@ import subprocess
 import sys
 import time
 from datetime import datetime, timedelta, timezone
-from pathlib import Path
-
-sys.path.insert(0, str(Path(__file__).resolve().parent))
-
-import check_base  # noqa: E402
 
 # How long to wait for GitHub to merge the pull request again on the new base, and how often to look.
 WAIT_SECONDS = 180
@@ -37,6 +31,8 @@ POLL_SECONDS = 5
 START_GRACE = timedelta(minutes=10)
 GOOD = {"success", "skipped", "neutral"}
 EVENTS = {"pull_request", "pull_request_review"}
+# The workflow of the owner's OK (check_owner.py): red alone, it waits for the owner's Approve.
+OWNER_WORKFLOW = "process-owner"
 
 
 class Failed(Exception):
@@ -71,13 +67,12 @@ def latest_runs(runs):
     return list(newest.values())
 
 
-def decide(runs, base_time, stale_base, pushed_at, reopened_at, now):
-    """What to do, with the reason: ("merge", ""), ("wait", why), ("rerun", why), ("stop", why) or
-    ("red", why).
+def decide(runs, base_time, pushed_at, reopened_at, now):
+    """What to do, with the reason: ("merge", ""), ("wait", why), ("rerun", why), ("stop", why),
+    ("cancelled", why) or ("red", why).
     runs: the newest run of each workflow on the pull request's last commit; base_time: when the base
-    branch got its current commit; stale_base: whether a run failed on an old base (check_base.TITLE);
-    pushed_at: when the last commit was pushed, or None; reopened_at: when the pull request was last
-    reopened, or None; now: the current time. Times are aware datetimes."""
+    branch got its current commit; pushed_at: when the last commit was pushed, or None; reopened_at: when
+    the pull request was last reopened, or None; now: the current time. Times are aware datetimes."""
     reopened_here = reopened_at is not None and reopened_at >= base_time
     just_reopened = reopened_here and now - reopened_at < START_GRACE
     if not runs:
@@ -95,14 +90,14 @@ def decide(runs, base_time, stale_base, pushed_at, reopened_at, now):
     if just_reopened and any(when(run["created_at"]) < reopened_at for run in runs):
         return "wait", "the checks haven't all started again since the pull request was reopened"
     old = sorted(run["name"] for run in runs if when(run["created_at"]) < base_time)
-    if old or stale_base:
-        why = "the base moved after these ran: " + ", ".join(old) if old else "a run tested an old base"
+    if old:
+        why = "the base moved after these ran: " + ", ".join(old)
         if not reopened_here:
             return "rerun", why
         return "stop", why + ", even after reopening it on this base"
     cancelled = sorted(run["name"] for run in runs if run["conclusion"] == "cancelled")
     if cancelled:
-        return "red", "cancelled, to run again: " + ", ".join(cancelled)
+        return "cancelled", ", ".join(cancelled) + " cancelled"
     red = sorted(run["name"] for run in runs if run["conclusion"] not in GOOD)
     if red:
         return "red", "failed: " + ", ".join(red)
@@ -127,17 +122,6 @@ def last_event(repo, number, name):
         if len(events) < 100:
             break
     return max(times) if times else None
-
-
-def stale_base(repo, head):
-    """Whether the newest process-docs run on head failed on an old base, by its annotation."""
-    found = api(f"repos/{repo}/commits/{head}/check-runs?check_name=process-docs&per_page=100")
-    checks = sorted(found.get("check_runs", []),
-                    key=lambda check: (check.get("started_at") or "", check["id"]))
-    if not checks or checks[-1].get("conclusion") != "failure":
-        return False
-    notes = api(f"repos/{repo}/check-runs/{checks[-1]['id']}/annotations")
-    return any(note.get("title") == check_base.TITLE for note in notes or [])
 
 
 def wait_for_merge_on(repo, number, base_sha):
@@ -170,6 +154,16 @@ def reopen(repo, number):
             time.sleep(POLL_SECONDS)
 
 
+def red_message(why):
+    """What merge says of red checks, why being decide's reason ("failed: " and the workflows' names):
+    when only the owner's OK is red, the owner's Approve is what is missing, otherwise a check to fix."""
+    if why == "failed: " + OWNER_WORKFLOW:
+        return (f"Not merged: {why}. The owner's Approve of the last commit is missing or not yet checked; "
+                f"run this again after it.")
+    return (f"Not merged: {why}. Fix the red check: it is a \"fix\" finding "
+            f"(docs/process/workflow.md, step 5).")
+
+
 def merge(repo, number, commit):
     pull = api(f"repos/{repo}/pulls/{number}")
     if pull["state"] != "open" or pull.get("draft"):
@@ -181,20 +175,23 @@ def merge(repo, number, commit):
     base_sha = api(f"repos/{repo}/git/ref/heads/{base}")["object"]["sha"]
     runs = api(f"repos/{repo}/actions/runs?head_sha={head}&per_page=100")
     action, why = decide(latest_runs(runs.get("workflow_runs", [])), moved_at(repo, base, base_sha),
-                         stale_base(repo, head), moved_at(repo, pull["head"]["ref"], head),
+                         moved_at(repo, pull["head"]["ref"], head),
                          last_event(repo, number, "reopened"), datetime.now(timezone.utc))
     if action == "wait":
         return 1, f"Not merged: {why}. Run this again when the checks finish."
+    if action == "cancelled":
+        return 1, f"Not merged: {why}: run them again (gh run rerun <id>), then run this again."
     if action == "red":
-        return 1, f"Not merged: {why}. A red check is a \"fix\" finding (docs/process/workflow.md, step 5)."
+        return 1, red_message(why)
     if action == "stop":
-        return 1, (f"Not merged: {why}. Reopening again won't help: say so in the report, and to the "
-                   f"template's coordinator if a workflow doesn't run on reopening.")
+        return 1, (f"Not merged: {why}. Reopening again won't help: a workflow that doesn't run on "
+                   f"`reopened` must get it in the project's .github/workflows "
+                   f"(docs/process/pull-requests.md); otherwise say so in the report.")
     if action == "rerun":
         if not wait_for_merge_on(repo, number, base_sha):
             return 1, (f"Not merged: {why}, and GitHub hasn't merged the pull request on {base} at "
                        f"{base_sha[:8]} within {WAIT_SECONDS} s; if it conflicts with {base}, a work "
-                       f"session merges {base} in (docs/process/workflow.md, step 7). Otherwise run this "
+                       f"session merges {base} in (docs/process/workflow.md#the-merge). Otherwise run this "
                        f"again later.")
         reopen(repo, number)
         return 1, (f"Not merged yet: {why}. The pull request was closed and reopened, so the checks run "

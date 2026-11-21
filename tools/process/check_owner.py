@@ -1,21 +1,18 @@
 #!/usr/bin/env python3
 """Checks that a pull request which needs the owner's OK has it, so the coordinator can merge the rest
-on its own (docs/process/workflow.md, "The owner's OK and the merge"). Standard library and git only.
+on its own (docs/process/owner.md#the-owners-ok). Standard library and git only.
 
 A pull request needs the owner's OK unless it is labelled ok-without-reading, and it always needs it
 when it changes what the owner keeps for themself: CLAUDE.md and CLAUDE.local.md at any depth, a .claude
 folder or file and anything in it, .mcp.json, docs/plan.md, docs/process.json, anything under .github/,
 the paths docs/process.json's "kept" names on the base branch, or the template's files and its lock,
-names compared whatever their case. A symlink or submodule at one of these paths, or at a folder on the
-way to one, never goes in, approved or not, since the check can't see what is behind it; nor does a file
-Claude Code loads as rules (a CLAUDE.md, a rule under .claude/rules/) that imports ("@" and a path) a
-file the owner doesn't keep, or a symlink or submodule. The
-template's files and the lock of a process update are the exception where each is exactly as in the
-newer release the update's lock names, of the template main's lock names, and that release is on the
-template's main: the owner agreed it in the template. With the agents' own account the OK is an approval
-of the pull request's last commit by the repository's owner; with the owner's account nobody can approve
-their own pull request, so the check only makes sure the label isn't ok-without-reading where it can't be,
-and the OK stays the owner's word that the coordinator quotes.
+names compared whatever their case. The OK is an approval of the pull request's last commit by the
+repository's owner. A file Claude Code loads as rules by itself (a CLAUDE.md or CLAUDE.local.md, a rule
+under .claude/rules/) that imports ("@" and a path) a file the owner doesn't keep never goes in, approved
+or not: its rules could then change without the owner. The template's files and the lock of a process
+update are the exception where each is exactly as in the newer release that the update's lock names,
+for the template that the base's lock names, and that release is on the template's main: the owner
+agreed it in the template.
 
 check_pr.py takes api and rerun_red from here for its own runs.
 
@@ -44,10 +41,6 @@ KEPT_BY_OWNER = ["docs/plan.md", "docs/process.json", ".mcp.json", owned.LOCK]
 # Rules for agents and their permissions, hooks and tools, which Claude Code reads at any depth: a file
 # of these names, or a .claude folder or file and anything under it.
 KEPT_NAMES = ["claude.md", "claude.local.md", ".claude"]
-# Where the paths the owner keeps lie, so a symlink or submodule at a folder on the way to them is seen.
-KEPT_PLACES = KEPT_BY_OWNER + owned.OWNED_DIRS + owned.OWNED_FILES + [".github"]
-# Git's modes for what the check can't look into: a symlink and a submodule.
-LINK, SUBMODULE = "120000", "160000"
 # Who may give the OK: the repository's owner. Collaborators, the agents' account among them, and on a
 # public repository anyone at all can approve too, so their approvals don't count.
 OWNER = "OWNER"
@@ -64,7 +57,8 @@ def kept_by_owner(name, kept=()):
 
 
 def tree(commit):
-    """Every entry of the commit's tree, as (mode, object id, path): files, symlinks and submodules."""
+    """Every entry of the commit's tree, as (mode, object id, path): files, symlinks and submodules.
+    Raises ValueError when git can't read it."""
     entries = []
     for entry in git("ls-tree", "-r", "-z", commit).split("\0"):
         meta, _, path = entry.partition("\t")
@@ -90,11 +84,12 @@ def is_rule_file(path):
 
 
 def import_errors(entries, kept=()):
-    """Why the pull request can't merge yet: a file Claude Code loads as rules (is_rule_file), or one it
-    imports in turn, imports with "@path" a file of the tree (entries, from tree) the owner doesn't keep,
-    or a symlink or submodule, or a path through one: its rules could then change without the owner. A
-    path is read relative to the importing file and from the repository's root; anything after an "@"
-    that could be a path counts, inside code or not, and a path to nothing in the tree is left alone."""
+    """Why the pull request can't merge whatever its approvals: a file Claude Code loads as rules
+    (is_rule_file), or one it imports in turn, imports with "@path" a file of the tree (entries, from
+    tree) the owner doesn't keep (kept_by_owner, with kept): its rules could then change without the
+    owner. A path is read relative to the importing file and from the repository's root; anything after
+    an "@" that could be a path counts, inside code or not, and a path to nothing in the tree is left
+    alone. Raises ValueError when git can't read a file."""
     found = {path.casefold(): (mode, object_id, path) for mode, object_id, path in entries}
     queue = [path for mode, _, path in entries if mode.startswith("100") and is_rule_file(path)]
     seen, errors = set(), []
@@ -107,57 +102,15 @@ def import_errors(entries, kept=()):
             for name in {raw, raw.rstrip(".,;:!?")}:
                 for base in (posixpath.dirname(path), ""):
                     target = posixpath.normpath(posixpath.join(base, name)).casefold()
-                    links = [found[folder] for folder in folders(target) + [target]
-                             if folder in found and found[folder][0] in (LINK, SUBMODULE)]
-                    if links:
-                        what = "symlink" if links[0][0] == LINK else "submodule"
-                        errors.append(f"{path} imports {raw.rstrip('.,;:!?')} through the {what}"
-                                      f" {links[0][2]}: the check can't see what is behind it, so import a"
-                                      " plain file")
-                    elif target in found and not kept_by_owner(found[target][2], kept):
-                        errors.append(f"{path} imports {found[target][2]}, which the owner doesn't keep: add"
+                    if target not in found:
+                        continue
+                    mode, _, imported = found[target]
+                    if not kept_by_owner(imported, kept):
+                        errors.append(f"{path} imports {imported}, which the owner doesn't keep: add"
                                       " it to \"kept\" in docs/process.json or move it under .claude/")
-                    elif target in found:
-                        queue.append(found[target][2])
+                    elif mode.startswith("100"):
+                        queue.append(imported)
     return sorted(set(errors))
-
-
-def folders(path):
-    """The folders path lies in, outermost first: a/b/c gives a and a/b."""
-    parts = path.split("/")
-    return ["/".join(parts[:index]) for index in range(1, len(parts))]
-
-
-def on_the_way(path, kept=(), places=()):
-    """Whether path, whatever its case, is one the owner keeps, a folder on the way to one of places (in
-    lower case: KEPT_PLACES and the kept files of the trees, as link_errors gathers them), or a folder
-    under which a kept pattern could match."""
-    path = path.casefold()
-    return (kept_by_owner(path, kept)
-            or any(place == path or place.startswith(path + "/") for place in places)
-            or any(re.split(r"[*?[]", pattern, maxsplit=1)[0].casefold().startswith(path + "/")
-                   or fnmatch.fnmatchcase(path + "/\0", pattern.casefold()) for pattern in kept))
-
-
-def link_errors(entries, kept=(), trees=()):
-    """Why the pull request can't merge whatever its approvals: a symlink or submodule among entries (the
-    head's tree, from tree) at a path the owner keeps or a folder on the way to one (on_the_way, with the
-    trees of the base and the head). The check can't see where a link leads or what a submodule holds, so
-    the owner's OK of the path wouldn't cover what is behind it, and following links as the owner's Mac
-    would is too easy to get wrong."""
-    places = [place.casefold() for place in KEPT_PLACES] + [name.casefold() for _, _, name in trees
-                                                            if kept_by_owner(name, kept)]
-    errors = []
-    for mode, _, path in entries:
-        if mode not in (LINK, SUBMODULE) or not on_the_way(path, kept, places):
-            continue
-        hint = (" A CLAUDE.md that should say what another file says is a plain file with the line"
-                " @<that file>, @AGENTS.md say, with that file added to \"kept\" in docs/process.json."
-                if path.rsplit("/", 1)[-1].casefold() in ("claude.md", "claude.local.md") else "")
-        errors.append(f"{path} is a {'symlink' if mode == LINK else 'submodule'} where the owner keeps the"
-                      " paths: it never goes in, not even with the owner's approval; make it a plain file or"
-                      " folder." + hint)
-    return errors
 
 
 def approved_head(reviews, head, author):
@@ -172,17 +125,19 @@ def approved_head(reviews, head, author):
     return any(review.get("state") == "APPROVED" and review.get("commit_id") == head for review in last.values())
 
 
-def check(labels, changed, agents_account, reviews, head, author, released=(), kept=()):
-    """The reasons the pull request may not merge yet; empty when it may. released: the changed files
-    that are exactly as in the template's release (released_files), which the owner agreed already.
-    kept: the base branch's "kept" patterns (kept_patterns)."""
+def check(labels, changed, reviews, head, author, released=(), kept=()):
+    """The reasons the pull request may not merge yet; empty when it may. labels: its labels now;
+    changed: the paths it changes (changed_files); reviews: GitHub's list of its reviews, oldest first;
+    head: its last commit; author: its author's login; released: the changed files that are exactly as
+    in the template's release (released_files), which the owner agreed already; kept: the base branch's
+    "kept" patterns (kept_patterns)."""
     owners = sorted(name for name in changed if kept_by_owner(name, kept) and name not in released)
     errors = []
     if "ok-without-reading" in labels and owners:
         errors.append("it changes what only the owner's OK lets in, so it needs the label owner-review: "
                       + ", ".join(owners[:5]) + (" and more" if len(owners) > 5 else ""))
     needs_ok = "ok-without-reading" not in labels or owners
-    if needs_ok and agents_account != "owner" and not approved_head(reviews, head, author):
+    if needs_ok and not approved_head(reviews, head, author):
         errors.append("it needs the owner's OK: an approval of its last commit")
     return errors
 
@@ -201,24 +156,6 @@ def config_at(commit):
     except ValueError:
         return {}
     return config if isinstance(config, dict) else {}
-
-
-def agents_account(base, head, author=None, owner=None):
-    """agents_account from docs/process.json on the base branch, so the pull request can't change it for
-    itself, and "own" when neither branch has it (the template itself). When the base has none yet
-    (setting up, adopting the process) it comes from the pull request: there "owner" would let it in
-    without an approval, and "own" would block it for good where the agents really work as the owner,
-    since nobody can approve their own pull request. So the pull request's "owner" counts only when its
-    author is the repository's owner (owner: that login, None where the repository belongs to an
-    organisation and that can't be told); doctor.py checks the setting against gh's account after."""
-    for from_pull_request, commit in ((False, base), (True, head)):
-        project = config_at(commit).get("project")
-        if isinstance(project, dict) and project.get("agents_account"):
-            value = project["agents_account"]
-            if from_pull_request and value == "owner" and owner and (author or "").lower() != owner.lower():
-                return "own"
-            return value
-    return "own"
 
 
 def kept_patterns(commit):
@@ -243,8 +180,8 @@ def blob(commit, name):
 
 def released_files(changed, base, head, repo):
     """The template's changed files and the lock, those exactly as in the release the pull request's lock
-    names, of the template main's lock names: the pull request can't choose another template to vouch
-    for it. Empty in the template itself, when the locks disagree on the template, when the release is
+    names, for the template the base's lock names: the pull request can't choose another template to
+    vouch for it. Empty in the template itself, when the locks disagree on the template, when the release is
     not newer than the base's (going back to an older one needs the owner's OK), when the release can't
     be fetched, or when its tag is not on the template's main (owned.fetch_release)."""
     owned_changed = [name for name in changed if owned.is_owned(name) or name == owned.LOCK]
@@ -263,8 +200,6 @@ def released_files(changed, base, head, repo):
     if release is None:
         return set()
     return {name for name in owned_changed if blob(head, name) == blob(release, name)}
-
-
 
 
 def api(path, method="GET"):
@@ -321,18 +256,13 @@ def main(argv):
         base, head = pull["base"]["sha"], pull["head"]["sha"]
         repo = event["repository"]["full_name"]
         author = (pull.get("user") or {}).get("login")
-        owner = event["repository"].get("owner") or {}
-        owner = owner.get("login") if owner.get("type") == "User" else None
         changed = changed_files(base, head)
-        base_tree, head_tree = tree(base), tree(head)
         kept = kept_patterns(base)
         # The head's "kept" counts for imports too: a pull request that adds to it changes
         # docs/process.json, which needs the owner's OK anyway.
-        errors = (import_errors(head_tree, kept + kept_patterns(head))
-                  + link_errors(head_tree, kept, base_tree + head_tree)
-                  + check(labels(repo, pull["number"]), changed, agents_account(base, head, author, owner),
-                          reviews(repo, pull["number"]), head, author, released_files(changed, base, head, repo),
-                          kept))
+        errors = (import_errors(tree(head), kept + kept_patterns(head))
+                  + check(labels(repo, pull["number"]), changed, reviews(repo, pull["number"]), head, author,
+                          released_files(changed, base, head, repo), kept))
     except (OSError, ValueError, KeyError, IndexError) as error:
         errors = [f"can't read the pull request: {error}"]
     for error in errors:
