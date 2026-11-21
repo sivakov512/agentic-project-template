@@ -4,16 +4,16 @@ the commit that was reviewed and approved, its subject the title and the number,
 only when every check tested the base as it is now.
 
 GitHub tests a pull request on its merge into the base, which it makes again only some time after the
-base moves, so a run may test an old base. The process checks note in each of their runs the base
-commit it tests (check.py), and only runs created from the first one that tested the current base count. When there are
-no such runs, this waits until GitHub has merged the pull request on the current base, then closes and
-reopens it, which runs the checks again (every workflow on pushes runs on `reopened`,
+base moves, so a run may test an old base. The process checks note in each of their runs the base commit
+it tests (check.py), and only runs created from the first one that tested the current base count. When
+there are no such runs, this waits until GitHub has merged the pull request on the current base, then
+closes and reopens it, which runs the checks again (every workflow on pushes runs on `reopened`,
 docs/process/pull-requests.md) and keeps the owner's Approve; the coordinator runs it again once they
-finish. It reopens at most once for each commit of the base: if that didn't help, it stops and says
-what is still wrong. It reads the runs of pull request and review events, so a review that dismisses
-the owner's Approve counts, and waits while any of them runs, a run again of an older one included.
-Rules on GitHub (reviews, required checks) still decide whether the merge goes through. Standard library
-and gh only.
+finish. It reopens at most once for each commit of the base: if that didn't help, it stops and says what
+is still wrong. It reads the runs of pull request and review events, so a review that dismisses the
+owner's Approve counts, and waits while any of them runs, a run again of an older one included. Rules on
+GitHub (reviews, required checks) still decide whether the merge goes through. Standard library and gh
+only.
 
     python3 tools/process/merge.py <number> <commit>
 

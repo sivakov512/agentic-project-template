@@ -49,8 +49,9 @@ The workflows `.github/workflows/process-*.yml` run these jobs, all required for
 
 Every workflow that runs on pushes to pull requests, the project's own included, runs on `reopened`,
 since `merge.py` runs the checks again by reopening the pull request
-([workflow.md](workflow.md#the-merge)). `merge.py` goes by each workflow's last run that wasn't skipped,
-so a job that runs only on a label is run again by putting the label on again once `main` has moved.
+([workflow.md](workflow.md#the-merge)). `merge.py` doesn't count a skipped run where the workflow has
+others, so a job that runs only on a label is run again by putting the label on again once `main` has
+moved.
 
 A passing run of `process-pr` or `process-owner` runs again the failed jobs earlier events left red on
 the same commit. If one stays red: `gh run list --workflow <file> --commit <last commit>`, then
