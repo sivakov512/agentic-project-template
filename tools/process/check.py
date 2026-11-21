@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """Runs every check an agent runs before pushing: the documents, the template's files against the lock,
-the checks' own tests, then the project's checks from docs/process.json; in a pull request's run in CI,
-also that the run tests the pull request on its base as the base is now (check_base.py). The pull
-request's description and title have checks of their own, check_pr.py and check_commits.py
+the checks' own tests, then the project's checks from docs/process.json; with --process-only in a pull
+request's run in CI, also that the run tests the pull request on its base as the base is now
+(check_base.py). The pull request's description and title have checks of their own, check_pr.py and check_commits.py
 (docs/process/rules.md, "Your work"). Standard library and git only.
 
     python3 tools/process/check.py                  everything
@@ -39,11 +39,18 @@ def main(argv):
             print(f"{name}: {error}")
         if errors:
             failed.append(name)
-    for error in check_base.check(ROOT, os.environ):
-        # The annotation's title is how merge.py tells this failure from others.
-        print(f"::error title={check_base.TITLE}::{error}")
-        print(f"Base: {error}")
-        failed.append("Base")
+    if process_only:
+        # Only in process-docs, which checks out GitHub's merge; a project's own job may check out the head.
+        try:
+            base_problems = check_base.check(ROOT, os.environ)
+        except subprocess.CalledProcessError as error:
+            base_problems = [(False, f"git can't tell which base the run tests: {error.stderr or error}")]
+        for stale, error in base_problems:
+            if stale:
+                # The annotation's title is how merge.py tells this failure from others.
+                print(f"::error title={check_base.TITLE}::{error}")
+            print(f"Base: {error}")
+            failed.append("Base")
     if not run_tests():
         failed.append("Tests of the checks")
     if not process_only:

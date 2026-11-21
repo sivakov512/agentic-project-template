@@ -51,6 +51,12 @@ never clash with the project's own.
 | `process-commits` | `tools/process/check_commits.py` | the title against the commit rules ([config.md](config.md#commits)); a job of `process-pr.yml`, so it runs on the same events |
 | `process-owner` | `tools/process/check_owner.py` | a pull request that needs the owner's OK has the owner's approval of its last commit, and one labelled `ok-without-reading` changes none of the files CI holds for the owner ([workflow.md](workflow.md#the-owners-ok-and-the-merge)); it runs again on every review |
 
+Every workflow that runs on pull requests, the project's own included, runs on `reopened`, since
+`merge.py` runs the checks again by closing and reopening the pull request
+([workflow.md](workflow.md#how-a-piece-of-work-goes), step 7). Where the project's `CLAUDE.md` asks for
+the reviews in draft (step 5), the project's own workflows skip draft pull requests
+(`if: github.event.pull_request.draft == false`) and run on `ready_for_review` too.
+
 A passing run of `process-pr` or `process-owner` runs again the failed jobs of the red runs earlier events
 left on the same commit, which would block the merge. If one stays red, `gh run list --workflow
 <process-pr.yml or process-owner.yml> --commit <the pull request's last commit>`, then `gh run rerun

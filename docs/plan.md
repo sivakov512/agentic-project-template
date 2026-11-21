@@ -35,7 +35,9 @@ What, beyond [the process's list](process/reports.md#when-the-owner-looks), the 
 this project. Which code is risky, if any (it handles a secret, or acts on the owner's
 machine, on infrastructure or on data that can't be restored), so it gets a review for harm, and
 whether it then goes `ok-without-reading` rather than being
-[offered to the owner](process/reports.md#reviewed-work-offered-to-the-owner).
+[offered to the owner](process/reports.md#reviewed-work-offered-to-the-owner), and whether the
+coordinator may run more rounds of that review rather than stopping
+([workflow.md](process/workflow.md#how-a-piece-of-work-goes), step 5).
 
 ## Tracker
 
