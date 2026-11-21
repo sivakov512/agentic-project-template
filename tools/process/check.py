@@ -2,7 +2,8 @@
 """Runs every check an agent runs before pushing: the documents, the template's files against the lock,
 the checks' own tests, then the project's checks from docs/process.json; with --process-only in a pull
 request's run in CI, also that the run tests the pull request on its base as the base is now
-(check_base.py). The pull request's description and title have checks of their own, check_pr.py and check_commits.py
+(check_base.py), and that workflows skipping drafts run when a draft leaves draft. The pull request's
+description and title have checks of their own, check_pr.py and check_commits.py
 (docs/process/rules.md, "Your work"). Standard library and git only.
 
     python3 tools/process/check.py                  everything
@@ -34,7 +35,8 @@ def run_tests():
 def main(argv):
     process_only = "--process-only" in argv[1:]
     failed = []
-    for name, errors in (("Docs", check_docs.check(ROOT)), ("Template files", owned.check(ROOT))):
+    for name, errors in (("Docs", check_docs.check(ROOT)), ("Template files", owned.check(ROOT)),
+                         ("Workflows", check_base.workflow_problems(ROOT))):
         for error in errors:
             print(f"{name}: {error}")
         if errors:

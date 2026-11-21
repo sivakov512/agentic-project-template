@@ -1178,6 +1178,20 @@ class BaseOfTheRun(unittest.TestCase):
         self.assertEqual(check_base.check(Path("."), {"GITHUB_EVENT_NAME": "push", "GITHUB_BASE_REF": ""}), [])
         self.assertEqual(check_base.check(Path("."), {}), [])
 
+    def test_a_workflow_skipping_drafts_must_run_when_they_leave_draft(self):
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            (root / ".github/workflows").mkdir(parents=True)
+            slow = "jobs:\n  macos:\n    if: github.event.pull_request.draft == false\n"
+            types = "on:\n  pull_request:\n    types: [opened, synchronize, reopened"
+            (root / ".github/workflows/project-checks.yml").write_text(types + "]\n" + slow, encoding="utf-8")
+            (root / ".github/workflows/project-other.yml").write_text("on: push\n", encoding="utf-8")
+            [found] = check_base.workflow_problems(root)
+            self.assertIn("project-checks.yml", found)
+            (root / ".github/workflows/project-checks.yml").write_text(types + ", ready_for_review]\n" + slow,
+                                                                       encoding="utf-8")
+            self.assertEqual(check_base.workflow_problems(root), [])
+
     def test_reads_the_merge_and_the_remote_as_ci_checks_them_out(self):
         def git(cwd, *args):
             return subprocess.run(["git", *args], cwd=cwd, capture_output=True, text=True, check=True).stdout.strip()
@@ -1218,10 +1232,9 @@ def run(name, minutes, status="completed", conclusion="success", event="pull_req
 
 
 class MergeDecision(unittest.TestCase):
-    def decide(self, runs, stale=False, pushed=None, reopened=None, now=200, ready=None):
+    def decide(self, runs, stale=False, pushed=None, reopened=None, now=200):
         return merge.decide(runs, T0, stale, pushed if pushed is None else at(pushed),
-                            None if reopened is None else at(reopened), at(now),
-                            None if ready is None else at(ready))
+                            None if reopened is None else at(reopened), at(now))
 
     def test_green_runs_after_the_base_moved_merge(self):
         self.assertEqual(self.decide([run("process-checks", 60), run("project", 61)]), ("merge", ""))
@@ -1241,14 +1254,6 @@ class MergeDecision(unittest.TestCase):
     def test_right_after_reopening_old_runs_wait_whatever_made_them_stale(self):
         runs = [run("process-checks", 100, conclusion="failure")]
         self.assertEqual(self.decide(runs, stale=True, reopened=195)[0], "wait")
-
-    def test_a_run_skipped_while_a_draft_runs_again_once(self):
-        runs = [run("process-checks", 100), run("macos", 100, conclusion="skipped")]
-        self.assertEqual(self.decide(runs)[0], "merge")
-        self.assertEqual(self.decide(runs, ready=150)[0], "rerun")
-        self.assertEqual(self.decide(runs, ready=150, reopened=120)[0], "rerun")
-        self.assertIn("macos", self.decide(runs, ready=150, reopened=160)[1])
-        self.assertEqual(self.decide(runs, ready=150, reopened=160)[0], "stop")
 
     def test_a_red_run_is_not_run_again(self):
         self.assertEqual(self.decide([run("project", 60, conclusion="failure")]), ("red", "failed: project"))

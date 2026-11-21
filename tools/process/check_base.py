@@ -5,9 +5,12 @@ request into the base branch, and GitHub makes that merge again only some time a
 run, even one started by closing and reopening the pull request, may test it on an old base, pass, and
 let a merge break `main`. `check.py --process-only` runs this in the `process-docs` job on pull request
 events only and fails such a run; merge.py reads that failure by its annotation's title and runs the
-checks again. Standard library and git only.
+checks again. It also checks, everywhere, that a workflow skipping draft pull requests runs when one
+leaves draft (docs/process/pull-requests.md), or its slow jobs would never test the pull request before
+the merge. Standard library and git only.
 """
 
+import re
 import subprocess
 
 # The title of the annotation a run on an old base leaves on GitHub; merge.py looks for it.
@@ -41,3 +44,16 @@ def check(root, environ):
                             capture_output=True, text=True, check=True).stdout.split()
     found = problem(parents, base, listed[0] if listed else "")
     return [found] if found else []
+
+
+def workflow_problems(root):
+    """The workflows under .github/workflows that skip draft pull requests but don't run on
+    `ready_for_review`, as messages; a skipped job counts as passing for the merge."""
+    problems = []
+    for path in sorted((root / ".github" / "workflows").glob("*.y*ml")):
+        text = path.read_text(encoding="utf-8")
+        if re.search(r"pull_request\.draft\s*==\s*false", text) and "ready_for_review" not in text:
+            problems.append(f"{path.relative_to(root)} skips draft pull requests but doesn't run on "
+                            f"ready_for_review, so its skipped jobs would never test the pull request "
+                            f"(docs/process/pull-requests.md)")
+    return problems

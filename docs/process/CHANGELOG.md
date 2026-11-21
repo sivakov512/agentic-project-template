@@ -24,10 +24,10 @@ rounds of the review for harm by the owner's leave, and smaller fixes.
   asks for them, so that slow CI runs once: the slow jobs of the project's own workflows skip drafts and
   the workflows run on `ready_for_review`; the work session leaves its finished pull request in draft and
   says on it that the work is done; the reviews and fixes go on the draft, and the coordinator marks it
-  ready once no "fix" finding is left. `merge.py` counts a run skipped before the pull request left draft
-  as old. A review that needs CI's result comes after that, in the same round; `CLAUDE.md` may hold the
-  draft longer, until the owner has tried a local build. A red check once ready is a "fix" finding, fixed
-  with the pull request kept ready, whose fix gets one review outside the two rounds.
+  ready once no "fix" finding is left. `check.py` fails a workflow that skips drafts but doesn't run on
+  `ready_for_review`. A review that needs CI's result comes after that, in the same round; `CLAUDE.md`
+  may hold the draft longer, until the owner has tried a local build. A red check once ready is a "fix"
+  finding, fixed with the pull request kept ready, whose fix gets one review outside the two rounds.
 - More rounds of the review for harm (`workflow.md`, step 5, "Risky code"): where `docs/plan.md` gives
   that decision to the coordinator, it may run them instead of stopping; the merge still needs the
   reviewer for harm's "Ready to merge as is: yes", and the report names each round. `rules.md`: a
