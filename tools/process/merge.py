@@ -58,15 +58,19 @@ def when(text):
 
 
 def latest_runs(runs):
-    """The newest run of each workflow from pull request and review events, from GitHub's list of runs."""
-    newest = {}
+    """The newest run of each workflow from pull request and review events, from GitHub's list of runs;
+    but where that one was skipped (its jobs run only on a label, say) and the newest run that wasn't
+    failed, that failed run, so a skipped run never hides a red one."""
+    newest, tested = {}, {}
     for run in runs:
         if run.get("event") not in EVENTS:
             continue
-        known = newest.get(run["workflow_id"])
-        if known is None or (run["created_at"], run["id"]) > (known["created_at"], known["id"]):
-            newest[run["workflow_id"]] = run
-    return list(newest.values())
+        for found in (newest, tested) if run["conclusion"] != "skipped" else (newest,):
+            known = found.get(run["workflow_id"])
+            if known is None or (run["created_at"], run["id"]) > (known["created_at"], known["id"]):
+                found[run["workflow_id"]] = run
+    return [tested[workflow] if run["conclusion"] == "skipped" and workflow in tested
+            and tested[workflow]["conclusion"] not in GOOD else run for workflow, run in newest.items()]
 
 
 def decide(runs, base_time, merged_at, pushed_at, reopened_at, now):

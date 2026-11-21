@@ -9,11 +9,11 @@ the paths docs/process.json's "kept" names on the base branch, or the template's
 names compared whatever their case. The OK is an approval of the pull request's last commit by the
 repository's owner. A file Claude Code loads as rules by itself (a CLAUDE.md or CLAUDE.local.md, a rule
 under .claude/rules/) that imports ("@" and a path) a file the owner doesn't keep never goes in, approved
-or not: its rules could then change without the owner. Nor does a symlink or submodule at a path the
-owner keeps, or an import through one: the check can't see where it leads. The template's files and the lock of a process
-update are the exception where each is exactly as in the newer release that the update's lock names,
-for the template that the base's lock names, and that release is on the template's main: the owner
-agreed it in the template.
+or not: its rules could then change without the owner. Nor does a symlink or submodule where the owner
+keeps files, or an import through one: the check can't see where it leads. The template's files and the
+lock of a process update are the exception where each is exactly as in the newer release that the
+update's lock names, for the template that the base's lock names, and that release is on the template's
+main: the owner agreed it in the template.
 
 check_pr.py takes api and rerun_red from here for its own runs.
 
@@ -100,13 +100,22 @@ def through_link(path, found):
     return None
 
 
+def holds_kept(path, kept=()):
+    """Whether path is a place the owner keeps, or a folder on the way to one: a name kept_by_owner
+    names, a kept pattern or a template folder under it, or anything under it kept by name."""
+    folder = path.casefold() + "/"
+    places = KEPT_BY_OWNER + owned.OWNED_DIRS + owned.OWNED_FILES + [".github/"] + list(kept)
+    return (kept_by_owner(path, kept) or kept_by_owner(folder + "x", kept)
+            or any(place.casefold().startswith(folder) for place in places))
+
+
 def link_errors(entries, kept=()):
-    """A symlink or submodule (entries, from tree) at a path the owner keeps (kept_by_owner, with kept):
-    the check can't see where it leads, so what lies behind it could change without the owner. Such a
-    pull request can't merge whatever its approvals."""
-    return sorted(f"{path} is a {'symlink' if mode == LINKS[0] else 'submodule'} where the owner keeps a file:"
-                  " put the file itself there, or import it with @"
-                  for mode, _, path in entries if mode in LINKS and kept_by_owner(path, kept))
+    """A symlink or submodule (entries, from tree) at a path the owner keeps, or at a folder on the way
+    to one (holds_kept, with kept): the check can't see where it leads, so what lies behind it could
+    change without the owner. Such a pull request can't merge whatever its approvals."""
+    return sorted(f"{path} is a {'symlink' if mode == LINKS[0] else 'submodule'} where the owner keeps"
+                  " files: put the files themselves there, or import them with @"
+                  for mode, _, path in entries if mode in LINKS and holds_kept(path, kept))
 
 
 def import_errors(entries, kept=()):

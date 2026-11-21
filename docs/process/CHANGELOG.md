@@ -7,8 +7,8 @@ The newest version first. Each entry says what changed and what projects must do
 
 The process made shorter, with the same protections, and the merge on the current `main`. The process
 documents went from about 15,700 words in 0.11.0 to about 11,400; what each role reads before it acts
-went down more: a work session from about 4,200 words to 2,100, the coordinator from about 10,300 to
-6,400.
+went down more: a work session from about 4,200 words to 2,000, the coordinator from about 10,300 to
+6,300.
 
 - **The merge on the current `main`** (`workflow.md`, "The merge"). Closing and reopening a pull request
   didn't make its checks test the current `main`, since GitHub makes its merge into `main` again only

@@ -604,6 +604,13 @@ class OwnerCheck(unittest.TestCase):
         self.assertIn("add it to \"kept\" in docs/process.json or move it under .claude/", unkept[0])
         self.assertEqual(short(kept), ["AGENTS.md imports docs/more.md"])
 
+    def test_a_link_on_the_way_to_what_the_owner_keeps_is_caught(self):
+        link = "120000"
+        for path, kept in (("docs", []), ("hardware", ["hardware/*"]), ("hardware/config", ["hardware/config/**"]),
+                           (".github", []), ("tools", []), (".claude", [])):
+            self.assertEqual(len(check_owner.link_errors([(link, "x", path)], kept)), 1, path)
+        self.assertEqual(check_owner.link_errors([(link, "x", "src"), (link, "x", "docs/guide")], ["hardware/*"]), [])
+
     def test_links_where_the_owner_keeps_files_never_go_in(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
@@ -625,7 +632,7 @@ class OwnerCheck(unittest.TestCase):
             finally:
                 check_owner.ROOT = saved
         self.assertEqual(len(links), 1, links)
-        self.assertIn("CLAUDE.md is a symlink where the owner keeps a file", links[0])
+        self.assertIn("CLAUDE.md is a symlink where the owner keeps files", links[0])
         self.assertEqual(len(imports), 1, imports)
         self.assertIn("through linked, a symlink or submodule", imports[0])
 
@@ -1183,6 +1190,13 @@ class MergeDecision(unittest.TestCase):
         self.assertEqual(self.decide(runs, merged=90)[0], "rerun")
         self.assertEqual(self.decide(runs, merged=None)[0], "rerun")
         self.assertEqual(self.decide(runs, merged=30), ("merge", ""))
+
+    def test_a_skipped_run_never_hides_a_red_one(self):
+        red = run("e2e", 60, conclusion="failure", number=1)
+        skipped = run("e2e", 70, conclusion="skipped", number=2)
+        self.assertEqual(merge.latest_runs([red, skipped]), [red])
+        green = dict(red, conclusion="success")
+        self.assertEqual(merge.latest_runs([green, skipped]), [skipped])
 
     def test_a_skipped_run_tested_nothing_so_its_age_doesnt_matter(self):
         runs = [run("process-checks", 60), run("preview", -60, conclusion="skipped")]
