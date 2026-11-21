@@ -47,11 +47,10 @@ The workflows `.github/workflows/process-*.yml` run these jobs, all required for
 | `process-lock` | `tools/process/check_lock.py` | a pull request that changes the template's files moves to a newer version ([updates.md](updates.md#the-lock)) |
 | `process-owner` | `tools/process/check_owner.py` | a pull request that needs the owner's OK has the owner's Approve of its last commit, and one labelled `ok-without-reading` changes nothing the owner keeps ([owner.md](owner.md#the-owners-ok)); it runs again on every review |
 
-Every workflow on pull requests, the project's own included, runs on `reopened`, since `merge.py` runs
-the checks again by reopening the pull request ([workflow.md](workflow.md#the-merge)). One whose jobs
-run only on another event (a label, say) then leaves a skipped run, which `merge.py` doesn't count:
-it goes by the workflow's last run that wasn't skipped, so after `main` moves such a job runs again on
-its event (the label put on again) before the merge.
+Every workflow that runs on pushes to pull requests, the project's own included, runs on `reopened`,
+since `merge.py` runs the checks again by reopening the pull request
+([workflow.md](workflow.md#the-merge)). `merge.py` goes by each workflow's last run that wasn't skipped,
+so a job that runs only on a label is run again by putting the label on again once `main` has moved.
 
 A passing run of `process-pr` or `process-owner` runs again the failed jobs earlier events left red on
 the same commit. If one stays red: `gh run list --workflow <file> --commit <last commit>`, then

@@ -56,9 +56,9 @@ included. A project with `agents_account` or `merged_by` set to `owner` first mo
 agents' own and the coordinator's merge, with the owner. Check that the
 "Owner review" section of `docs/plan.md` still says what the owner meant under the new point 6, and say
 in the update's "Owner review" what changed for the owner. From now on the coordinator merges with
-`merge.py`. If a project's own workflow on pull requests lists its event types without `reopened` (one
-that runs on a label included), adding it goes to the owner in a pull request of its own, merged before
-the others. A project whose owner
+`merge.py`. If a project's own workflow that runs on pushes to pull requests lists its event types
+without `reopened`, adding it goes to the owner in a pull request of its own, merged before the others; a
+workflow whose jobs run only on a label needs nothing, its label is put on again after `main` moves. A project whose owner
 wants the reviews in draft says so in `CLAUDE.md`, and its own workflows add `ready_for_review` and
 `if: github.event.pull_request.draft == false` on their slow jobs, in a pull request of its own.
 
