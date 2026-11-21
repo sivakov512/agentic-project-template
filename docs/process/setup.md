@@ -1,138 +1,78 @@
 # Setting up a project
 
-For a repository just made from the template: `docs/process.json` on `main` says `"set_up": false`,
-and the project's files are still the template's placeholders ([README.md](README.md#what-lives-where)).
-The session that finds it so sets the project up in one pull request. A project that already runs a
-process of its own goes as "Adopting the process in an existing project" below.
-
-**If a branch `setup` or a pull request from it exists,** setting up has started: continue there, from
-its ticked steps and its comments.
+For a repository just made from the template: `docs/process.json` on `main` says `"set_up": false`, and
+the project's files are still the template's placeholders. The session that finds it so sets the project
+up in one pull request. If a branch `setup` or a pull request from it exists, continue there.
 
 ## What the owner gives
 
-A brief: what the project is, for whom, and what "done" looks like, in the first message or a linked
-document.
+A brief: what the project is, for whom, and what "done" looks like. Ask what the steps below need and the
+brief doesn't answer, in one batch of questions, each with your recommendation. Always ask:
 
-- Ask what the steps below need and the brief doesn't answer, in the chat, in one batch of questions,
-  the account question first, each with your recommendation.
-- Step 1 already pushes: do it only once the owner has answered the account question and `gh api user`
-  shows that account. The other answers may come later, but nothing goes into the plan before them.
-- Once the setup pull request is open, put the brief, the questions and the answers in a comment on it.
-
-Always ask, whatever the brief says:
-
-- **whose account the agents work under, and who merges**
-  ([workflow.md](workflow.md#the-owners-ok-and-the-merge)), recommending the agents' own account:
-  GitHub then holds the owner's OK, while with the owner's account only the rules do. With the agents'
-  own account the agents run where only their account is signed in: no owner token in `gh`, the
-  credential helper or the environment they can reach (a separate user on the machine, or a container);
-- **which tracker mirrors the project for the owner,** or that there is none; whether the project is in
-  it yet; and how agents reach it (a connector, a skill, a token), which the owner grants. If the
-  project isn't in it yet, `tracker` names the tracker and says "project to be created";
-- **how the project ships** (what is released, versions, how it is built and published, who starts
-  it, how the owner gets a build to try), or that it isn't released ([config.md](config.md#releases));
+- **the agents' own GitHub account** ([owner.md](owner.md#the-owners-ok)), invited to the repository with
+  Write access, not Admin, with a token that may change workflow files. The agents run where only that
+  account is signed in: no owner token in `gh`, the credential helper or the environment they can reach;
+- **the tracker** that mirrors the project for the owner, or none, and how agents reach it;
+- **how the project ships** ([config.md](config.md#releases)), or that it isn't released;
 - the owner's language, and the commit rules, if any ([config.md](config.md#commits)).
+
+Push nothing before `gh api user` shows the agents' account. Once the pull request is open, put the
+brief, the questions and the answers in a comment on it.
 
 ## Steps
 
-1. **Branch** `setup` from `main`, start it with `git commit --allow-empty -m "chore: start the
-   setup"`, and open a draft pull request titled `Plan: set up the project` (`docs(plan): set up
-   the project` once step 4 asks for Conventional Commits), "Backlog item: Setup", with the steps below as
-   a checklist in its description. Tick each step there when it is done.
-2. **`CLAUDE.md`:** replace the placeholder text with what the project is, in two or three lines, and
-   the project's own rules for agents (dangerous operations, hardware, accounts, secrets, house style,
-   anything every session must know). Such a rule goes here, never only in `docs/plan.md`. Keep the
-   line `@docs/process/rules.md`.
-3. **`docs/plan.md`:** fill in every section the placeholder lists.
-   - The milestones are the foundation, written out in full, then those that each end with something
-     the owner uses, a line each: what the owner gets from it
-     ([workflow.md](workflow.md#milestones-and-gates)).
-   - Keep the document chain as short as the project allows, and name in it where the interfaces
-     between parts are written ([workflow.md](workflow.md#how-the-repository-works)); with code, the
-     document of the code's design that lists its folders ([rules.md](rules.md#code)); with a user
-     interface, its design-system document ([rules.md](rules.md#the-ui-review)).
-4. **`docs/process.json`:** the owner's language, the tracker, how the project ships, the agents'
-   account and who merges, the commit rules, the kinds of ID and coverage rules
-   ([config.md](config.md)). `checks` stays empty until the project has code; the item that adds the
-   first check also adds `.github/workflows/project-checks.yml` that runs it in CI. Leave `set_up` false
-   until step 9.
-5. **`docs/backlog.md`:** the first milestone's items, under its heading
-   ([changes.md](changes.md#the-backlog)).
-6. **`docs/now.md`:** where the work stands: the foundation, nothing in work, the first items next.
-7. **`README.md`:** what the project is, for a visitor. **`LICENSE`** is the
-   template's: replace it with the project's license, or remove it if the owner wants none. The
-   process files keep their own notice in `docs/process/README.md`.
-8. **GitHub:** `python3 tools/process/doctor.py --fix-labels` creates the two review labels. The
-   repository's settings are the owner's: list them in the pull request as paths of clicks.
-   - Settings → General → Pull Requests: untick "Allow merge commits" and "Allow rebase merging", tick
-     "Allow squash merging" and set its default commit message to "Pull request title". Where a ruleset
-     protects `main`, also Settings → Rules → Rulesets → the ruleset for `main` → Require a pull request
-     before merging → Allowed merge methods: Squash only.
-   - Settings → Branches (or Rules): protect `main`:
-     - changes only through pull requests, with the checks `process-docs`, `process-pr`,
-       `process-lock`, `process-commits` and `process-owner` required (the project's own jobs too, once
-       they exist);
-     - no required approvals (untick "Require approvals"): `process-owner` asks for the owner's approval
-       where it is needed;
-     - with the agents' own account, also "Require review from Code Owners" and "Dismiss stale pull
-       request approvals when new commits are pushed", and the setting-up session makes
-       `.github/CODEOWNERS` say `/.github/ @<the owner's login>` (the template's own names the
-       template's owner) ([pull-requests.md](pull-requests.md#what-the-checks-cant-stop));
-     - in both modes, no bypassing ("Do not allow bypassing the above settings", or no bypass list in a
-       ruleset).
-   - Settings → Secrets and variables → Actions → Variables: `CI_RUNNER`, if the checks should run on a
-     self-hosted runner. Every pull request's code runs there before any review, so only for a private
-     repository, or with approval required for all outside collaborators (Settings → Actions → General
-     → approval for fork pull request workflows); better a runner that is fresh for each job.
-   - The secrets the project itself needs, if any are known yet. Those that publish, deploy or mint
-     tokens (a GitHub App's private key among them) go into a GitHub Environment limited to `main`
-     (Settings → Environments → New environment → Deployment branches and tags: `main` only), which
-     the job that uses them names. A job that publishes therefore runs on the push to `main` (with
-     release-please, on its `release_created` output). The Environment may also allow release tags
-     `v*`, and a job publish on the tag, only where a tag ruleset stops the agents' account from
-     creating, moving or deleting them. A repository secret is only for what any branch may use.
-9. **Finish:** remove the `<!-- template placeholder -->` lines, set `"set_up": true`, run
-   `python3 tools/process/check.py` and `python3 tools/process/doctor.py`, and go on only when both pass,
-   apart from what waits on the owner.
-10. **Review and report:** the pull request leaves draft, labelled `owner-review`; a reviewer checks it
-    ([rules.md](rules.md#every-review)); its "Owner review" asks the owner to read the plan and
-    `CLAUDE.md` and to do the list from step 8.
-11. **Merge** as the project chose ([workflow.md](workflow.md#the-owners-ok-and-the-merge)). The next
-    session is the coordinator; if the project is still to be created in the tracker, its first job is
-    to create it and write its ID into `tracker` in a coordinator record.
+1. **Branch** `setup` from `main`, start it with `git commit --allow-empty -m "chore: start the setup"`,
+   and open a draft pull request `Plan: set up the project` (`docs(plan): set up the project` with
+   Conventional Commits), "Backlog item: Setup", with these steps as a checklist, ticked as they are
+   done.
+2. **`CLAUDE.md`:** what the project is, in two or three lines, and the project's own rules for agents
+   (dangerous operations, hardware, accounts, secrets, house style): a rule every session must keep goes
+   here, never only in `docs/plan.md`. Keep the line `@docs/process/rules.md`.
+3. **`docs/plan.md`:** every section the placeholder lists. The milestones: the foundation in full, then
+   those after it, a line each ([workflow.md](workflow.md#milestones-and-gates)). The document chain as
+   short as the project allows, naming where interfaces are written, the design document that lists the
+   code's folders ([rules.md](rules.md#code)) and, with a user interface, the design-system document.
+4. **`docs/process.json`:** the language, the tracker, how the project ships, the commit rules, the kinds
+   of ID and coverage rules ([config.md](config.md)). `checks` stays empty until the project has code;
+   the item that adds the first check adds `.github/workflows/project-checks.yml` too.
+5. **`docs/backlog.md`:** the first milestone's items ([changes.md](changes.md#the-backlog)).
+6. **`docs/now.md`:** the foundation, nothing in work, the first items next.
+7. **`README.md`:** what the project is, for a visitor. **`LICENSE`:** the project's license, or none.
+8. **GitHub:** `python3 tools/process/doctor.py --fix-labels` creates the two labels. The settings are
+   the owner's; list them in the pull request as paths of clicks:
+   - Settings → General → Pull Requests: only "Allow squash merging", its default message "Pull request
+     title" (in a ruleset for `main` too: Allowed merge methods: Squash only);
+   - protect `main` (Settings → Branches, or Rules): changes only through pull requests; required checks
+     `process-docs`, `process-pr`, `process-lock`, `process-commits`, `process-owner` and later the
+     project's own; no required approvals (`process-owner` asks for the owner's where needed); "Require
+     review from Code Owners" and "Dismiss stale pull request approvals when new commits are pushed"; no
+     bypassing. The session makes `.github/CODEOWNERS` say `/.github/ @<the owner's login>`;
+   - `CI_RUNNER` (Settings → Secrets and variables → Actions → Variables), if the checks run on a
+     self-hosted runner: only for a private repository, since every pull request's code runs there;
+   - secrets that publish, deploy or mint tokens go into a GitHub Environment limited to `main`, named by
+     the job that uses them, which therefore runs on the push to `main`.
+9. **Finish:** remove the `<!-- template placeholder -->` lines, set `"set_up": true`, and run
+   `check.py` and `doctor.py` until both pass, apart from what waits on the owner.
+10. **Review and merge:** the pull request leaves draft labelled `owner-review` and gets the review
+    ([reviews.md](reviews.md)); its "Owner review" asks the owner to read the plan and `CLAUDE.md` and to
+    do the settings. The session merges it with `merge.py` after the owner's Approve
+    ([workflow.md](workflow.md#the-merge)); the next session is the coordinator.
 
 ## Adopting the process in an existing project
 
-The project's coordinator does it when the owner asks, under the project's current rules, reading the
-template at its latest release.
+The project's coordinator does it when the owner asks, from the template's latest release, on a branch
+`setup`, in one pull request (kind `plan`, `owner-review`, "Backlog item: Setup"), asking the questions
+above that the project doesn't answer yet. Open work pull requests stay open and get the template's
+sections once it merges.
 
-- It asks the questions of "What the owner gives" that the project's files don't answer yet, and works
-  on a branch `setup`, continued as above.
-- One pull request, kind `plan`, labelled `owner-review`, "Backlog item: Setup". The copied template
-  files count as generated; if the rest would pass the size limit ([rules.md](rules.md#your-work)), the
-  renumbering of the backlog goes first in a pull request of its own (kind `plan`, labelled
-  `ok-without-reading`, "Backlog item: Setup").
-- Work pull requests open at the move stay open: once it is merged, their descriptions get the
-  template's sections they lack.
-
-The steps:
-
-1. With the template checked out at its latest release tag, run `python3 <template>/tools/process/sync.py
-   <template> .`: it brings the template's files and the lock. Copy the project placeholders from the
-   same checkout where the project has no such file yet ([README.md](README.md#what-lives-where)).
-2. Split the project's rules: what the process files now say is removed from the project's `CLAUDE.md`
-   and plan. What is the project's own stays: rules every session keeps in `CLAUDE.md`, which imports
-   `@docs/process/rules.md`, the rest under the sections of the `docs/plan.md` placeholder. The plan is
-   brought into the shape of the foundation and the milestones after it as
-   [workflow.md](workflow.md#a-project-already-under-way) says.
-3. Move the project's documents where the process expects them, and its backlog into the `B-###` form,
-   renumbered if it used another prefix; `docs/now.md` keeps a table from old numbers to new, the old
-   ones written as code if their prefix is still one of the project's kinds. If the default branch
-   isn't `main`, the owner renames it (Settings → General → Default branch).
-4. Write `docs/process.json` as in step 4 of setting up, with the project's checks, `ids_ignore` for
-   frozen documents and `"set_up": true`. Remove the `<!-- template placeholder -->` lines.
-5. Remove the project's old copies of what the template now does: its docs, pull request and commit
-   checks and their workflow. Its own checks (tests, builds) move to `.github/workflows/project-*.yml`,
-   with job names that don't start with `process-`.
-6. Run `python3 tools/process/check.py` and `python3 tools/process/doctor.py` until both pass, apart
-   from what waits on the owner, and ask the owner for the settings of step 8 of setting up.
+1. Run `python3 <template>/tools/process/sync.py <template> .` from a checkout of the release tag: it
+   brings the template's files and the lock. Copy the placeholders the project lacks.
+2. Remove from the project's `CLAUDE.md` and plan what the process files now say; keep the project's own
+   rules there. Bring the plan into milestones ([workflow.md](workflow.md#a-project-already-under-way)).
+3. Move the documents where the process expects them, and the backlog into the `B-###` form;
+   `docs/now.md` keeps a table from old numbers to new. If the default branch isn't `main`, the owner
+   renames it. If the renumbering makes the pull request too large, it goes first in one of its own.
+4. Write `docs/process.json` as in step 4, with `ids_ignore` for frozen documents and `"set_up": true`.
+5. Remove the project's old copies of what the template does; its own checks move to
+   `.github/workflows/project-*.yml`, with job names that don't start with `process-`.
+6. Run `check.py` and `doctor.py` until both pass, and ask the owner for the settings of step 8.

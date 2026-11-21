@@ -25,9 +25,9 @@ PROJECT_FILES = ["CLAUDE.md", "README.md", "docs/plan.md", "docs/now.md", "docs/
                  "docs/decisions/README.md", check_docs.CONFIG]
 PLACEHOLDER = "<!-- template placeholder -->"
 REQUIRED_CHECKS = ["process-docs", "process-pr", "process-lock", "process-commits", "process-owner"]
-# With the agents' own account .github/CODEOWNERS gives the owner .github/, where the workflow of
-# process-owner is: it runs the check from the base branch's copy, so the workflow is all a pull request could change
-# to get round it (docs/process/setup.md, step 8). Paths there that must fall to the owner alone:
+# .github/CODEOWNERS gives the owner .github/, where the workflow of process-owner is: it runs the check
+# from the base branch's copy, so the workflow is all a pull request could change to get round it
+# (docs/process/setup.md, step 8). Paths there that must fall to the owner alone:
 CODE_OWNED = [".github/CODEOWNERS", ".github/workflows/process-owner.yml", ".github/workflows/x.yml"]
 
 
@@ -91,16 +91,13 @@ def binds_everyone(branch, rules):
     return True if protection.get("enabled") and level == "everyone" and not rules else None
 
 
-def identity_problem(agents_account, login, owner):
-    """What is wrong with gh's account (login) for agents_account, or None when it fits. Under their own
-    account the agents must not hold the owner's, which GitHub lets approve and merge as the owner; under
-    the owner's, they work as the owner (docs/process/workflow.md, "The owner's OK and the merge")."""
-    same = login.lower() == owner.lower()
-    if agents_account == "own" and same:
-        return (f"gh works as the repository's owner {login}, but agents_account is own: sign gh and git in"
-                " as the agents' account, where the owner's isn't signed in")
-    if agents_account == "owner" and not same:
-        return f"gh works as {login}, but agents_account is owner: the agents work as {owner}, or the setting is own"
+def identity_problem(login, owner):
+    """What is wrong with gh's account (login), or None when it fits: the agents work under an account of
+    their own and must not hold the repository's owner's (owner), which GitHub lets approve and merge as
+    the owner (docs/process/owner.md#the-owners-ok)."""
+    if login.lower() == owner.lower():
+        return (f"gh works as the repository's owner {login}: sign gh and git in as the agents' account,"
+                " where the owner's isn't signed in")
     return None
 
 
@@ -167,10 +164,6 @@ def check_files(report):
         for error in check_docs.config_errors(config):
             report.line(False, error)
         tracker = project.get("tracker") if isinstance(project, dict) else None
-        if set_up and project.get("agents_account") and project.get("merged_by"):
-            account = "their own account" if project["agents_account"] == "own" else "the owner's account"
-            report.line(True, f"agents work under {account}; the {project['merged_by']} merges"
-                        " (docs/process/workflow.md)")
         if set_up and isinstance(tracker, str) and tracker.strip():
             report.line(True, f"tracker: {tracker}" + ("" if tracker.strip().lower() == "none"
                         else " (keep it in step: docs/process/coordinator.md, \"The tracker\")"))
@@ -191,11 +184,10 @@ def check_files(report):
                     "CLAUDE.md imports the process rules", "keep the line @docs/process/rules.md")
     errors = owned.check(ROOT)
     report.line(not errors, "the template's files match the lock", "; ".join(errors[:3]))
-    agents_account = project.get("agents_account") if isinstance(project, dict) else None
-    return lock, set_up, agents_account
+    return lock, set_up
 
 
-def check_github(report, lock, set_up, fix_labels, agents_account):
+def check_github(report, lock, set_up, fix_labels):
     repo = this_repo()
     if not repo:
         report.line(None, "GitHub", "gh can't see this repository: log in to gh to check the GitHub side")
@@ -209,18 +201,17 @@ def check_github(report, lock, set_up, fix_labels, agents_account):
         problem = merge_settings_problem(about)
         report.line(None if problem is False else not problem, "squash merging only, titled by the pull request",
                     "the owner sets it (docs/process/setup.md, step 8)" + (f": {problem}" if problem else ""))
-    if agents_account != "owner" and about:
+    if about:
         report.line(about.get("type") == "User", "the repository belongs to the owner's personal account",
                     "process-owner counts only the repository owner's approval, and an organisation"
-                    " gives nobody that (docs/process/workflow.md, \"The owner's OK and the merge\")")
-    # The template's coordinator works as the agents' own account.
-    account = agents_account or ("own" if is_template else None)
+                    " gives nobody that (docs/process/owner.md#the-owners-ok)")
     code, out = gh("api", "user", "--jq", ".login")
-    if account and code == 0 and about.get("type") == "User":
-        problem = identity_problem(account, out.strip(), repo.split("/")[0])
-        report.line(not problem, f"gh works as {out.strip()}, as agents_account {account} asks", problem)
-    elif account:
-        report.line(None, "gh's account fits agents_account", "can't tell gh's account from the repository's owner")
+    if code == 0 and about.get("type") == "User":
+        problem = identity_problem(out.strip(), repo.split("/")[0])
+        report.line(not problem, f"gh works as {out.strip()}, not as the repository's owner", problem)
+    else:
+        report.line(None, "gh works as the agents' account",
+                    "can't tell gh's account from the repository's owner")
     if about.get("private") is False:
         code, out = gh("api", f"repos/{repo}/actions/variables", "--jq", ".variables[].name")
         report.line(None if code != 0 else "CI_RUNNER" not in out.split(),
@@ -275,23 +266,19 @@ def check_github(report, lock, set_up, fix_labels, agents_account):
             report.line(None, "no required approvals for main",
                         "the owner checks: process-owner asks for approvals where needed (docs/process/setup.md, step 8)")
         elif reviews[0] > 0:
-            report.line(None if agents_account != "owner" else False, "no required approvals for main",
-                        f"the ruleset asks {reviews[0]} approval(s): "
-                        + ("nobody can approve their own pull request, so nothing would merge"
-                           if agents_account == "owner" else
-                           "pull requests OK without reading still wait for the owner")
-                        + " (docs/process/setup.md, step 8)")
-        if agents_account != "owner":
-            owner = repo.split("/")[0]
-            codeowners = ROOT / ".github/CODEOWNERS"
-            text = codeowners.read_text(encoding="utf-8") if codeowners.exists() else ""
-            report.line(not not_owners_alone(text, owner), f".github/CODEOWNERS gives .github/ to @{owner} alone",
-                        f"its last rule for .github/ must be \"/.github/ @{owner}\" (docs/process/setup.md, step 8)")
-            report.line(code_owner_review(rules), "main requires the code owners' review",
-                        "the owner ticks \"Require review from Code Owners\" (docs/process/setup.md, step 8)")
-            report.line(None if reviews is None else reviews[1], "approvals are dismissed by new commits",
-                        "the owner ticks \"Dismiss stale pull request approvals when new commits are pushed\""
-                        " (docs/process/setup.md, step 8)")
+            report.line(None, "no required approvals for main",
+                        f"the ruleset asks {reviews[0]} approval(s): pull requests OK without reading still"
+                        " wait for the owner (docs/process/setup.md, step 8)")
+        owner = repo.split("/")[0]
+        codeowners = ROOT / ".github/CODEOWNERS"
+        text = codeowners.read_text(encoding="utf-8") if codeowners.exists() else ""
+        report.line(not not_owners_alone(text, owner), f".github/CODEOWNERS gives .github/ to @{owner} alone",
+                    f"its last rule for .github/ must be \"/.github/ @{owner}\" (docs/process/setup.md, step 8)")
+        report.line(code_owner_review(rules), "main requires the code owners' review",
+                    "the owner ticks \"Require review from Code Owners\" (docs/process/setup.md, step 8)")
+        report.line(None if reviews is None else reviews[1], "approvals are dismissed by new commits",
+                    "the owner ticks \"Dismiss stale pull request approvals when new commits are pushed\""
+                    " (docs/process/setup.md, step 8)")
         # Bypassing would let the owner's account, or anyone holding it, merge past process-owner.
         report.line(binds_everyone(branch, rules), "no bypassing for main",
                     "the owner checks it: an empty bypass list in the ruleset, or \"Do not allow bypassing the"
@@ -313,8 +300,8 @@ def check_github(report, lock, set_up, fix_labels, agents_account):
 
 def main(argv):
     report = Report()
-    lock, set_up, agents_account = check_files(report)
-    check_github(report, lock, set_up, "--fix-labels" in argv[1:], agents_account)
+    lock, set_up = check_files(report)
+    check_github(report, lock, set_up, "--fix-labels" in argv[1:])
     print("Nothing missing" if not report.failed else f"{report.failed} thing(s) missing")
     return 1 if report.failed else 0
 

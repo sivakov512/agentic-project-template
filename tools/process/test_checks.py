@@ -15,12 +15,14 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
+import check  # noqa: E402
 import check_commits  # noqa: E402
 import check_docs  # noqa: E402
 import check_lock  # noqa: E402
 import check_owner  # noqa: E402
 import check_pr  # noqa: E402
 import doctor  # noqa: E402
+import merge  # noqa: E402
 import owned  # noqa: E402
 import sync  # noqa: E402
 import update  # noqa: E402
@@ -44,8 +46,7 @@ BACKLOG = """\
 
 # A project's kinds of ID and coverage, as docs/process.json gives them: cases to requirements.
 CONFIG = {
-    "project": {"set_up": True, "owner_language": "English", "tracker": "none", "releases": "none",
-                "agents_account": "own", "merged_by": "coordinator"},
+    "project": {"set_up": True, "owner_language": "English", "tracker": "none", "releases": "none"},
     "ids": [
         {"kind": "case", "prefix": "C", "file": "docs/cases.md", "defined_by": "heading"},
         {"kind": "scenario", "prefix": "S", "file": "docs/scenarios.md", "defined_by": "heading"},
@@ -330,8 +331,6 @@ class DocsCheck(unittest.TestCase):
             ({"project": {**CONFIG["project"], "owner_language": ""}}, "owner_language must be set"),
             ({"project": {**CONFIG["project"], "tracker": ""}}, "tracker must be set"),
             ({"project": {**CONFIG["project"], "releases": ""}}, "releases must be set"),
-            ({"project": {**CONFIG["project"], "merged_by": ""}}, "merged_by must be set"),
-            ({"project": {**CONFIG["project"], "agents_account": "bot"}}, "agents_account must be own or owner"),
             ({"ids_ignore": "docs/a.md"}, "ids_ignore must be a list"),
             ({"commits": {"one_line": "yes"}}, "commits must be an object of true or false"),
             ({"commits": {"signed": True}}, "knows only one_line, no_co_authors and conventional"),
@@ -340,6 +339,11 @@ class DocsCheck(unittest.TestCase):
         ]:
             with self.subTest(text=text):
                 self.assertFound(text, self.errors({}, config))
+
+    def test_old_account_settings_are_accepted_whatever_they_hold(self):
+        for old in ({"agents_account": "owner", "merged_by": "owner"}, {"agents_account": "bot", "merged_by": 3}):
+            with self.subTest(old=old):
+                self.assertEqual(check_docs.project_errors({"project": {**CONFIG["project"], **old}}), [])
 
 
 class PullRequestCheck(unittest.TestCase):
@@ -501,8 +505,8 @@ class PullRequestEvent(unittest.TestCase):
 class OwnerCheck(unittest.TestCase):
     HEAD = "abc123"
 
-    def errors(self, labels, changed=("src/app.py",), account="own", reviews=()):
-        return check_owner.check(labels, list(changed), account, list(reviews), self.HEAD, "agents")
+    def errors(self, labels, changed=("src/app.py",), reviews=()):
+        return check_owner.check(labels, list(changed), list(reviews), self.HEAD, "agents")
 
     def review(self, state, login="owner", commit=HEAD, association="OWNER"):
         return {"user": {"login": login}, "state": state, "commit_id": commit, "author_association": association}
@@ -571,48 +575,21 @@ class OwnerCheck(unittest.TestCase):
                                               "src/.claude-notes.md"]), [])
 
 
-    def test_links_and_submodules_where_the_owner_keeps_paths_never_go_in(self):
-        link, submodule = check_owner.LINK, check_owner.SUBMODULE
-        kept = ["src/payments/*", "*/secrets/*"]
-        trees = [("100644", "x", "Firmware/CLAUDE.md"), ("100644", "x", "boards/x/.claude/settings.json")]
-        def errors(mode, path):
-            return check_owner.link_errors([(mode, "x", path)], kept, trees)
-        for mode, path in ((link, ".claude"), (link, ".Claude"), (link, "firmware/.claude"),
-                           (link, "CLAUDE.md"), (link, "src/claude.local.md"), (submodule, ".claude"),
-                           (link, "docs"), (link, "tools/process"), (link, ".github"), (submodule, "src"),
-                           (link, "app/secrets"), (link, "firmware"), (link, "boards"), (link, "boards/x")):
-            with self.subTest(mode=mode, path=path):
-                found = errors(mode, path)
-                self.assertEqual(len(found), 1, found)
-                self.assertIn("not even with the owner's approval", found[0])
-        self.assertIn("@AGENTS.md", errors(link, "CLAUDE.md")[0])
-        self.assertNotIn("@AGENTS.md", errors(link, ".claude")[0])
-        for mode, path in ((link, "web/assets/logo.svg"), (link, "docs-old"), (submodule, "vendor/lib"),
-                           (link, "config"), (link, "app")):
-            with self.subTest(mode=mode, path=path):
-                self.assertEqual(errors(mode, path), [])
-        self.assertEqual(check_owner.link_errors([("100644", "x", ".claude")]), [])  # a plain file
-
-    def test_rules_may_import_only_plain_files_the_owner_keeps(self):
+    def test_rules_may_import_only_files_the_owner_keeps(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             git_in(root, "init", "-q")
             (root / "firmware").mkdir()
             (root / "firmware/CLAUDE.md").write_bytes(b"Rules \xff\0 see @notes.md\n")
-            (root / "notes2.md").symlink_to("src/whatever.md")
-            (root / "lib").symlink_to("src")
-            head = commit_files(root, {
-                "CLAUDE.md": "Read @AGENTS.md and @.claude/rules/style.md. Mail me@example.com. See @missing.md.\n"
-                             "Also @notes2.md, @lib/rules.md and @vendor/sdk/RULES.md.\n",
+            commit_files(root, {
+                "CLAUDE.md": "Read @AGENTS.md and @.claude/rules/style.md. Mail me@example.com. See @missing.md.\n",
                 "AGENTS.md": "See @docs/more.md\n",
                 ".claude/rules/style.md": "@docs/rules.md\n",
                 ".claude/commands/deploy.md": "Deploy @src/app.py\n",  # not loaded as rules
                 "docs/plan.md": "The plan, see @src/app.py\n",  # kept, but not loaded as rules
                 "docs/more.md": "More.\n", "docs/rules.md": "Rules.\n", "firmware/notes.md": "Notes.\n",
-                "src/app.py": "print()\n", "src/whatever.md": "Agent rules.\n", "src/rules.md": "Agent rules.\n"},
+                "src/app.py": "print()\n"},
                 "imports")
-            git_in(root, "update-index", "--add", "--cacheinfo", f"160000,{head},vendor/sdk")
-            git_in(root, "commit", "-qm", "submodule")
             saved, check_owner.ROOT = check_owner.ROOT, root
             try:
                 entries = check_owner.tree(git_in(root, "rev-parse", "HEAD"))
@@ -622,13 +599,42 @@ class OwnerCheck(unittest.TestCase):
                 check_owner.ROOT = saved
         def short(errors):
             return [error.split(", which")[0].split(":")[0] for error in errors]
-        links = ["CLAUDE.md imports lib/rules.md through the symlink lib",
-                 "CLAUDE.md imports notes2.md through the symlink notes2.md",
-                 "CLAUDE.md imports vendor/sdk/RULES.md through the submodule vendor/sdk"]
         self.assertEqual(short(unkept), [".claude/rules/style.md imports docs/rules.md", "CLAUDE.md imports AGENTS.md",
-                                         *links, "firmware/CLAUDE.md imports firmware/notes.md"])
+                                         "firmware/CLAUDE.md imports firmware/notes.md"])
         self.assertIn("add it to \"kept\" in docs/process.json or move it under .claude/", unkept[0])
-        self.assertEqual(short(kept), ["AGENTS.md imports docs/more.md", *links])
+        self.assertEqual(short(kept), ["AGENTS.md imports docs/more.md"])
+
+    def test_a_link_on_the_way_to_what_the_owner_keeps_is_caught(self):
+        link = "120000"
+        for path, kept in (("docs", []), ("hardware", ["hardware/*"]), ("hardware/config", ["hardware/config/**"]),
+                           (".github", []), ("tools", []), (".claude", [])):
+            self.assertEqual(len(check_owner.link_errors([(link, "x", path)], kept)), 1, path)
+        self.assertEqual(check_owner.link_errors([(link, "x", "src"), (link, "x", "docs/guide")], ["hardware/*"]), [])
+
+    def test_links_where_the_owner_keeps_files_never_go_in(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            git_in(root, "init", "-q")
+            (root / "AGENTS.md").write_text("Rules.\n")
+            (root / "CLAUDE.md").symlink_to("AGENTS.md")
+            (root / "shared").mkdir()
+            (root / "shared/rules.md").write_text("More.\n")
+            (root / "linked").symlink_to("shared")
+            (root / "sub").mkdir()
+            (root / "sub/CLAUDE.md").write_text("See @../linked/rules.md\n")
+            (root / "notes.md").symlink_to("AGENTS.md")
+            commit_files(root, {}, "links")
+            saved, check_owner.ROOT = check_owner.ROOT, root
+            try:
+                entries = check_owner.tree(git_in(root, "rev-parse", "HEAD"))
+                links = check_owner.link_errors(entries, ["AGENTS.md"])
+                imports = check_owner.import_errors(entries, ["AGENTS.md"])
+            finally:
+                check_owner.ROOT = saved
+        self.assertEqual(len(links), 1, links)
+        self.assertIn("CLAUDE.md is a symlink where the owner keeps files", links[0])
+        self.assertEqual(len(imports), 1, imports)
+        self.assertIn("through linked, a symlink or submodule", imports[0])
 
 
     def owner_check(self, head_tree, changed, labels, reviews, head_kept=(), text=""):
@@ -641,25 +647,13 @@ class OwnerCheck(unittest.TestCase):
                                          "repository": {"full_name": "someone/project"}}))
             with mock.patch.multiple(
                     check_owner, tree=lambda commit: head_tree if commit == self.HEAD else [],
-                    changed_files=lambda base, head: changed, agents_account=lambda *args: "own",
+                    changed_files=lambda base, head: changed,
                     kept_patterns=lambda commit: list(head_kept) if commit == self.HEAD else [],
                     text_of=lambda object_id: text, released_files=lambda *args: set(),
                     labels=lambda repo, number: labels, reviews=lambda repo, number: reviews), \
                     mock.patch.dict("os.environ", {}, clear=False), contextlib.redirect_stdout(io.StringIO()):
                 os.environ.pop("GITHUB_RUN_ID", None)
                 return check_owner.main(["check_owner.py", str(event)])
-
-    def test_a_submodule_elsewhere_is_like_any_other_path(self):
-        head_tree = [("100644", "x", "src/app.py"), (check_owner.SUBMODULE, "x", "vendor/lib")]
-        for changed in (["src/app.py"], ["vendor/lib"]):
-            with self.subTest(changed=changed):
-                self.assertEqual(self.owner_check(head_tree, changed, ["code", "ok-without-reading"], []), 0)
-
-    def test_the_owners_approval_doesnt_let_a_link_in(self):
-        approved = [self.review("APPROVED")]
-        self.assertEqual(self.owner_check([], [".claude"], ["plan", "owner-review"], approved), 0)
-        self.assertEqual(self.owner_check([(check_owner.LINK, "x", ".claude")], [".claude"],
-                                          ["plan", "owner-review"], approved), 1)
 
     def test_an_import_goes_in_once_the_pull_request_keeps_it(self):
         head_tree = [("100644", "x", "CLAUDE.md"), ("100644", "y", "AGENTS.md")]
@@ -668,7 +662,7 @@ class OwnerCheck(unittest.TestCase):
         self.assertEqual(self.owner_check(*args, text="@AGENTS.md\n"), 1)
         self.assertEqual(self.owner_check(*args, head_kept=["AGENTS.md"], text="@AGENTS.md\n"), 0)
 
-    def test_symlinks_and_submodules_are_read_from_the_tree(self):
+    def test_the_tree_holds_files_symlinks_and_submodules(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             git_in(root, "init", "-q")
@@ -686,42 +680,35 @@ class OwnerCheck(unittest.TestCase):
         self.assertEqual(sorted((mode, path) for mode, _, path in entries),
                          [("100644", "agentstuff/settings.json"), ("120000", ".claude"), ("120000", "logo.svg"),
                           ("160000", "vendor/lib")])
-        self.assertEqual(len(check_owner.link_errors(entries, trees=entries)), 1)
 
     def test_the_paths_the_settings_keep_need_owner_review(self):
         kept = ["package.json", "src/payments/*", "*.toml"]
         for name, needs_owner in (("package.json", True), ("src/payments/charge/card.py", True),
                                   ("ruff.toml", True), ("src/app.py", False), ("web/package.json", False)):
             with self.subTest(name=name):
-                errors = check_owner.check(["code", "ok-without-reading"], [name], "own", [], self.HEAD, "agents",
+                errors = check_owner.check(["code", "ok-without-reading"], [name], [], self.HEAD, "agents",
                                            kept=kept)
                 self.assertEqual(bool(errors), needs_owner, errors)
 
-    def test_the_settings_come_from_the_base_and_owner_only_from_the_owner(self):
-        def config(account, kept):
-            return json.dumps({"project": {"agents_account": account}, "kept": kept})
+    def test_kept_patterns_are_read_from_the_settings(self):
+        def config(kept):
+            return json.dumps({"project": {}, "kept": kept})
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             git_in(root, "init", "-q")
-            empty = commit_files(root, {"docs/process.json": config("", ["package.json"])}, "template")
-            owner = commit_files(root, {"docs/process.json": config("owner", [])}, "setup")
-            own = commit_files(root, {"docs/process.json": config("own", "not a list")}, "own")
+            listed = commit_files(root, {"docs/process.json": config(["package.json"])}, "listed")
+            broken = commit_files(root, {"docs/process.json": config("not a list")}, "broken")
             saved, check_owner.ROOT = check_owner.ROOT, root
             try:
-                self.assertEqual(check_owner.kept_patterns(empty), ["package.json"])
-                self.assertEqual(check_owner.kept_patterns(own), [])
-                self.assertEqual(check_owner.agents_account(empty, owner, "Someone", "someone"), "owner")
-                self.assertEqual(check_owner.agents_account(empty, owner, "agents", "someone"), "own")
-                self.assertEqual(check_owner.agents_account(empty, owner, "agents", None), "owner")
-                self.assertEqual(check_owner.agents_account(owner, own, "agents", "someone"), "owner")
-                self.assertEqual(check_owner.agents_account(empty, empty), "own")
+                self.assertEqual(check_owner.kept_patterns(listed), ["package.json"])
+                self.assertEqual(check_owner.kept_patterns(broken), [])
             finally:
                 check_owner.ROOT = saved
 
     def test_released_files_need_no_approval_and_the_rest_counts_as_usual(self):
         changed = ["docs/process/rules.md", ".process-lock.json", "docs/backlog.md"]
         def errors(changed, released):
-            return check_owner.check(["plan", "ok-without-reading"], changed, "own", [], self.HEAD, "agents",
+            return check_owner.check(["plan", "ok-without-reading"], changed, [], self.HEAD, "agents",
                                      released=released)
         released = {"docs/process/rules.md", ".process-lock.json"}
         self.assertEqual(errors(changed, released), [])
@@ -820,11 +807,10 @@ class OwnerCheck(unittest.TestCase):
                                                           "user": {"login": "agents"}},
                                          "repository": {"full_name": "someone/project"}}))
             saved = {name: getattr(check_owner, name) for name in
-                     ("changed_files", "agents_account", "labels", "reviews", "released_files", "rerun_red",
+                     ("changed_files", "labels", "reviews", "released_files", "rerun_red",
                       "kept_patterns", "tree")}
             reran = []
             check_owner.changed_files = lambda base, head: ["src/app.py"]
-            check_owner.agents_account = lambda base, head, author, owner: "own"
             check_owner.kept_patterns = lambda base: []
             check_owner.tree = lambda commit: []
             check_owner.reviews = lambda repo, number: []
@@ -846,9 +832,6 @@ class OwnerCheck(unittest.TestCase):
                 for name, value in saved.items():
                     setattr(check_owner, name, value)
 
-    def test_with_the_owners_account_only_the_label_is_checked(self):
-        self.assertEqual(self.errors(["owner-review"], account="owner"), [])
-        self.assertEqual(len(self.errors(["ok-without-reading"], changed=["docs/plan.md"], account="owner")), 1)
 
 
 class TitleAgainstCommitRules(unittest.TestCase):
@@ -1076,11 +1059,9 @@ class DoctorMergeSettings(unittest.TestCase):
 
 
 class DoctorIdentity(unittest.TestCase):
-    def test_the_account_must_fit_agents_account(self):
-        self.assertIsNone(doctor.identity_problem("own", "agents-bot", "Owner"))
-        self.assertIn("agents_account is own", doctor.identity_problem("own", "owner", "Owner"))
-        self.assertIsNone(doctor.identity_problem("owner", "owner", "Owner"))
-        self.assertIn("agents_account is owner", doctor.identity_problem("owner", "agents-bot", "Owner"))
+    def test_gh_must_not_work_as_the_owner(self):
+        self.assertIsNone(doctor.identity_problem("agents-bot", "Owner"))
+        self.assertIn("repository's owner owner", doctor.identity_problem("owner", "Owner"))
 
 
 class Update(unittest.TestCase):
@@ -1125,9 +1106,8 @@ class Update(unittest.TestCase):
             self.assertEqual(check_pr.check(body, root, "Plan: update the process to 0.8.0", ["ok-without-reading"]), [])
 
     def test_the_owner_review_text_fits_why_the_owner_is_asked(self):
-        self.assertEqual(update.review(True, False), ("ok-without-reading", update.NO_REVIEW))
-        self.assertEqual(update.review(False, True), ("ok-without-reading", update.NO_REVIEW))
-        self.assertEqual(update.review(True, True), ("owner-review", update.APPROVE_ONLY))
+        self.assertEqual(update.review(False), ("ok-without-reading", update.NO_REVIEW))
+        self.assertEqual(update.review(True), ("owner-review", update.APPROVE_ONLY))
         text = update.APPROVE_ONLY.format(tag="v0.7.0", template="someone/template")
         self.assertIn("Approve only, no reading needed", text)
         self.assertIn("https://github.com/someone/template/releases/tag/v0.7.0", text)
@@ -1155,6 +1135,185 @@ class Sync(unittest.TestCase):
             entries = sync.changelog_since(template, "0.1.0")
             self.assertIn("## 0.2.0", entries)
             self.assertNotIn("## 0.1.0", entries)
+
+
+class Workflows(unittest.TestCase):
+    def test_a_workflow_skipping_drafts_must_run_when_they_leave_draft(self):
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            (root / ".github/workflows").mkdir(parents=True)
+            slow = "jobs:\n  macos:\n    if: github.event.pull_request.draft == false\n"
+            types = "on:\n  pull_request:\n    types: [opened, synchronize, reopened"
+            (root / ".github/workflows/project-checks.yml").write_text(types + "]\n" + slow, encoding="utf-8")
+            (root / ".github/workflows/project-other.yml").write_text("on: push\n", encoding="utf-8")
+            [found] = check.workflow_problems(root)
+            self.assertIn("project-checks.yml", found)
+            self.assertIn("docs/process/workflow.md#reviews-in-draft", found)
+            (root / ".github/workflows/project-checks.yml").write_text(types + ", ready_for_review]\n" + slow,
+                                                                       encoding="utf-8")
+            self.assertEqual(check.workflow_problems(root), [])
+            for skip in ("if: ${{ !github.event.pull_request.draft }}", "if: github.event.pull_request.draft != true"):
+                (root / ".github/workflows/project-checks.yml").write_text(
+                    "on:\n  pull_request:\njobs:\n  slow:\n    " + skip + "\n", encoding="utf-8")
+                self.assertEqual(len(check.workflow_problems(root)), 1, skip)
+
+
+T0 = merge.when("2026-11-15T10:56:00Z")
+
+
+def at(minutes):
+    return T0 + merge.timedelta(minutes=minutes)
+
+
+def run(name, minutes, status="completed", conclusion="success", event="pull_request", number=1):
+    return {"name": name, "workflow_id": name, "id": number, "event": event, "status": status,
+            "conclusion": conclusion, "created_at": at(minutes).isoformat().replace("+00:00", "Z")}
+
+
+class MergeDecision(unittest.TestCase):
+    def decide(self, runs, pushed=None, reopened=None, now=200, merged=1):
+        return merge.decide(runs, T0, None if merged is None else at(merged), pushed if pushed is None else at(pushed),
+                            None if reopened is None else at(reopened), at(now))
+
+    def test_green_runs_after_the_base_moved_merge(self):
+        self.assertEqual(self.decide([run("process-checks", 60), run("project", 61)]), ("merge", ""))
+
+    def test_runs_older_than_the_base_run_again_once(self):
+        runs = [run("process-checks", 60), run("project", -60)]
+        self.assertEqual(self.decide(runs)[0], "rerun")
+        self.assertEqual(self.decide(runs, reopened=-90)[0], "rerun")
+        self.assertEqual(self.decide(runs, reopened=195)[0], "wait")
+        self.assertEqual(self.decide(runs, reopened=100)[0], "stop")
+
+    def test_runs_after_main_moved_but_before_githubs_new_merge_run_again(self):
+        runs = [run("process-checks", 60)]
+        self.assertEqual(self.decide(runs, merged=90)[0], "rerun")
+        self.assertEqual(self.decide(runs, merged=None)[0], "rerun")
+        self.assertEqual(self.decide(runs, merged=30), ("merge", ""))
+
+    def test_a_skipped_run_never_hides_an_older_one(self):
+        red = run("e2e", 60, conclusion="failure", number=1)
+        skipped = run("e2e", 70, conclusion="skipped", number=2)
+        self.assertEqual(merge.latest_runs([red, skipped]), [red])
+        green = dict(red, conclusion="success", created_at=at(-10).isoformat().replace("+00:00", "Z"))
+        self.assertEqual(merge.latest_runs([green, skipped]), [green])
+        self.assertEqual(merge.latest_runs([skipped]), [skipped])
+        self.assertEqual(self.decide(merge.latest_runs([green, skipped, run("process-checks", 71)]))[0], "rerun")
+
+    def test_a_skipped_run_tested_nothing_so_its_age_doesnt_matter(self):
+        runs = [run("process-checks", 60), run("preview", -60, conclusion="skipped")]
+        self.assertEqual(self.decide(runs), ("merge", ""))
+        reopened = [run("process-checks", 196), run("preview", -60, conclusion="skipped")]
+        self.assertEqual(self.decide(reopened, reopened=195), ("merge", ""))
+
+    def test_right_after_reopening_runs_from_before_it_wait(self):
+        runs = [run("process-checks", 100, conclusion="failure")]
+        self.assertEqual(self.decide(runs, reopened=195)[0], "wait")
+
+    def test_a_red_run_is_not_run_again(self):
+        self.assertEqual(self.decide([run("project", 60, conclusion="failure")]), ("red", "failed: project"))
+
+    def test_a_cancelled_run_is_named_as_such(self):
+        self.assertEqual(self.decide([run("project", 60, conclusion="cancelled")]), ("cancelled", "project cancelled"))
+
+    def test_running_checks_wait(self):
+        self.assertEqual(self.decide([run("project", 60, status="in_progress", conclusion=None)])[0], "wait")
+
+    def test_no_runs_wait_then_run_again_then_stop(self):
+        self.assertEqual(self.decide([], pushed=195)[0], "wait")
+        self.assertEqual(self.decide([], pushed=100)[0], "rerun")
+        self.assertEqual(self.decide([], pushed=100, reopened=150)[0], "stop")
+
+    def test_the_newest_run_of_each_workflow_counts_review_events_included(self):
+        runs = [run("process-owner", 60, conclusion="failure", number=1),
+                run("process-owner", 70, event="pull_request_review", number=2),
+                run("project", 80, event="push", conclusion="failure", number=3)]
+        self.assertEqual(merge.latest_runs(runs), [runs[1]])
+
+
+class MergeCommand(unittest.TestCase):
+    HEAD, BASE = "h" * 40, "b" * 40
+
+    def fake(self, runs, merge_parent=None):
+        calls = []
+
+        def api(path, *args):
+            if path.endswith("/pulls/7"):
+                return {"state": "open", "draft": False, "title": "feat: a thing", "mergeable": True,
+                        "merge_commit_sha": "m" * 40, "head": {"sha": self.HEAD, "ref": "b-001-thing"},
+                        "base": {"ref": "main"}}
+            if "/git/ref/heads/main" in path:
+                return {"object": {"sha": self.BASE}}
+            if "/activity?ref=refs/heads/main" in path:
+                return [{"after": self.BASE, "timestamp": "2026-11-15T10:56:00Z"}]
+            if "/activity?" in path:
+                return [{"after": self.HEAD, "timestamp": "2026-11-15T11:00:00Z"}]
+            if "/actions/runs" in path:
+                return {"workflow_runs": runs}
+            if "/issues/7/events" in path:
+                return []
+            if "/commits/" + "m" * 40 in path:
+                return {"parents": [{"sha": merge_parent or self.BASE}],
+                        "commit": {"committer": {"date": "2026-11-15T10:57:00Z"}}}
+            raise AssertionError(path)
+
+        def gh(*args):
+            calls.append(args)
+            return ""
+        return api, gh, calls
+
+    def test_merges_the_approved_commit_by_squash_with_the_number_and_an_empty_body(self):
+        api, gh, calls = self.fake([run("project", 60)])
+        with mock.patch.object(merge, "api", api), mock.patch.object(merge, "gh", gh):
+            code, _ = merge.merge("o/r", "7", self.HEAD[:8])
+        self.assertEqual(code, 0)
+        self.assertEqual(calls, [("api", "-X", "PUT", "repos/o/r/pulls/7/merge", "-f", "merge_method=squash",
+                                  "-f", f"sha={self.HEAD}", "-f", "commit_title=feat: a thing (#7)",
+                                  "-f", "commit_message=")])
+
+    def test_red_checks_say_what_to_do(self):
+        for runs, expected in (([run("process-owner", 60, conclusion="failure")], "owner's Approve"),
+                               ([run("process-owner", 60, conclusion="failure"),
+                                 run("project", 61, conclusion="failure", number=2)], "Fix the red check"),
+                               ([run("project", 60, conclusion="failure")], "Fix the red check"),
+                               ([run("project", 60, conclusion="cancelled")], "gh run rerun")):
+            api, gh, calls = self.fake(runs)
+            with self.subTest(expected=expected), mock.patch.object(merge, "api", api), \
+                    mock.patch.object(merge, "gh", gh):
+                code, message = merge.merge("o/r", "7", self.HEAD)
+                self.assertEqual((code, calls), (1, []))
+                self.assertIn(expected, message)
+        self.assertNotIn("Fix", merge.red_message("failed: process-owner"))
+
+    def test_refuses_another_commit_than_the_approved_one(self):
+        api, gh, calls = self.fake([run("project", 60)])
+        with mock.patch.object(merge, "api", api), mock.patch.object(merge, "gh", gh):
+            code, message = merge.merge("o/r", "7", "c" * 8)
+        self.assertEqual((code, calls), (1, []))
+        self.assertIn("not cccccccc", message)
+
+    def test_reopens_only_once_github_merged_on_the_current_base(self):
+        api, gh, calls = self.fake([run("project", -60)], merge_parent="o" * 40)
+        with mock.patch.object(merge, "api", api), mock.patch.object(merge, "gh", gh), \
+                mock.patch.object(merge, "WAIT_SECONDS", 0), mock.patch.object(merge.time, "sleep"):
+            code, _ = merge.merge("o/r", "7", self.HEAD)
+        self.assertEqual((code, calls), (1, []))
+        api, gh, calls = self.fake([run("project", -60)])
+        with mock.patch.object(merge, "api", api), mock.patch.object(merge, "gh", gh):
+            code, message = merge.merge("o/r", "7", self.HEAD)
+        self.assertEqual(code, 1)
+        self.assertEqual([call[-1] for call in calls], ["state=closed", "state=open"])
+        self.assertIn("closed and reopened", message)
+
+    def test_a_failed_reopening_says_the_pull_request_is_closed(self):
+        def gh(*args):
+            if args[-1] == "state=open":
+                raise merge.Failed("boom")
+            return ""
+        with mock.patch.object(merge, "gh", gh), mock.patch.object(merge.time, "sleep"):
+            with self.assertRaises(merge.Failed) as raised:
+                merge.reopen("o/r", "7")
+        self.assertIn("left CLOSED", str(raised.exception))
 
 
 if __name__ == "__main__":

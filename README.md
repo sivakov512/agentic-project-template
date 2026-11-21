@@ -53,14 +53,10 @@ The details are in [`docs/process/`](docs/process/README.md).
 ## Start a project
 
 1. **Use this template** on GitHub to make a new repository.
-2. **Choose whose account the agents work under:**
-   - **an account of their own (recommended).** GitHub itself keeps what needs you from merging
-     without your Approve. It needs a second GitHub account, invited to the repository with Write
-     access (not Admin), with a token that may change workflow files; the repository under your
-     personal account, not an organisation; and your own login kept off wherever the agents run.
-   - **your account.** Simpler to set up, but the agents act with your full GitHub access, everything
-     carries your name, and only their rules stop a merge without your OK, which you give in the chat
-     or by merging yourself.
+2. **Give the agents a GitHub account of their own:** a second account, invited to the repository with
+   Write access (not Admin), with a token that may change workflow files. Keep the repository under your
+   personal account, not an organisation, and your own login off wherever the agents run. GitHub then
+   keeps what needs you from merging without your Approve.
 3. **Open an agent session** (Claude Code) in the repository, signed in to `git` and `gh` as that
    account, and say in a few lines what the project is.
 4. **The agent sets the project up.** It asks you what it needs to know: the goal, your tracker, how
@@ -74,10 +70,10 @@ what needs you.
 
 - At each gate: accept what the milestone delivered and agree the plan of the next one.
 - The decisions that plan names as yours (an interface, a file format, the stack), each when it is
-  ready. Reviewed risky code and decisions of those kinds the plan didn't name are offered to you, and
-  you can stop those offers until the milestone's end.
-- To use each milestone's result in your real work and say what came up: a milestone isn't finished
-  without it.
+  ready, and reviewed risky code and architecture changes, unless your plan says they go without you.
+  Say "stop asking me about this" or "ask again", and the coordinator writes it into your plan.
+- To try each milestone's result before its release, and to use the release in your real work and say
+  what came up: a milestone isn't finished without it.
 - Questions in a batch, each with a recommendation; an Approve on GitHub for what needs you; now and
   then a setting to click, or something only you can do (an account, money, hardware).
 
@@ -86,7 +82,8 @@ what needs you.
 - [`docs/process/`](docs/process/README.md): the process itself: rules for agents, roles, how a piece
   of work goes, pull requests, reports, decisions and traceability, setting up and updating.
 - `tools/process/`: the checks CI runs; `doctor.py`, which tells the coordinator what the setup is
-  missing; `update.py`, which brings a newer version of the process into a project.
+  missing; `merge.py`, the coordinator's merge; `update.py`, which brings a newer version of the process
+  into a project.
 - Placeholders for what is the project's own: `CLAUDE.md`, `docs/plan.md` (goal, milestones, releases),
   `docs/now.md` (where the work stands), `docs/backlog.md`, `docs/decisions/`, `docs/process.json`
   (settings the checks read).

@@ -1,109 +1,81 @@
 # Updating and changing the process
 
-The process lives in one place, the template repository named in `.process-lock.json`. Projects get
-it by copy and keep it the same as a released version of the template.
+The process lives in one place, the template repository named in `.process-lock.json`. Projects get it by
+copy and keep it the same as a released version of the template.
 
 ## The lock
 
-`.process-lock.json` holds the template's name, the version of the process, and a hash of every file
-that belongs to the template ([README.md](README.md#what-lives-where)).
+`.process-lock.json` holds the template's name, the version of the process, and a hash of every file that
+belongs to the template ([README.md](README.md#what-lives-where)).
 
-- `tools/process/check.py` fails when a template file differs from its hash, is missing, or isn't in
-  the lock, or when the lock's version isn't the newest in [CHANGELOG.md](CHANGELOG.md).
-- `tools/process/check_lock.py` compares a pull request with `main`'s lock: if it changes the template's
-  files, its lock must name a newer version than `main`'s.
-- `process-owner` lets the template's files in without the owner only when they are exactly those of
-  that release, and its tag is on the template's `main`.
+- `check.py` fails when a template file differs from its hash, is missing or isn't in the lock, or when
+  the lock's version isn't the newest in [CHANGELOG.md](CHANGELOG.md).
+- `check_lock.py` fails a pull request that changes the template's files without moving the lock to a
+  newer version than `main`'s.
+- `process-owner` lets the template's files in without the owner only when they are exactly those of a
+  release whose tag is on the template's `main`.
 
 ## Getting a newer process
 
-A project takes a new release of the template when it is worked on; a project nobody works on needs no
-update. `tools/process/doctor.py` says when a newer version is out.
+A project takes a new release when it is worked on; `doctor.py` says when one is out.
 
 1. The coordinator runs `python3 tools/process/update.py` with a clean working tree. It makes a branch
-   `process-update-X.Y.Z` from `main` as it is on GitHub, copies the template's files at the release
-   (refusing, before running anything of it, a release whose tag is not on the template's `main`), writes
-   the new lock, opens the pull request ("Backlog item: Process update", labelled `ok-without-reading`
-   unless step 3 sends it to the owner) with the changelog entries since the current version, and leaves
-   the checkout on that branch. It force-pushes that branch, its own, to replace one left from a run that
-   couldn't open its pull request, the one exception to "no force push". While any process update pull
-   request is open, it does nothing. A release may change `.github/workflows/process-*.yml`, so the
-   agents' account's git credentials must be allowed to change workflow files (a classic token's
-   `workflow` scope, or Workflows: write).
-2. In the same pull request the coordinator does what the entries' "Projects:" lines ask of the project
-   (a new key in `docs/process.json`, say). A step that needs a decision of the owner's, not only an OK
-   of what the step says, goes in a pull request of its own, opened right after the update merges; the
-   update's description names it, and the update merges without it. If the lines say they break open work
-   pull requests, it posts on each what to change, as "fix" findings, then starts "Fix pull request #N".
-3. If that changes nothing the owner keeps, the coordinator merges the update on its own once its checks
-   pass and its review, if it needs one ([workflow.md](workflow.md#how-a-piece-of-work-goes), step 5),
-   has no "fix" finding left, and the report lists it. If it does (the plan, the settings), the pull
-   request is labelled `owner-review` and goes to the owner, whose review covers only what the project
-   had to do. With the agents' own account, an update that changes files under `.github/` goes to the
-   owner too; `update.py` labels it `owner-review`, and its "Owner review" says that an Approve is all it
-   needs.
+   `process-update-X.Y.Z` from `main` on GitHub, copies the template's files at the release (refusing one
+   whose tag is not on the template's `main`), writes the lock, opens the pull request ("Backlog item:
+   Process update") with the changelog entries since the current version, and leaves the checkout on that
+   branch. It may force-push that branch, its own, the one exception to "no force push". While a process
+   update pull request is open, it does nothing. The agents' token must be allowed to change workflow
+   files.
+2. In the same pull request the coordinator does what the entries' "Projects:" lines ask. A step that
+   needs a decision of the owner's goes in a pull request of its own, after the update merges. Where the
+   lines say open pull requests break, it posts on each what to change, as "fix" findings.
+3. If that changes nothing the owner keeps, the coordinator merges the update once its checks pass and
+   its review, if it needs one, has no "fix" finding left. Otherwise (the plan, the settings, files under
+   `.github/`) it goes to the owner labelled `owner-review`, the owner's review covering only what the
+   project had to do; for files under `.github/` alone, an Approve is all it needs.
 
 ## When a release breaks the project
 
-If a merged release breaks the project (a check that blocks every pull request, say):
-
-1. The coordinator reverts the update's commit on `main` (`git revert`) in one pull request, `Plan: roll
-   the process back to X.Y.Z` (or `chore: ...` with Conventional Commits), with "Backlog item: Process
-   update", labelled `owner-review`, and tells the owner and the template's coordinator what broke. The
-   same pull request records in `docs/now.md`: "Process: stays on X.Y.Z; A.B.C broke <what>; take the
-   release after it". Its reviewer checks that it reverts the update's one commit and adds that line,
-   and nothing else.
-2. `process-lock` refuses a lock going back, so the owner removes it as a required check for this one
-   merge, and `process-owner` too when it is what broke (Settings > Rules > Rulesets > the ruleset for
-   `main` > Require status checks to pass > remove it > Save changes; with classic protection, Settings >
-   Branches > Edit), merges, and adds them back the same way at once.
-3. The coordinator then waits for the release that fixes it rather than taking the broken one again,
-   and treats `doctor.py`'s "A.B.C is out" as known while that line is in `docs/now.md`. The
-   coordinator's next record of `docs/now.md` after the update that takes the fixed release removes
-   the line.
+1. The coordinator reverts the update's commit in one pull request, `Plan: roll the process back to
+   X.Y.Z`, "Backlog item: Process update", labelled `owner-review`, which also records in `docs/now.md`:
+   "Process: stays on X.Y.Z; A.B.C broke <what>; take the release after it". It tells the owner and the
+   template's coordinator what broke.
+2. `process-lock` refuses a lock going back, so the owner removes it from the required checks for this
+   one merge, and `process-owner` too when that is what broke (Settings → Rules → Rulesets → the ruleset
+   for `main` → Require status checks to pass), merges, and adds them back at once.
+3. The coordinator waits for the release that fixes it, and removes the line from `docs/now.md` in the
+   update that takes it.
 
 ## Changing the process
 
-When the process gets in the way or misses something, the change is made in the template, never in a
-project. A project's coordinator writes the problem and the change it proposes to the owner; with the
-owner's yes it goes to the template as an issue, or as a pull request where the agents may open one,
-linking where it came from (the project's pull request or report).
+A change to the process is made in the template, never in a project. A project's coordinator writes the
+problem and the change it proposes to the owner; with the owner's yes it goes to the template as an issue
+or a pull request.
 
-In the template, the process files are its documents, and its coordinator changes them itself:
+In the template, its coordinator changes the process files itself:
 
-1. A pull request of kind `plan`, labelled `owner-review`, with "Backlog item: Process change", that
-   changes the template's files; a reviewer checks it as any other.
-2. The same pull request adds an entry at the top of [CHANGELOG.md](CHANGELOG.md): the new version, the
-   date, what changed, and a last line `Projects: …` saying what projects must do, or `Projects: nothing
-   to do.` A change that can fail a project's open pull requests (a new required section, a stricter
-   check) says what to fix in them. The version is `MAJOR.MINOR.PATCH`: patch for wording, minor for new
-   rules or files, major when projects must change something, a new required key in
-   `docs/process.json` included. While the version is 0.x, minor stands in for major too.
-3. It runs `python3 tools/process/lock.py`, which writes `.process-lock.json` for the new version, and
-   `python3 tools/process/check.py`.
-4. After the owner's OK, the coordinator merges, and nobody tags by hand: the workflow
-   `.github/workflows/template-release.yml` tags the last commit the merge put on `main` `vX.Y.Z`, the
-   version at the top of the changelog, and makes a GitHub release `X.Y.Z` of it with that entry as its
-   notes.
+1. A pull request of kind `plan`, labelled `owner-review`, "Backlog item: Process change", reviewed as
+   any other.
+2. It adds an entry at the top of [CHANGELOG.md](CHANGELOG.md): the version, the date, what changed, and
+   a last line `Projects: …` saying what projects must do, or `Projects: nothing to do.` A change that
+   can fail open pull requests says what to fix in them. Versions are `MAJOR.MINOR.PATCH`: patch for
+   wording, minor for new rules or files, major when projects must change something; while the version is
+   0.x, minor stands in for major.
+3. It runs `python3 tools/process/lock.py` and `python3 tools/process/check.py`.
+4. After the owner's Approve it merges. The workflow `template-release.yml` then tags the merge `vX.Y.Z`
+   and makes a GitHub release with the changelog entry as its notes; nobody tags by hand.
 
 ### Release tags
 
-- Projects trust a tag only when its commit is on the template's `main`. A tag made anywhere else
-  blocks that version's release, though: when the tag exists before the merge, off `main` or without a
-  release, the workflow fails red, and the owner deletes the tag (with the ruleset below turned off for
-  it) and runs the workflow again.
-- So that a release, once out, is never moved or deleted, the owner keeps a tag ruleset: Settings >
-  Rules > Rulesets > New ruleset > New tag ruleset; name `releases`, Enforcement status Active, Target
-  tags > Add target > Include by pattern `v*`; tick "Restrict updates" and "Restrict deletions" and
-  leave "Restrict creations" off, since the workflow makes the tags; no bypass list; Create.
-- The workflow runs only where the repository is the template its lock names.
-
-A fork that becomes a template of its own deletes `.process-lock.json` once and runs `lock.py`, which
-then names the fork.
+- Projects trust a tag only when its commit is on the template's `main`. A tag made before the merge
+  blocks the release: the workflow fails, and the owner deletes the tag and runs the workflow again.
+- A tag ruleset keeps releases from being moved or deleted: Settings → Rules → Rulesets → New tag
+  ruleset, name `releases`, Active, target pattern `v*`, "Restrict updates" and "Restrict deletions" on,
+  "Restrict creations" off, no bypass list.
+- The workflow runs only where the repository is the template its lock names. A fork that becomes a
+  template of its own deletes `.process-lock.json` once and runs `lock.py`.
 
 ### What the template's files hold
 
-- They describe the process only: they never name a project's milestones, documents or tools. A rule
-  that fits only one project belongs in that project's `CLAUDE.md` or `docs/plan.md`.
-- They never write `@` right before a path: `process-owner` reads that as an import, and fails in every
-  project where the path is a file the owner doesn't keep.
+- The process only: never a project's milestones, documents or tools.
+- Never an `@` right before a path: `process-owner` reads that as an import.
